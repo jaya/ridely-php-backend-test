@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'api-passengers',
+        'passwords' => 'passengers',
     ],
 
     /*
@@ -36,9 +36,13 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
+        'api-drivers' => [
+            'driver' => 'jwt',
+            'provider' => 'drivers',
+        ],
+        'api-passengers' => [
+            'driver' => 'jwt',
+            'provider' => 'passengers',
         ],
     ],
 
@@ -60,15 +64,14 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'drivers' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Driver::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'passengers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Passenger::class,
+        ],
     ],
 
     /*
@@ -93,6 +96,18 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'passengers' => [
+            'provider' => 'passengers',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'drivers' => [
+            'provider' => 'drivers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\RideController;
 
 /*
@@ -27,3 +28,8 @@ Route::post('/rides/cancel-ride', [RideController::class, 'cancelRide']);
 Route::post('/rides/accept-ride', [RideController::class, 'acceptRide']);
 Route::post('/rides/refuse-ride', [RideController::class, 'refuseRide']);
 Route::post('/rides/finish-ride', [RideController::class, 'finishRide']);
+
+// ->middleware('auth:api-passengers')
+Route::prefix('estimates')->group(function() {
+    Route::post('/calculate', [EstimateController::class, 'calculate']);
+});

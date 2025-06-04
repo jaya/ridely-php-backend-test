@@ -1,0 +1,50 @@
+version: '3.5'
+
+services:
+  cache:
+    image: redis:8
+    container_name: tiago-jayla-cache
+    command: --appendonly yes
+    volumes:
+      - .data/redis:/data
+    working_dir: /var/www/app
+    ports:
+      - "6379:6379"
+    networks:
+      - app_net
+
+  db:
+    image: postgres
+    container_name: tiago-jayla-db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_net
+
+  app:
+    build: .
+    container_name: tiago-jayla-app
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "80:8080"
+    depends_on:
+      - cache
+      - db
+    networks:
+      - app_net
+
+volumes:
+  pgsql_data: {}
+
+networks:
+  app_net:
+    driver: bridge
