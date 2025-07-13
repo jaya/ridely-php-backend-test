@@ -40,20 +40,42 @@ class RideController extends Controller
     {
         $fields = $request->all();
 
-        $driver = Driver::where('available', true)
-            ->orderBy('activation_date', 'asc')
-            ->first();
+        // Validação básica
+        // Basic validation
+        $request->validate([
+            'passenger.name' => 'required|string',
+            'passenger.email' => 'required|email',
+            'pick_up.latitude' => 'required|numeric',
+            'pick_up.longitude' => 'required|numeric',
+            'drop_off.latitude' => 'required|numeric',
+            'drop_off.longitude' => 'required|numeric'
+        ]);
 
-        if (!$driver) {
+        // Localização do passageiro
+        // Passenger localization
+        $pickupLat = $fields['pick_up']['latitude'];
+        $pickupLng = $fields['pick_up']['longitude'];
+
+        // Buscar todos os motoristas disponíveis com coordenadas
+        // Search all available drivers with coordinates
+        $drivers = Driver::where('available', true)->get();
+
+        if ($drivers->isEmpty()) {
             return response()->json(['error' => 'We do not have drivers available'], 400);
         }
+
+        // Encontrar o mais próximo com Haversine
+        // Find the nearest with Haversine
+        $closest = $drivers->sortBy(function ($driver) use ($pickupLat, $pickupLng) {
+            return $this->haversine($pickupLat, $pickupLng, $driver->latitude, $driver->longitude);
+        })->first();
 
         $ride = Ride::create([
             'passenger_name' => $fields['passenger']['name'],
             'passenger_email' => $fields['passenger']['email'],
-            'pick_up' => $fields['pick_up'],
-            'drop_off' => $fields['drop_off'],
-            'driver_id' => $driver->id
+            'pick_up' => "{$pickupLat},{$pickupLng}",
+            'drop_off' => "{$fields['drop_off']['latitude']},{$fields['drop_off']['longitude']}",
+            'driver_id' => $closest->id
         ]);
 
         $ride->request();
@@ -64,11 +86,11 @@ class RideController extends Controller
             'drop_off' => $ride->drop_off,
             'pick_up' => $ride->pick_up,
             'driver' => [
-                'name' => $driver->name,
+                'name' => $closest->name,
                 'car' => [
-                    'color' => $driver->car_color,
-                    'license_plate' => $driver->car_license_plate,
-                    'model' => $driver->car_model
+                    'color' => $closest->car_color,
+                    'license_plate' => $closest->car_license_plate,
+                    'model' => $closest->car_model
                 ]
             ]
         ]);
@@ -171,5 +193,16 @@ class RideController extends Controller
                 'status' => $ride->status,
             ];
         }));
+    }
+
+    private function haversine($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat / 2) ** 2 +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) ** 2;
+        return $earthRadius * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 }

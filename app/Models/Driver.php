@@ -16,6 +16,8 @@ class Driver extends Model
         'car_model',
         'car_color',
         'available',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
