@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Include the project variables
+if test -f .projectrc; then
+  source .projectrc
+elif test -f ./scripts/.projectrc; then
+  source ./scripts/.projectrc
+fi
+
+# get the clusters
+# echo "kubectl config get-contexts ${CLUSTER_NAME}"
+# if kubectl config get-contexts ${CLUSTER_NAME} &> /dev/null; then
+
+# get the clusters
+echo "kind get clusters | grep -q \"^${CLUSTER_NAME}$\""
+if kind get clusters | grep -q "^${CLUSTER_NAME}$"; then
+  echo "Cluster already exists"
+else
+  echo "Cluster doesn't exists, creating..."
+  echo "kind create cluster --name ${CLUSTER_NAME}"
+  kind create cluster --name ${CLUSTER_NAME}
+fi

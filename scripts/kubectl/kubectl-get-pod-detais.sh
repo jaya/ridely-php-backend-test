@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Include the project variables
+if test -f .projectrc; then
+  source .projectrc
+elif test -f ./scripts/.projectrc; then
+  source ./scripts/.projectrc
+fi
+
+if [ -z "$PROJECT_NAMESPACE" ]; then
+  echo '.projectrc file not found, please review the project settings, this file contains project variables for the scripts'
+  exit 1
+fi
+#
+#kubectl get pods -n $PROJECT_NAMESPACE
+#kubectl describe pod <nome-do-pod> -n $PROJECT_NAMESPACE
+#kubectl logs <nome-do-pod> -n $PROJECT_NAMESPACE
+
+# Suponha que você quer filtrar por pods com "ridely-database" no nome
+#POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep ridely-database | awk '{print $1}')
+POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep ridely-database | head -n 1 | awk '{print $1}')
+
+# Agora você pode usar $POD nos demais comandos:
+kubectl describe pod "$POD" -n $PROJECT_NAMESPACE
+kubectl logs "$POD" -n $PROJECT_NAMESPACE
+kubectl logs job/ridely-database-connection-test -n $PROJECT_NAMESPACE

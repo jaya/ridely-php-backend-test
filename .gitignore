@@ -1,13 +1,18 @@
-/.phpunit.cache
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/vendor
-.env
-.env.backup
-.env.production
-.phpunit.result.cache
+# backend
+# ridely_api
+/backend/apis/ridely_api/.phpunit.cache
+/backend/apis/ridely_api/public/build
+/backend/apis/ridely_api/public/hot
+/backend/apis/ridely_api/public/storage
+/backend/apis/ridely_api/storage/*.key
+/backend/apis/ridely_api/vendor
+/backend/apis/ridely_api/.env
+/backend/apis/ridely_api/.env.backup
+/backend/apis/ridely_api/.env.production
+/backend/apis/ridely_api/.phpunit.result.cache
 /.fleet
 /.idea
 /.vscode
+
+# docs
+/docs/plantuml.jar

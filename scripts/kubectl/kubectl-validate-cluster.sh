@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Include the project variables
+if test -f .projectrc; then
+  source .projectrc
+elif test -f ./scripts/.projectrc; then
+  source ./scripts/.projectrc
+fi
+
+if [ -z "$CLUSTER_NAME" ]; then
+  echo '.projectrc file not found, please review the project settings, this file contains project variables for the scripts'
+  exit 1
+fi
+
+echo '----------------------------------------'
+echo 'Validating cluster...'
+echo '----------------------------------------'
+
+echo "kubectl cluster-info --context ${CLUSTER_NAME}"
+kubectl cluster-info --context ${CLUSTER_NAME}
