@@ -19,6 +19,7 @@ if [ -z "$SHARED_DATABASE_CHART_NAME" ]; then
   exit 1
 fi
 
+ROOT_DIR=$(pwd)
 
 echo '----------------------------------------'
 echo 'Deleting database pvc'
@@ -41,3 +42,34 @@ if [ $? -ne 0 ]; then
   echo 'Trying to upgrade the existing one...'
    helm upgrade "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
 fi
+
+echo '----------------------------------------'
+echo 'Installing services chart'
+echo '----------------------------------------'
+echo 'Installing Auth Service chart'
+echo '----------------------------------------'
+echo 'Moving to the directory ./backend/charts/auth-service/'
+
+cd ./backend/charts/auth-service/
+
+if [ -z "$(ls -A ./charts)" ]; then
+#   echo 'Building dependency'
+#   helm dependency build
+   echo 'Updating dependency'
+   helm dependency update
+else
+  echo "Dependency already installed"
+fi
+
+echo "returning to root directory: $ROOT_DIR "
+cd $ROOT_DIR
+
+#helm dependency update "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"
+helm install "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values.yaml
+
+if [ $? -ne 0 ]; then
+  echo 'Trying to upgrade the existing one...'
+  helm upgrade "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/auth-service/values.yaml
+fi
+
+

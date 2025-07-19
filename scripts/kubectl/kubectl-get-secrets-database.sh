@@ -21,5 +21,10 @@ fi
 echo '----------------------------------------'
 echo 'Get Secrets for Database...'
 echo '----------------------------------------'
+echo "$SHARED_DATABASE_CHART_NAME-secret:"
 kubectl get secret --namespace "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-secret" -o jsonpath="{.data.mysql-root-password}" | base64 --decode
+echo ""
+
+echo "auth-service-postgresql:"
+kubectl get secret --namespace "$PROJECT_NAMESPACE" "auth-service-postgresql" -o jsonpath="{.data.password}" | base64 --decode
 echo ""

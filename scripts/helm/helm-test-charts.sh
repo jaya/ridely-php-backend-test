@@ -22,5 +22,13 @@ echo '----------------------------------------'
 echo 'Testing database chart...'
 echo '----------------------------------------'
 # database helm
-echo "helm test "$SHARED_DATABASE_CHART_NAME" -n "$PROJECT_NAMESPACE""
+echo "helm test \"$SHARED_DATABASE_CHART_NAME\" -n \"$PROJECT_NAMESPACE\""
 helm test "$SHARED_DATABASE_CHART_NAME" -n "$PROJECT_NAMESPACE"
+
+echo '----------------------------------------'
+echo 'Testing services chart'
+echo '----------------------------------------'
+echo 'Testing Auth Service chart'
+echo '----------------------------------------'
+echo "helm test \"auth-service\" -n \"$PROJECT_NAMESPACE\""
+helm test "auth-service" -n "$PROJECT_NAMESPACE"

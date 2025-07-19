@@ -18,7 +18,17 @@ if [ -z "$SHARED_DATABASE_CHART_NAME" ]; then
   exit 1
 fi
 #
-#echo '----------------------------------------'
-#echo 'Validating cluster...'
-#echo '----------------------------------------'
-kubectl port-forward "svc/$SHARED_DATABASE_CHART_NAME" 3306:3306 -n "$PROJECT_NAMESPACE"
+echo '----------------------------------------'
+echo 'Port forwarding...'
+echo '----------------------------------------'
+echo "kubectl port-forward svc/$SHARED_DATABASE_CHART_NAME 3306:3306 -n $PROJECT_NAMESPACE"
+kubectl port-forward "svc/$SHARED_DATABASE_CHART_NAME" 3306:3306 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
+
+echo "kubectl port-forward svc/auth-service-postgresql 5432:5432 -n $PROJECT_NAMESPACE"
+kubectl port-forward "svc/auth-service-postgresql" 5432:5432 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
+
+export POD_NAME=$(kubectl get pods --namespace "$PROJECT_NAMESPACE" -l "app.kubernetes.io/name=keycloak" -o jsonpath="{.items[0].metadata.name}")
+echo "kubectl port-forward $POD_NAME 8080:8080 -n $PROJECT_NAMESPACE"
+kubectl port-forward "$POD_NAME" 8080:8080 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
+
+

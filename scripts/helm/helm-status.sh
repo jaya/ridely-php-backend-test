@@ -20,8 +20,14 @@ if [ -z "$SHARED_DATABASE_CHART_NAME" ]; then
 fi
 
 echo '----------------------------------------'
-echo 'Validating the status of a chart...'
+echo 'Validating database chart status'
 echo '----------------------------------------'
 # database helm
 helm status "$SHARED_DATABASE_CHART_NAME" -n "$PROJECT_NAMESPACE"
 
+echo '----------------------------------------'
+echo 'Validating services chart status'
+echo '----------------------------------------'
+echo 'Auth Service chart'
+echo '----------------------------------------'
+helm status "auth-service" -n "$PROJECT_NAMESPACE"
