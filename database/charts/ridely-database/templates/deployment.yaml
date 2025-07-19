@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ include "ridely-database.fullname" . }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ include "ridely-database.fullname" . }}
@@ -15,7 +15,6 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: mysql:8
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
