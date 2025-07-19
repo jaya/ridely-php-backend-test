@@ -22,6 +22,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "ridely-database.fullname" . }}-secret
                   key: mysql-root-password
+            - name: MYSQL_HEALTHCHECK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-database.fullname" . }}-secret
+                  key: mysql-healthcheck-password
           volumeMounts:
             - name: mysql-storage
               mountPath: /var/lib/mysql
@@ -29,14 +34,6 @@ spec:
             - name: {{ .Chart.Name }}
               containerPort: 3306
               protocol: TCP
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /*/}}
-{{/*              port: http*/}}
           resources:
             limits:
               cpu: 300m
@@ -48,16 +45,3 @@ spec:
         - name: mysql-storage
           persistentVolumeClaim:
             claimName: {{ include "ridely-database.fullname" . }}-pvc
-{{/*      {{- with .Values.nodeSelector }}*/}}
-{{/*      nodeSelector:*/}}
-{{/*        {{- toYaml . | nindent 8 }}*/}}
-{{/*      {{- end }}*/}}
-{{/*      {{- with .Values.affinity }}*/}}
-{{/*      affinity:*/}}
-{{/*        {{- toYaml . | nindent 8 }}*/}}
-{{/*      {{- end }}*/}}
-{{/*      {{- with .Values.tolerations }}*/}}
-{{/*      tolerations:*/}}
-{{/*        {{- toYaml . | nindent 8 }}*/}}
-{{/*      {{- end }}*/}}
-
