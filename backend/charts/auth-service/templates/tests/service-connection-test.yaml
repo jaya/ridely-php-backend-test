@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "auth-service.name" . }}-connection-test
+  labels:
+    app: {{ include "auth-service.name" . }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  template:
+    spec:
+      containers:
+        - name: curl
+          image: curlimages/curl:8.5.0
+          command:
+            - "sh"
+            - "-c"
+            - >
+              echo "Testing Keycloak health...";
+              HOST="http://{{ include "auth-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local";
+              URL="$HOST:80/realms/master";
+              echo "Host: $HOST";
+              echo "URL: $URL";
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $URL);
+              if [ "$HTTP_CODE" -ne 200 ]; then
+                echo "Keycloak test failed with HTTP $HTTP_CODE";
+                exit 1;
+              else
+                echo "Keycloak is healthy";
+              fi
+      restartPolicy: Never

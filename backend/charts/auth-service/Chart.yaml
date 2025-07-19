@@ -1,0 +1,11 @@
+apiVersion: v2
+name: auth-service-keycloak
+description: Keycloak with MySQL
+type: application
+version: 0.1.0
+appVersion: "24.0.1"
+
+dependencies:
+  - name: keycloak
+    version: "19.3.4"
+    repository: "https://charts.bitnami.com/bitnami"

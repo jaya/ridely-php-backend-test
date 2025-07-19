@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm
+  labels:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/component: realm-config
+  annotations:
+    "helm.sh/resource-policy": keep
+data:
+  realm.json: |-
+{{ .Files.Get "files/realms/realms-export.json" | indent 4 }}

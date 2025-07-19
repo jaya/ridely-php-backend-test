@@ -1,0 +1,31 @@
+keycloak:
+  auth:
+    adminUser: admin
+    adminPassword: password
+
+  extraEnvVars:
+  - name: KEYCLOAK_IMPORT
+    value: /opt/bitnami/keycloak/data/import/realm.json
+  - name: KEYCLOAK_EXTRA_ARGS
+    value: "--import-realm"
+
+  global:
+    postgresql:
+      enabled: true
+      auth:
+        username: keycloak
+        database: keycloak
+        password: postgrespassword
+
+  extraVolumes:
+    - name: realm-volume
+      configMap:
+        name: keycloak-realm
+
+  extraVolumeMounts:
+    - name: realm-volume
+      mountPath: /opt/bitnami/keycloak/data/import
+      readOnly: true
+
+
+# https://medium.com/@kaloyanmanev/bitnami-keycloack-inside-docker-compose-import-realm-on-startup-3627a7da7f39
