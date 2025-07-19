@@ -1,3 +1,5 @@
 PROJECT_NAME=ridely-archtecture
 PROJECT_NAMESPACE=ridely
 CLUSTER_NAME=ridely-cluster
+
+SHARED_DATABASE_CHART_NAME=ridely-database

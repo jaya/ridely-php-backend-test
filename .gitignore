@@ -1,15 +1,15 @@
 # backend
-# ridely_api
-/backend/apis/ridely_api/.phpunit.cache
-/backend/apis/ridely_api/public/build
-/backend/apis/ridely_api/public/hot
-/backend/apis/ridely_api/public/storage
+# ridely-api
+/backend/apis/ridely-api/.phpunit.cache
+/backend/apis/ridely-api/public/build
+/backend/apis/ridely-api/public/hot
+/backend/apis/ridely-api/public/storage
 /backend/apis/ridely_api/storage/*.key
-/backend/apis/ridely_api/vendor
-/backend/apis/ridely_api/.env
-/backend/apis/ridely_api/.env.backup
-/backend/apis/ridely_api/.env.production
-/backend/apis/ridely_api/.phpunit.result.cache
+/backend/apis/ridely-api/vendor
+/backend/apis/ridely-api/.env
+/backend/apis/ridely-api/.env.backup
+/backend/apis/ridely-api/.env.production
+/backend/apis/ridely-api/.phpunit.result.cache
 /.fleet
 /.idea
 /.vscode

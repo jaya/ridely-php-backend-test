@@ -1,4 +1,14 @@
 #!/bin/bash
+# use the set -u command to ensure all variables are set before using
+set -u
+
+# Include the project variables file
+if test -f .projectrc; then
+  source .projectrc
+elif test -f ./scripts/.projectrc; then
+  source ./scripts/.projectrc
+fi
+
 # For AMD64 / x86_64
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
 # For ARM64

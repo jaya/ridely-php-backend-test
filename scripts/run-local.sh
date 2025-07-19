@@ -1,6 +1,8 @@
 #!/bin/bash
+# use the set -u command to ensure all variables are set before using
+set -u
 
-# Include the project variables
+# Include the project variables file
 if test -f .projectrc; then
   source .projectrc
 elif test -f ./scripts/.projectrc; then
@@ -15,6 +17,7 @@ if [ -z "$PROJECT_NAME" ]; then
   exit 1
 else
   echo "Project name: ${PROJECT_NAME}"
+  echo "Project namespace: ${PROJECT_NAMESPACE}"
   echo "Cluster name: ${CLUSTER_NAME}"
 fi
 
@@ -36,7 +39,7 @@ else
 fi
 
 echo '----------------------------------------'
-echo 'Checking cluster'
+echo 'Checking namespace'
 echo '----------------------------------------'
 bash ./scripts/kubectl/kubectl-create-namespace.sh
 
@@ -70,10 +73,11 @@ echo '----------------------------------------'
 helm list -n $PROJECT_NAMESPACE
 kubectl get all -n $PROJECT_NAMESPACE
 
-echo '----------------------------------------'
-echo 'Testing charts'
-echo '----------------------------------------'
-bash ./scripts/helm/helm-test-charts.sh
+# This steps already run because it is a job
+#echo '----------------------------------------'
+#echo 'Testing charts'
+#echo '----------------------------------------'
+#bash ./scripts/helm/helm-test-charts.sh
 
 echo '----------------------------------------'
 echo 'Port Forward'
