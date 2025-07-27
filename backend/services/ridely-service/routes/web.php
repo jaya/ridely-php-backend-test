@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,7 +18,5 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-// Health check
-Route::get('/health', function () {
-    return response()->json(['status' => 'ok']);
-});
+Route::get('/', [AppController::class, 'index']);
+Route::get('/health', [AppController::class, 'alive']);

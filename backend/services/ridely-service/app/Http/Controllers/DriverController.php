@@ -7,9 +7,31 @@ use App\Models\Driver;
 use App\Models\Ride;
 use App\Exceptions\DriverException;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Annotations as OA;
 
 class DriverController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/drivers",
+     *     summary="Cria um novo motorista",
+     *     tags={"Driver"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "car"},
+     *             @OA\Property(property="name", type="string", example="Carlos"),
+     *             @OA\Property(property="car", ref="#/components/schemas/Car"),
+     *             @OA\Property(property="available", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Driver criado com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/Driver")
+     *     )
+     * )
+     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->all();
@@ -35,6 +57,28 @@ class DriverController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/drivers/{id}",
+     *     summary="Remove um motorista",
+     *     tags={"Driver"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID do driver",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Driver removido com sucesso"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Driver não encontrado"
+     *     )
+     * )
+     */
     public function destroy($id): JsonResponse
     {
         $driver = Driver::findOrFail($id);
@@ -43,6 +87,35 @@ class DriverController extends Controller
         return response()->json(null, 204);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/drivers/{id}/open-rides",
+     *     summary="Lista corridas abertas para um motorista",
+     *     tags={"Driver"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID do driver",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de rides abertas",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Ride")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Nenhuma corrida aberta",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="No rides waiting to be accepted")
+     *         )
+     *     )
+     * )
+     */
     public function getOpenRides($id): JsonResponse
     {
         $driver = Driver::findOrFail($id);

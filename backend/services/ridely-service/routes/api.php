@@ -15,7 +15,6 @@ use App\Http\Controllers\RideController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
 Route::post('/drivers', [DriverController::class, 'store']);
 Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
 Route::get('/drivers/{id}/get-rides', [DriverController::class, 'getOpenRides']);
