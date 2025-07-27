@@ -1,0 +1,815 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Ridely Service",
+        "description": "Provide Taxi services",
+        "version": "1.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Root endpoint",
+                "operationId": "9a1fcb6838228d4c219920618151d5bd",
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RootSchema"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Health check endpoint",
+                "operationId": "1b08f26c6d3e6712513ec64ace17c564",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/api/drivers": {
+            "post": {
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Cria um novo motorista",
+                "operationId": "6bdf167696d642223e0d27e88a0b4896",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "car"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Carlos"
+                                    },
+                                    "car": {
+                                        "$ref": "#/components/schemas/Car"
+                                    },
+                                    "available": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Driver criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Driver"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/drivers/{id}": {
+            "delete": {
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Remove um motorista",
+                "operationId": "c32adc70b84b5c4d5f214e60757aaee3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do driver",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Driver removido com sucesso"
+                    },
+                    "404": {
+                        "description": "Driver não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/drivers/{id}/open-rides": {
+            "get": {
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Lista corridas abertas para um motorista",
+                "operationId": "4259d1c29c868e72923df1f15e8a9aa3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do driver",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de rides abertas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Ride"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhuma corrida aberta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No rides waiting to be accepted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rides/{id}": {
+            "get": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Buscar detalhes de uma corrida",
+                "operationId": "7f96668377fce18b120c31e371b5b9a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhes da corrida",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RideFull"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Remover uma corrida",
+                "operationId": "5721d2736b2d96864b9d9be576307b24",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Corrida removida"
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada"
+                    }
+                }
+            }
+        },
+        "/api/rides/request": {
+            "post": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Solicitar motorista",
+                "operationId": "9283744df978faa70c0f7ac4aa01d0cf",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "passenger",
+                                    "pick_up",
+                                    "drop_off"
+                                ],
+                                "properties": {
+                                    "passenger": {
+                                        "$ref": "#/components/schemas/Passenger"
+                                    },
+                                    "pick_up": {
+                                        "type": "string",
+                                        "example": "Rua X, 200"
+                                    },
+                                    "drop_off": {
+                                        "type": "string",
+                                        "example": "Av. Brasil, 1000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corrida criada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RideFull"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Não há motoristas disponíveis",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "We do not have drivers available"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rides/cancel": {
+            "post": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Cancelar corrida",
+                "operationId": "b54fea99fc1835ae6f60ba27ec80e093",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corrida cancelada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RideSimple"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada"
+                    }
+                }
+            }
+        },
+        "/api/rides/accept": {
+            "post": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Aceitar corrida",
+                "operationId": "3ad14b66a9da5a66ec3bfde3d7735bfa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corrida aceita",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "accepted"
+                                        },
+                                        "drop_off": {
+                                            "type": "string",
+                                            "example": "Av. Brasil, 1000"
+                                        },
+                                        "pick_up": {
+                                            "type": "string",
+                                            "example": "Rua X, 200"
+                                        },
+                                        "passenger": {
+                                            "$ref": "#/components/schemas/Passenger"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida ou motorista não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/rides/refuse": {
+            "post": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Recusar corrida",
+                "operationId": "b61d1fa412a3ae239198c4d952164873",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corrida recusada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "refused"
+                                        },
+                                        "drop_off": {
+                                            "type": "string",
+                                            "example": "Av. Brasil, 1000"
+                                        },
+                                        "pick_up": {
+                                            "type": "string",
+                                            "example": "Rua X, 200"
+                                        },
+                                        "passenger": {
+                                            "$ref": "#/components/schemas/Passenger"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada"
+                    }
+                }
+            }
+        },
+        "/api/rides/finish": {
+            "post": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Finalizar corrida",
+                "operationId": "ca98aa2e6833782d17c4445b0128ba21",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Corrida finalizada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "finished"
+                                        },
+                                        "drop_off": {
+                                            "type": "string",
+                                            "example": "Av. Brasil, 1000"
+                                        },
+                                        "price": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 25
+                                        },
+                                        "passenger": {
+                                            "$ref": "#/components/schemas/Passenger"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada"
+                    }
+                }
+            }
+        },
+        "/api/drivers/{driverId}/open-rides": {
+            "get": {
+                "tags": [
+                    "Ride"
+                ],
+                "summary": "Listar corridas abertas para motorista",
+                "operationId": "fa7d7c7deb7bdd59045635663ab91a30",
+                "parameters": [
+                    {
+                        "name": "driverId",
+                        "in": "path",
+                        "description": "ID do motorista",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de corridas abertas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RideSimple"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Motorista indisponível",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Driver is not available"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhuma corrida aberta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No rides waiting to be accepted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Car": {
+                "required": [
+                    "license_plate",
+                    "model",
+                    "color"
+                ],
+                "properties": {
+                    "license_plate": {
+                        "type": "string",
+                        "example": "ABC1234"
+                    },
+                    "model": {
+                        "type": "string",
+                        "example": "Fiat Uno"
+                    },
+                    "color": {
+                        "type": "string",
+                        "example": "Vermelho"
+                    }
+                },
+                "type": "object"
+            },
+            "Driver": {
+                "required": [
+                    "id",
+                    "name",
+                    "car",
+                    "available"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Carlos"
+                    },
+                    "car": {
+                        "$ref": "#/components/schemas/Car"
+                    },
+                    "available": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "DriverShort": {
+                "required": [
+                    "name",
+                    "car"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Carlos"
+                    },
+                    "car": {
+                        "$ref": "#/components/schemas/Car"
+                    }
+                },
+                "type": "object"
+            },
+            "Passenger": {
+                "required": [
+                    "name",
+                    "email"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Maria"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "maria@email.com"
+                    }
+                },
+                "type": "object"
+            },
+            "RideFull": {
+                "required": [
+                    "id",
+                    "status",
+                    "pick_up",
+                    "drop_off"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "requested"
+                    },
+                    "pick_up": {
+                        "type": "string",
+                        "example": "Rua X, 200"
+                    },
+                    "drop_off": {
+                        "type": "string",
+                        "example": "Av. Brasil, 1000"
+                    },
+                    "driver": {
+                        "$ref": "#/components/schemas/DriverShort"
+                    },
+                    "passenger": {
+                        "$ref": "#/components/schemas/Passenger"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 25
+                    }
+                },
+                "type": "object"
+            },
+            "Ride": {
+                "required": [
+                    "id",
+                    "status",
+                    "drop_off",
+                    "pick_up",
+                    "passenger"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "waiting"
+                    },
+                    "drop_off": {
+                        "type": "string",
+                        "example": "Av. Brasil, 1000"
+                    },
+                    "pick_up": {
+                        "type": "string",
+                        "example": "Rua X, 200"
+                    },
+                    "passenger": {
+                        "$ref": "#/components/schemas/Passenger"
+                    }
+                },
+                "type": "object"
+            },
+            "RideSimple": {
+                "required": [
+                    "id",
+                    "status",
+                    "pick_up",
+                    "drop_off"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "requested"
+                    },
+                    "pick_up": {
+                        "type": "string",
+                        "example": "Rua X, 200"
+                    },
+                    "drop_off": {
+                        "type": "string",
+                        "example": "Av. Brasil, 1000"
+                    }
+                },
+                "type": "object"
+            },
+            "RootSchema": {
+                "required": [
+                    "app"
+                ],
+                "properties": {
+                    "app": {
+                        "type": "string",
+                        "example": "ridely-service:1.0.0"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Public",
+            "description": "Public"
+        },
+        {
+            "name": "Driver",
+            "description": "Driver"
+        },
+        {
+            "name": "Ride",
+            "description": "Ride"
+        }
+    ]
+}
