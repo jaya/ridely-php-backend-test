@@ -1,6 +1,6 @@
 #!/bin/bash
 # use the set -u command to ensure all variables are set before using
-set -u
+#set -u
 
 # Include the project variables file
 if test -f .projectrc; then
@@ -27,7 +27,10 @@ fi
 #SERVICE=$SHARED_DATABASE_CHART_NAME
 #POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep "$SERVICE" | head -n 1 | awk '{print $1}')
 
-SERVICE=auth-service-keycloak
+SERVICE="auth-service-keycloak"
+if [ ! -z "$1" ]; then
+  SERVICE=$1
+fi
 POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep "$SERVICE" | head -n 1 | awk '{print $1}')
 
 # Agora você pode usar $POD nos demais comandos:

@@ -1,15 +1,15 @@
 # backend
-# ridely-api
-/backend/services/ridely-api/.phpunit.cache
-/backend/services/ridely-api/public/build
-/backend/services/ridely-api/public/hot
-/backend/services/ridely-api/public/storage
+# ridely-service
+/backend/services/ridely-service/.phpunit.cache
+/backend/services/ridely-service/public/build
+/backend/services/ridely-service/public/hot
+/backend/services/ridely-service/public/storage
 /backend/apis/ridely_api/storage/*.key
-/backend/services/ridely-api/vendor
-/backend/services/ridely-api/.env
-/backend/services/ridely-api/.env.backup
-/backend/services/ridely-api/.env.production
-/backend/services/ridely-api/.phpunit.result.cache
+/backend/services/ridely-service/vendor
+/backend/services/ridely-service/.env
+/backend/services/ridely-service/.env.backup
+/backend/services/ridely-service/.env.production
+/backend/services/ridely-service/.phpunit.result.cache
 /.fleet
 /.idea
 /.vscode
@@ -17,3 +17,5 @@
 # docs
 /docs/plantuml.jar
 /backend/charts/auth-service/charts/keycloak-19.3.4.tgz
+/backend/services/ridely-service/docker/nginx/certificate.crt
+/backend/services/ridely-service/docker/nginx/certificate.key

@@ -32,3 +32,6 @@ echo "kubectl port-forward $POD_NAME 8080:8080 -n $PROJECT_NAMESPACE"
 kubectl port-forward "$POD_NAME" 8080:8080 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
 
 
+export POD_NAME=$(kubectl get pods --namespace "$PROJECT_NAMESPACE" -l "app=ridely-service" -o jsonpath="{.items[0].metadata.name}")
+echo "kubectl port-forward $POD_NAME 8000:80 -n $PROJECT_NAMESPACE"
+kubectl port-forward "$POD_NAME" 8000:80 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &

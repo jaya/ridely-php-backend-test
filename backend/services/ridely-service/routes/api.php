@@ -27,3 +27,4 @@ Route::post('/rides/cancel-ride', [RideController::class, 'cancelRide']);
 Route::post('/rides/accept-ride', [RideController::class, 'acceptRide']);
 Route::post('/rides/refuse-ride', [RideController::class, 'refuseRide']);
 Route::post('/rides/finish-ride', [RideController::class, 'finishRide']);
+

@@ -1,0 +1,30 @@
+replicaCount: 1
+
+images:
+  nginx:
+    repository: ridely-service-nginx
+    tag: latest
+    pullPolicy: IfNotPresent
+  php:
+    repository: ridely-service
+    tag: latest
+    pullPolicy: IfNotPresent
+
+app:
+  appKey: "base64:FF7T5Jj4AnEY80EmNzcP5Vm5HbEWnTgz2ea8DBGFG/A="
+
+env:
+  APP_ENV: production
+  APP_DEBUG: "false"
+  DB_CONNECTION: mysql
+  DB_HOST: ridely-database
+  DB_PORT: 3306
+#  DB_DATABASE: laravel
+#  DB_USERNAME: laravel
+  DB_DATABASE: ridely
+  DB_USERNAME: root
+  #DB_HOST=0.0.0.0
+  #DB_PORT=3306
+  #DB_DATABASE=ridely
+  #DB_USERNAME=root
+  #DB_PASSWORD=ridely

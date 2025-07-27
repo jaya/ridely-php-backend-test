@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ridely-service.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "ridely-service.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ridely-service.name" . }}
+    spec:
+      # TODO revisar para que o PHP possa ter mais instancias quando necessário
+      containers:
+        - name: nginx
+          image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
+          imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/app.conf
+              subPath: app.conf
+        - name: laravel
+          image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
+          imagePullPolicy: {{ .Values.images.php.pullPolicy }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: database-password
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: app-key
+          ports:
+            - containerPort: 9000
+          resources:
+            limits:
+              cpu: 200m
+              memory: 400Mi
+            requests:
+              cpu: 200m
+              memory: 400Mi
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ include "ridely-service.fullname" . }}-nginx-conf
