@@ -54,8 +54,20 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['json'],
             'ignore_exceptions' => false,
+        ],
+
+        'json' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/laravel-json.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+            'formatter' => Monolog\Formatter\JsonFormatter::class,
+            'formatter_with' => [
+                'batchMode' => Monolog\Formatter\JsonFormatter::BATCH_MODE_JSON,
+                'appendNewline' => true,
+            ],
         ],
 
         'single' => [
@@ -126,6 +138,7 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
     ],
 
 ];

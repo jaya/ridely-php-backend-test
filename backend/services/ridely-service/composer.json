@@ -48,7 +48,7 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "init": "./scripts/init.sh"
+        "preenv": "./scripts/init.sh"
     },
     "extra": {
         "laravel": {

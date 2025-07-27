@@ -14,6 +14,10 @@ app:
   appKey: "base64:FF7T5Jj4AnEY80EmNzcP5Vm5HbEWnTgz2ea8DBGFG/A="
 
 env:
+  LOG_CHANNEL: stack
+  LOG_STACK_CHANNELS: json
+  LOG_LEVEL: debug
+
   APP_ENV: production
   APP_DEBUG: "false"
   DB_CONNECTION: mysql
