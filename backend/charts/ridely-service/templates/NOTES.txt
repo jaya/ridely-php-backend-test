@@ -1,18 +1,52 @@
-{{/*To get the password:*/}}
-{{/*  kubectl -n {{ .Release.Namespace }} get secret auth-service-keycloak -o jsonpath='{.data.admin-password}' | base64 -d*/}}
+✅ Ridely Service has been deployed!
+
+🔧 Access your service (inside the cluster):
+
+  http://{{ include "ridely-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
 
 
-{{/*To access your Keycloak instance:*/}}
+🌐 Local testing via Port Forward:
 
-{{/*  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name=keycloak" -o jsonpath="{.items[0].metadata.name}")*/}}
-{{/*  kubectl port-forward --namespace {{ .Release.Namespace }} $POD_NAME 8080:8080*/}}
+  kubectl port-forward svc/{{ include "ridely-service.fullname" . }} 8000:80 -n {{ .Release.Namespace }}
 
-{{/*Then open your browser and go to:*/}}
-{{/*  http://127.0.0.1:8080*/}}
+> Then open in your browser: http://localhost:8000
 
-{{/*Test endpoint:*/}}
-{{/*  "http://auth-service-keycloak.{{ .Release.Namespace }}.svc.cluster.local:80/realms/master";*/}}
 
-{{/*Login with:*/}}
-{{/*  Username: {{ .Values.keycloak.auth.adminUser }}*/}}
-{{/*  Password: {{ .Values.keycloak.auth.adminPassword }}*/}}
+📦 Containers:
+- nginx: {{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}
+- php (Laravel): {{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}
+
+📂 Mounted config:
+- nginx.conf and app.conf via ConfigMap: {{ include "ridely-service.fullname" . }}-nginx-conf
+
+🔑 Secrets used:
+- {{ include "ridely-service.fullname" . }}-secret for DB_PASSWORD and APP_KEY
+
+🚀 Migrations:
+{{- if .Values.migrate.enabled }}
+A Kubernetes Job was created to run Laravel database migrations:
+
+  kubectl logs job/{{ include "ridely-service.fullname" . }}-migrate -n {{ .Release.Namespace }}
+
+To re-run the migration job manually:
+
+  helm uninstall {{ .Release.Name }}-migrate -n {{ .Release.Namespace }}
+  helm upgrade --install {{ .Release.Name }} ./backend/charts/ridely-service -n {{ .Release.Namespace }} --values ./backend/charts/ridely-service/values.yaml
+
+{{- else }}
+⚠️ Migrations were disabled via `.Values.migrate.enabled = false`.
+You can enable them in `values.yaml` to run migrations on deploy.
+
+{{- end }}
+
+🔍 Debug:
+
+  kubectl get all -n {{ .Release.Namespace }}
+  kubectl describe deploy/{{ include "ridely-service.fullname" . }} -n {{ .Release.Namespace }}
+  kubectl logs deploy/{{ include "ridely-service.fullname" . }} -c laravel -n {{ .Release.Namespace }}
+
+🧼 To uninstall everything:
+
+  helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+

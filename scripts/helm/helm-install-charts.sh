@@ -25,12 +25,19 @@ CHART=$1
 if [ ! -z "$CHART" ]; then
   echo "Target chart: $CHART"
 
-  helm install "$CHART" "./backend/charts/$CHART/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/$CHART/values.yaml
+  # Check if the chart required is "ridely-database"
+  if [ "$CHART" = "ridely-database" ]; then
+    CHART_PATH="./database/charts/$CHART"
+  else
+    CHART_PATH="./backend/charts/$CHART"
+  fi
 
-    if [ $? -ne 0 ]; then
-      echo 'Trying to upgrade the existing one...'
-      helm upgrade "$CHART" "./backend/charts/$CHART/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/$CHART/values.yaml
-    fi
+  helm install "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values.yaml" --set rollme=$(date +%s)
+
+  if [ $? -ne 0 ]; then
+    echo 'Trying to upgrade the existing one...'
+    helm upgrade "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values.yaml" --set rollme=$(date +%s)
+  fi
 
 else
 #  echo '----------------------------------------'

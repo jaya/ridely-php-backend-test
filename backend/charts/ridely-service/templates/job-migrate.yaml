@@ -1,0 +1,35 @@
+{{- if .Values.migrate.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ridely-service.fullname" . }}-migrate
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: [ 'sh', '-c', 'until nc -zv {{ .Values.env.DB_HOST }} {{ .Values.env.DB_PORT }}; do echo "Waiting for DB..."; sleep 2; done' ]
+      containers:
+        - name: migrate
+          image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
+          imagePullPolicy: IfNotPresent
+          command: ["php", "artisan", "migrate", "--force"]
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: database-password
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: app-key
+      restartPolicy: Never
+  backoffLimit: 3
+{{- end }}

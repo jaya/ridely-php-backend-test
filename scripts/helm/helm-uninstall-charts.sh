@@ -22,29 +22,36 @@ fi
 ROOT_DIR=$(pwd)
 
 
+CHART=$1
+if [ ! -z "$CHART" ]; then
+  echo "Target chart: $CHART"
 
+  helm uninstall "$CHART" -n "$PROJECT_NAMESPACE"
 
-
-#echo '----------------------------------------'
-#echo 'Uninstalling database chart'
-#echo '----------------------------------------'
-#helm uninstall "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
-#echo '----------------------------------------'
-#echo 'Deleting database pvc'
-#echo '----------------------------------------'
-#if kubectl get pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" &>/dev/null; then
-#  kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" \
-#    --ignore-not-found --wait=false &
-#fi
-echo '----------------------------------------'
-echo 'Uninstalling database chart'
-echo '----------------------------------------'
-SERVICE="auth-service"
-helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
-echo '----------------------------------------'
-echo 'Deleting database pvc'
-echo '----------------------------------------'
-if kubectl get pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" &>/dev/null; then
-  kubectl delete pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" \
-    --ignore-not-found --wait=false &
+else
+#  echo '----------------------------------------'
+#  echo 'Uninstalling database chart'
+#  echo '----------------------------------------'
+  #helm uninstall "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
+  #echo '----------------------------------------'
+  #echo 'Deleting database pvc'
+  #echo '----------------------------------------'
+  #if kubectl get pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" &>/dev/null; then
+  #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" \
+  #    --ignore-not-found --wait=false &
+  #fi
+  #echo '----------------------------------------'
+  #echo 'Uninstalling database chart'
+  #echo '----------------------------------------'
+  #SERVICE="auth-service"
+  #helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
+  #echo '----------------------------------------'
+  #echo 'Deleting database pvc'
+  #echo '----------------------------------------'
+  #if kubectl get pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" &>/dev/null; then
+  #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" \
+  #    --ignore-not-found --wait=false &
+  #fi
+  echo "to be implemented"
 fi
+

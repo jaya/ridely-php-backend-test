@@ -10,6 +10,9 @@ images:
     tag: latest
     pullPolicy: IfNotPresent
 
+migrate:
+  enabled: true
+
 app:
   appKey: "base64:FF7T5Jj4AnEY80EmNzcP5Vm5HbEWnTgz2ea8DBGFG/A="
 
