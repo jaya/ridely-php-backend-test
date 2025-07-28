@@ -104,26 +104,54 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Lista de motoristas",
+                        "description": "Lista de motoristas retornada com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Driver"
-                                    }
+                                    "$ref": "#/components/schemas/DriverListResponse"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Erro de validação dos critérios"
-                    },
-                    "422": {
-                        "description": "Outros erros"
+                        "description": "Erro de validação dos critérios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Não autorizado"
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Outros erros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponível",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -713,6 +741,33 @@
                 },
                 "type": "object"
             },
+            "DriverListResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Driver"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "Driver": {
                 "required": [
                     "id",
@@ -751,6 +806,34 @@
                     },
                     "car": {
                         "$ref": "#/components/schemas/Car"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "error"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Erro ao buscar motoristas."
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
