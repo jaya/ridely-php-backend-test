@@ -3,17 +3,22 @@
 namespace App\Exceptions;
 
 use App\Enums\ErrorMessagesEnum;
-use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
-class ServiceException extends Exception
+class ServiceException extends ApplicationException
 {
-    public static function invalidRequest($message)
+    protected $code;
+    protected $message;
+    protected $label;
+    protected $params;
+
+    public static function invalidRequest($message, array $params, \Throwable $previous = null): ServiceException
     {
-        return new self(sprintf(ErrorMessagesEnum::INVALID_REQUEST->value, $message));
+        return new ServiceException(ErrorMessagesEnum::INVALID_REQUEST, Response::HTTP_BAD_REQUEST, $message, $params, $previous);
     }
 
-    public static function invalidRequestParam(string $param)
+    public static function invalidRequestParam($message, array $params, \Throwable $previous = null): ServiceException
     {
-        return new self(sprintf(ErrorMessagesEnum::INVALID_REQUEST_PARAM->value, $param));
+        return new ServiceException(ErrorMessagesEnum::INVALID_REQUEST_PARAM, Response::HTTP_BAD_REQUEST, $message, $params, $previous);
     }
 } 
