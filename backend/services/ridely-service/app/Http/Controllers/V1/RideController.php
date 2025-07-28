@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\V1;
 
-use Illuminate\Http\Request;
-use App\Models\Ride;
+use App\Http\Controllers\Controller;
 use App\Models\Driver;
+use App\Models\Ride;
 use Illuminate\Http\JsonResponse;
-use OpenApi\Annotations as OA;
+use Illuminate\Http\Request;
 
 class RideController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/rides/{id}",
+     *     path="/api/v1/rides/{id}",
      *     summary="Buscar detalhes de uma corrida",
      *     tags={"Ride"},
      *     @OA\Parameter(
@@ -55,7 +55,7 @@ class RideController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/rides/{id}",
+     *     path="/api/v1/rides/{id}",
      *     summary="Remover uma corrida",
      *     tags={"Ride"},
      *     @OA\Parameter(
@@ -84,7 +84,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/rides/request",
+     *     path="/api/v1/rides/request",
      *     summary="Solicitar motorista",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -148,7 +148,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/rides/cancel",
+     *     path="/api/v1/rides/cancel",
      *     summary="Cancelar corrida",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -184,7 +184,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/rides/accept",
+     *     path="/api/v1/rides/accept",
      *     summary="Aceitar corrida",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -232,7 +232,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/rides/refuse",
+     *     path="/api/v1/rides/refuse",
      *     summary="Recusar corrida",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -279,7 +279,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/rides/finish",
+     *     path="/api/v1/rides/finish",
      *     summary="Finalizar corrida",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -329,7 +329,7 @@ class RideController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/drivers/{driverId}/open-rides",
+     *     path="/api/v1/drivers/{driverId}/open-rides",
      *     summary="Listar corridas abertas para motorista",
      *     tags={"Ride"},
      *     @OA\Parameter(

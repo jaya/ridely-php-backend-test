@@ -41,13 +41,98 @@
                 }
             }
         },
-        "/api/drivers": {
+        "/api/v1/drivers": {
+            "get": {
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Lista os motoristas com filtros opcionais",
+                "operationId": "d7e939814aa58b3a941ed13b4b77955e",
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "Deslocamento (ponto de início da listagem)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Quantidade de resultados por página (máx: 100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Campo para ordenação (ex: name, created_at)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Direção da ordenação: asc ou desc",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Campos específicos a retornar (ex: name,available)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de motoristas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Driver"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação dos critérios"
+                    },
+                    "422": {
+                        "description": "Outros erros"
+                    },
+                    "401": {
+                        "description": "Não autorizado"
+                    }
+                }
+            },
             "post": {
                 "tags": [
                     "Driver"
                 ],
                 "summary": "Cria um novo motorista",
-                "operationId": "6bdf167696d642223e0d27e88a0b4896",
+                "operationId": "616886d5a7effb20d218264e6804538a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -89,13 +174,13 @@
                 }
             }
         },
-        "/api/drivers/{id}": {
+        "/api/v1/drivers/{id}": {
             "delete": {
                 "tags": [
                     "Driver"
                 ],
                 "summary": "Remove um motorista",
-                "operationId": "c32adc70b84b5c4d5f214e60757aaee3",
+                "operationId": "3670a9b76c6831f3c02d896166bb485a",
                 "parameters": [
                     {
                         "name": "id",
@@ -117,13 +202,13 @@
                 }
             }
         },
-        "/api/drivers/{id}/open-rides": {
+        "/api/v1/drivers/{id}/open-rides": {
             "get": {
                 "tags": [
                     "Driver"
                 ],
                 "summary": "Lista corridas abertas para um motorista",
-                "operationId": "4259d1c29c868e72923df1f15e8a9aa3",
+                "operationId": "22eae3a965c896cdab0250aad9391f3e",
                 "parameters": [
                     {
                         "name": "id",
@@ -168,13 +253,13 @@
                 }
             }
         },
-        "/api/rides/{id}": {
+        "/api/v1/rides/{id}": {
             "get": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Buscar detalhes de uma corrida",
-                "operationId": "7f96668377fce18b120c31e371b5b9a0",
+                "operationId": "ba49c05c73d20b23b3c7e0f8be7fecb6",
                 "parameters": [
                     {
                         "name": "id",
@@ -207,7 +292,7 @@
                     "Ride"
                 ],
                 "summary": "Remover uma corrida",
-                "operationId": "5721d2736b2d96864b9d9be576307b24",
+                "operationId": "b8196402ca7419128eefa197acd4624a",
                 "parameters": [
                     {
                         "name": "id",
@@ -229,13 +314,13 @@
                 }
             }
         },
-        "/api/rides/request": {
+        "/api/v1/rides/request": {
             "post": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Solicitar motorista",
-                "operationId": "9283744df978faa70c0f7ac4aa01d0cf",
+                "operationId": "ea006005f9b5cab61ee6de4034d9edb2",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -294,13 +379,13 @@
                 }
             }
         },
-        "/api/rides/cancel": {
+        "/api/v1/rides/cancel": {
             "post": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Cancelar corrida",
-                "operationId": "b54fea99fc1835ae6f60ba27ec80e093",
+                "operationId": "f0b2a58f95283b96bf6b570afa0009f8",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -337,13 +422,13 @@
                 }
             }
         },
-        "/api/rides/accept": {
+        "/api/v1/rides/accept": {
             "post": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Aceitar corrida",
-                "operationId": "3ad14b66a9da5a66ec3bfde3d7735bfa",
+                "operationId": "6651f698831a8d0d2517b14b58b30666",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -401,13 +486,13 @@
                 }
             }
         },
-        "/api/rides/refuse": {
+        "/api/v1/rides/refuse": {
             "post": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Recusar corrida",
-                "operationId": "b61d1fa412a3ae239198c4d952164873",
+                "operationId": "2c2f4225b8b9d69cb6e476bfdf465318",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -465,13 +550,13 @@
                 }
             }
         },
-        "/api/rides/finish": {
+        "/api/v1/rides/finish": {
             "post": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Finalizar corrida",
-                "operationId": "ca98aa2e6833782d17c4445b0128ba21",
+                "operationId": "437aa54038d63c9673f1eea4d12eb8fa",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -536,13 +621,13 @@
                 }
             }
         },
-        "/api/drivers/{driverId}/open-rides": {
+        "/api/v1/drivers/{driverId}/open-rides": {
             "get": {
                 "tags": [
                     "Ride"
                 ],
                 "summary": "Listar corridas abertas para motorista",
-                "operationId": "fa7d7c7deb7bdd59045635663ab91a30",
+                "operationId": "29adaafeccc75b914e9d80fbee4f911e",
                 "parameters": [
                     {
                         "name": "driverId",

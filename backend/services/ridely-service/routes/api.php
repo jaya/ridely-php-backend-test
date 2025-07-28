@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\V1\DriverController;
+use App\Http\Controllers\V1\RideController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\RideController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,15 +14,8 @@ use App\Http\Controllers\RideController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::post('/drivers', [DriverController::class, 'store']);
-Route::delete('/drivers/{id}', [DriverController::class, 'destroy']);
-Route::get('/drivers/{id}/get-rides', [DriverController::class, 'getOpenRides']);
+Route::prefix('v1')->middleware(['api'])->group(base_path('routes/api/v1.php'));
+Route::prefix('v2')->middleware(['api'])->group(base_path('routes/api/v2.php'));
 
-Route::get('/rides/{id}', [RideController::class, 'show']);
-Route::delete('/rides/{id}', [RideController::class, 'destroy']);
-Route::post('/rides/request-driver', [RideController::class, 'requestDriver']);
-Route::post('/rides/cancel-ride', [RideController::class, 'cancelRide']);
-Route::post('/rides/accept-ride', [RideController::class, 'acceptRide']);
-Route::post('/rides/refuse-ride', [RideController::class, 'refuseRide']);
-Route::post('/rides/finish-ride', [RideController::class, 'finishRide']);
+
 

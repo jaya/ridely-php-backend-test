@@ -22,6 +22,18 @@ class Driver extends Model
         'available' => 'boolean',
     ];
 
+    public static array $fields = [
+        'id',
+        'name',
+        'activation_date',
+        'car_license_plate',
+        'car_model',
+        'car_color',
+        'available',
+        'created_at',
+        'updated_at'
+    ];
+
     public function rides()
     {
         return $this->hasMany(Ride::class);
