@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\V1;
 
 use App\Converters\DriverConverter;
+use App\Enums\ErrorMessagesEnum;
+use App\Exceptions\ApplicationException;
+use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\Criteria;
+use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
 use App\Services\DriverManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class DriverController extends Controller
 {
@@ -56,50 +61,46 @@ class DriverController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Lista de motoristas",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Driver")
-     *         )
+     *         description="Lista de motoristas retornada com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/DriverListResponse")
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Erro de validação dos critérios"
+     *         description="Erro de validação dos critérios",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
      *     ),
      *     @OA\Response(
-     *          response=422,
-     *          description="Outros erros"
-     *      ),
-     *     @OA\Response(
      *          response=401,
-     *          description="Não autorizado"
-     *       )
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="Outros erros",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *          response=503,
+     *          description="Serviço indisponível",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
      * )
      */
     public function index(Request $request, DriverManagerFacade $manager)
     {
         $criteria = new Criteria($request->all());
 
-        Log::info(sprintf("Request criteria: %s", json_encode($criteria->toArray())));
+        Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
         try {
             $drivers = $manager->list($criteria);
-
-            return response()->json([
-                'success' => true,
-                'label' => 'success',
-                'code' => 0,
-                'message' => 'Success',
-                'data' => $drivers,
-            ]);
+            return ResponseHelper::success($drivers);
+        } catch (ServiceException $e) {
+            return ResponseHelper::error($e);
+        } catch (RepositoryException $e) {
+            return ResponseHelper::error($e);
         } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'label' => 'error',
-                'code' => 1,
-                'message' => $e->getMessage(),
-                'detail' => config('app.debug') ? $e->getTrace() : null,
-            ], $e instanceof ServiceException ? 400 : 422);
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, Response::HTTP_BAD_REQUEST, previous: $e));
         }
 
     }
@@ -128,43 +129,16 @@ class DriverController extends Controller
     {
 
         $data = $request->all();
-        $driver = $manager->create($data);
 
-        $converter = new DriverConverter();
-        return response()->json($converter->convertFromModelToArray($driver), 201);
-
-        # TODO implemetar VO e converter
-//        return response()->json([
-//            'id' => $driver->id,
-//            'name' => $driver->name,
-//            'car' => [
-//                'license_plate' => $driver->car_license_plate,
-//                'model' => $driver->car_model,
-//                'color' => $driver->car_color
-//            ],
-//            'available' => $driver->available,
-//        ], 201);
-
-//        $car = $data['car'] ?? [];
-//
-//        $driver = Driver::create([
-//            'name' => $data['name'],
-//            'car_license_plate' => $car['license_plate'] ?? null,
-//            'car_model' => $car['model'] ?? null,
-//            'car_color' => $car['color'] ?? null,
-//            'available' => $data['available'] ?? true,
-//        ]);
-//
-//        return response()->json([
-//            'id' => $driver->id,
-//            'name' => $driver->name,
-//            'car' => [
-//                'license_plate' => $driver->car_license_plate,
-//                'model' => $driver->car_model,
-//                'color' => $driver->car_color
-//            ],
-//            'available' => $driver->available,
-//        ]);
+        try {
+            $driver = $manager->create($data);
+            $converter = new DriverConverter();
+            return ResponseHelper::success($converter->convertFromModelToArray($driver), Response::HTTP_CREATED);
+        } catch (ServiceException $e) {
+            return ResponseHelper::error($e);
+        } catch (\Throwable $e) {
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, 500, previous: $e));
+        }
     }
 
     /**
@@ -191,6 +165,7 @@ class DriverController extends Controller
      */
     public function destroy($id): JsonResponse
     {
+        // TODO incluir coluna active para deletar logicamente
         $driver = Driver::findOrFail($id);
         $driver->delete();
 
@@ -228,6 +203,7 @@ class DriverController extends Controller
      */
     public function getOpenRides($id): JsonResponse
     {
+        // TODO I need to review
         $driver = Driver::findOrFail($id);
         $rides = $driver->getOpenRides();
 
