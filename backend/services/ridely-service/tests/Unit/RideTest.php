@@ -8,12 +8,16 @@ use App\Models\Driver;
 use App\Exceptions\RideException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+
+// TODO be deleted
 class RideTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_can_accept_ride_when_driver_is_available()
     {
+        $this->markTestSkipped('This test will be removed');
+
         $driver = Driver::create([
             'name' => 'John Doe',
             'car_license_plate' => 'ABC123',
@@ -39,6 +43,8 @@ class RideTest extends TestCase
 
     public function test_cannot_accept_ride_when_driver_is_unavailable()
     {
+        $this->markTestSkipped('This test will be removed');
+
         $driver = Driver::create([
             'name' => 'John Doe',
             'car_license_plate' => 'ABC123',

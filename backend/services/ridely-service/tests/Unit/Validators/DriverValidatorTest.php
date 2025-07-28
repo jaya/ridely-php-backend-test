@@ -1,13 +1,14 @@
 <?php
 
-namespace Tests\Unit\App\Validator;
+namespace Tests\Unit\Validators;
 
 use App\Http\Criteria\Criteria;
-use App\Validator\DriverValidator;
+use App\Validators\DriverValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Tests\Unit\UnitTestCase;
 
+// TODO revisar os nomes dos testes
 class DriverValidatorTest extends UnitTestCase
 {
     protected DriverValidator $validator;
