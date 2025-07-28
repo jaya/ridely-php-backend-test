@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validator;
+namespace App\Validators;
 
 use App\Http\Criteria\Criteria;
 

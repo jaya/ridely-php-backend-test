@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Services\V2\Driver;
+namespace App\Services\V1\Driver;
 
 use App\Exceptions\ServiceException;
 use App\Repositories\V1\DriverRepository;
-use App\Validator\DriverValidator;
+use App\Validators\DriverValidator;
 use Illuminate\Validation\ValidationException;
-use App\Services\Interfaces\Driver\CreateDriver;
+use App\Services\Interfaces\Driver\CreateDriverService;
 
-// Note: Teste para futuras versões do serviço
-// TODO implementar uma mudança para demonstrar o uso de uma v2
-class CreateDriverService implements CreateDriver
+class CreateDriverServiceService implements CreateDriverService
 {
     protected ValidationException $exception;
 
@@ -24,9 +22,8 @@ class CreateDriverService implements CreateDriver
         if ($this->validate($data)) {
             return $this->repository->create($data);
         } else {
-            throw ServiceException::invalidRequest($this->exception->getMessage());
+            throw ServiceException::invalidRequest($this->exception->getMessage(), []);
         }
-
     }
 
     public function validate($data): bool {

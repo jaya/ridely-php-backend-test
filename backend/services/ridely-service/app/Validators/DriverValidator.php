@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validator;
+namespace App\Validators;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Http\Criteria\Criteria;
@@ -63,7 +63,7 @@ class DriverValidator implements ValidatorInterface
      */
     public function getInvalidDataException(): void
     {
-        $this->exception = ValidationException::withMessages([ErrorMessagesEnum::INVALID_DRIVER_DATA->value]);
+        $this->exception = ValidationException::withMessages([ErrorMessagesEnum::INVALID_DRIVER_DATA->message()]);
     }
 
     /**
@@ -115,12 +115,6 @@ class DriverValidator implements ValidatorInterface
      */
     public function criteriaRules(Criteria $criteria): array
     {
-        return array_merge($criteria->rules(), [
-            'fields.*' => [
-                'string',
-                'max:50',
-                Rule::in($this->validFields),
-            ],
-        ]);
+        return $criteria->rules($this->validFields);
     }
 }

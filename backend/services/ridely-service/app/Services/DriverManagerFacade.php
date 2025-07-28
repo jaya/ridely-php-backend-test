@@ -3,16 +3,16 @@
 namespace App\Services;
 
 use App\Http\Criteria\Criteria;
-use App\Services\Interfaces\Driver\CreateDriver;
-use App\Services\Interfaces\Driver\ReadDriver;
+use App\Services\Interfaces\Driver\CreateDriverService;
+use App\Services\Interfaces\Driver\ReadDriverService;
 
 class DriverManagerFacade
 {
-    protected CreateDriver $createService;
-    protected ReadDriver $readService;
+    protected CreateDriverService $createService;
+    protected ReadDriverService $readService;
     public function __construct(
-        CreateDriver $createService,
-        ReadDriver $readService
+        CreateDriverService $createService,
+        ReadDriverService $readService
     )
     {
         $this->createService = $createService;

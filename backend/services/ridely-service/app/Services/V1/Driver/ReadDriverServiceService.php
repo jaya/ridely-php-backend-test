@@ -5,12 +5,12 @@ namespace App\Services\V1\Driver;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\Criteria;
 use App\Repositories\V1\DriverRepository;
-use App\Services\Interfaces\Driver\ReadDriver;
-use App\Validator\DriverValidator;
+use App\Services\Interfaces\Driver\ReadDriverService;
+use App\Validators\DriverValidator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use App\Services\Interfaces\Driver\CreateDriver;
 
-class ReadDriverService implements ReadDriver
+class ReadDriverServiceService implements ReadDriverService
 {
     protected ValidationException $exception;
 
@@ -22,9 +22,11 @@ class ReadDriverService implements ReadDriver
     public function execute(Criteria $criteria)
     {
         if ($this->validate($criteria)) {
+            Log::debug("Searching for drivers");
             return $this->repository->all($criteria);
         } else {
-            throw ServiceException::invalidRequestParam($this->exception->getMessage());
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), $criteria->toArray(), $this->exception);
         }
     }
 
@@ -35,5 +37,10 @@ class ReadDriverService implements ReadDriver
         }
 
         return  $result;
+    }
+
+    public function getException(): ValidationException
+    {
+        return $this->exception;
     }
 }
