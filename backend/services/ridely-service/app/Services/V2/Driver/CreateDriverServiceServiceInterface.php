@@ -6,11 +6,11 @@ use App\Exceptions\ServiceException;
 use App\Repositories\V1\DriverRepository;
 use App\Validators\DriverValidator;
 use Illuminate\Validation\ValidationException;
-use App\Services\Interfaces\Driver\CreateDriverService;
+use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 
 // Note: Teste para futuras versões do serviço
 // TODO implementar uma mudança para demonstrar o uso de uma v2
-class CreateDriverServiceService implements CreateDriverService
+class CreateDriverServiceServiceInterface implements CreateDriverServiceInterface
 {
     protected ValidationException $exception;
 

@@ -85,6 +85,7 @@ class DriverController extends Controller
      *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
      *     ),
      * )
+     * // TODO revisar os exemplos dos erros, pois estão todos com a mesma mensagem, qualquer coisa criar outros schemas ou ver como passar os valores para o schema
      */
     public function index(Request $request, DriverManagerFacade $manager)
     {

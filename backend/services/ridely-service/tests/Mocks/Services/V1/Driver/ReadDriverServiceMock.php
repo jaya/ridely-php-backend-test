@@ -3,7 +3,7 @@
 namespace Mocks\Services\V1\Driver;
 
 use App\Repositories\V1\DriverRepository;
-use App\Services\V1\Driver\ReadDriverServiceService;
+use App\Services\V1\Driver\ReadDriverService;
 use App\Validators\DriverValidator;
 use Mocks\AbstractMock;
 use Mocks\Repositories\V1\DriverRepositoryMock;
@@ -30,9 +30,9 @@ class ReadDriverServiceMock extends AbstractMock
     /**
      * @throws Exception
      */
-    public function getMock(): ReadDriverServiceService&MockObject
+    public function getMock(): ReadDriverService&MockObject
     {
-        return $this->createMock(ReadDriverServiceService::class);
+        return $this->createMock(ReadDriverService::class);
     }
 
     /**
@@ -40,6 +40,6 @@ class ReadDriverServiceMock extends AbstractMock
      */
     public function getObjectWithMockDependencies(): object
     {
-        return new ReadDriverServiceService($this->repository, $this->validator);
+        return new ReadDriverService($this->repository, $this->validator);
     }
 }

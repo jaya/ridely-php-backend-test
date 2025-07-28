@@ -5,12 +5,12 @@ namespace App\Services\V1\Driver;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\Criteria;
 use App\Repositories\V1\DriverRepository;
-use App\Services\Interfaces\Driver\ReadDriverService;
+use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
 use App\Validators\DriverValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class ReadDriverServiceService implements ReadDriverService
+class ReadDriverService implements ReadDriverServiceInterface
 {
     protected ValidationException $exception;
 

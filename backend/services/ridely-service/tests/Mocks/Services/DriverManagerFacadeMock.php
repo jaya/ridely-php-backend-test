@@ -4,9 +4,9 @@ namespace Mocks\Services;
 
 use App\Repositories\V1\DriverRepository;
 use App\Services\DriverManagerFacade;
-use App\Services\Interfaces\Driver\CreateDriverService;
-use App\Services\Interfaces\Driver\ReadDriverService;
-use App\Services\V1\Driver\ReadDriverServiceService;
+use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
+use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
+use App\Services\V1\Driver\ReadDriverService;
 use Mocks\AbstractMock;
 use Mocks\Repositories\V1\DriverRepositoryMock;
 use Mocks\Services\V1\Driver\CreateDriverServiceMock;
@@ -16,8 +16,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class DriverManagerFacadeMock extends AbstractMock
 {
-    public CreateDriverService $createService;
-    public ReadDriverService $readService;
+    public CreateDriverServiceInterface $createService;
+    public ReadDriverServiceInterface $readService;
 
     public DriverRepository $repository;
 

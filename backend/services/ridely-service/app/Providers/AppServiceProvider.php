@@ -4,11 +4,11 @@ namespace App\Providers;
 
 use App\Repositories\V1\DriverRepository;
 use App\Services\DriverManagerFacade;
-use App\Services\Interfaces\Driver\CreateDriverService;
-use App\Services\Interfaces\Driver\ReadDriverService;
-use App\Services\V1\Driver\CreateDriverServiceService as CreateDriverServiceV1;
-use App\Services\V1\Driver\ReadDriverServiceService;
-use App\Services\V2\Driver\CreateDriverServiceService as CreateDriverServiceV2;
+use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
+use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
+use App\Services\V1\Driver\CreateDriverService as CreateDriverServiceV1;
+use App\Services\V1\Driver\ReadDriverService;
+use App\Services\V2\Driver\CreateDriverServiceServiceInterface as CreateDriverServiceV2;
 use App\Validators\DriverValidator;
 use Illuminate\Support\ServiceProvider;
 use L5Swagger\L5SwaggerServiceProvider;
@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
 
 
         // Conditional binding by version (detected by middleware)
-        $this->app->bind(CreateDriverService::class, function ($app) {
+        $this->app->bind(CreateDriverServiceInterface::class, function ($app) {
             $version = $app->bound('api.version') ? $app->make('api.version') : 'v1';
 
             return match ($version) {
@@ -41,11 +41,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Conditional binding by version (detected by middleware)
-        $this->app->bind(ReadDriverService::class, function ($app) {
+        $this->app->bind(ReadDriverServiceInterface::class, function ($app) {
             $version = $app->bound('api.version') ? $app->make('api.version') : 'v1';
 
             return match ($version) {
-                default => new ReadDriverServiceService(
+                default => new ReadDriverService(
                     $app->make(DriverRepository::class),
                     $app->make(DriverValidator::class),
                 ),
@@ -55,8 +55,8 @@ class AppServiceProvider extends ServiceProvider
         // DriverManagerFacade usando a interface (que agora é resolvível)
         $this->app->singleton(DriverManagerFacade::class, function ($app) {
             return new DriverManagerFacade(
-                $app->make(CreateDriverService::class),
-                $app->make(ReadDriverService::class)
+                $app->make(CreateDriverServiceInterface::class),
+                $app->make(ReadDriverServiceInterface::class)
             );
         });
 

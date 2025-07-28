@@ -3,7 +3,7 @@
 namespace Mocks\Services\V1\Driver;
 
 use App\Repositories\V1\DriverRepository;
-use App\Services\V1\Driver\CreateDriverServiceService;
+use App\Services\V1\Driver\CreateDriverService;
 use App\Validators\DriverValidator;
 use Mocks\AbstractMock;
 use Mocks\Repositories\V1\DriverRepositoryMock;
@@ -30,9 +30,9 @@ class CreateDriverServiceMock extends AbstractMock
     /**
      * @throws Exception
      */
-    public function getMock(): CreateDriverServiceService&MockObject
+    public function getMock(): CreateDriverService&MockObject
     {
-        return $this->createMock(CreateDriverServiceService::class);
+        return $this->createMock(CreateDriverService::class);
     }
 
     /**
@@ -40,6 +40,6 @@ class CreateDriverServiceMock extends AbstractMock
      */
     public function getObjectWithMockDependencies(): object
     {
-        return new CreateDriverServiceService($this->repository, $this->validator);
+        return new CreateDriverService($this->repository, $this->validator);
     }
 }

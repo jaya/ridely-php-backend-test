@@ -5,7 +5,7 @@ namespace Tests\Unit\Services\V1\Driver;
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\Criteria;
-use App\Services\V1\Driver\ReadDriverServiceService;
+use App\Services\V1\Driver\ReadDriverService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Mocks\Services\V1\Driver\ReadDriverServiceMock;
@@ -17,7 +17,7 @@ class ReadDriverServiceTest extends UnitTestCase
 {
     protected Criteria $criteria;
 
-    protected ReadDriverServiceService $service;
+    protected ReadDriverService $service;
 
     protected ReadDriverServiceMock $mock;
 
