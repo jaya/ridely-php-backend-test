@@ -1,5 +1,119 @@
 
 # TODO list
-- [x] Project folder review
-- [ ] Kubernetes configuration
-- [x] MYSQL chart
+- Geral
+  - [x] Estrutura do projeto (separação por contextos)
+  - Documentação
+    - Arquitetura
+      - Diagramas
+        - [ ] C4 Contexto
+        - [ ] C4 Container
+      - Documentos
+        - Serviços
+    - Geral
+        - [ ] Criar README com visão geral do projeto
+        - [ ] Documentar fluxo de autenticação e consumo de API
+        - [ ] Criar diagrama de componentes (PlantUML ou draw.io)
+        - [ ] Documentar eventos/mensageria e serviços envolvidos
+        - [ ] Documentar alertas e dashboards de observabilidade
+- Infraestrutura
+  - IAC (Terraform)
+    - [ ] EKS
+    - [ ] Codepipeline
+    - [ ] Criar VPC, subnets e security groups (Validar Necessidade)
+    - [ ] Configurar IAM Roles para EKS, RDS, etc.
+    - [ ] Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)
+  - Configurações com Ansible
+    - [ ] EKS
+    - [ ] Codepipeline
+    - [ ] Criar VPC, subnets e security groups (Validar Necessidade)
+    - [ ] Configurar IAM Roles para EKS, RDS, etc.
+    - [ ] Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)
+  - Healm e Kubernetes configuration
+    - Databases
+      - [ ] Redis chart
+      - [x] MYSQL chart
+    - Services
+      - [x] Auth Service (KeyCloak)
+      - [x] Ridely Service
+      - [x] Ridely Service Nginx
+      - [ ] Ridely Calc service (Node.js)
+      - [ ] RabbitMQ
+    - Api Gateway
+      - [ ] Kong
+      - [ ] Configurar `Ingress` com Kong
+    - Outros
+      - [ ] Configurar serviços com autoescalonamento (HPA)
+      - [ ] Configurar PVCs, se necessário
+      - [ ] Separar ambientes (local, homologação, produção) com arquivos `values.yaml` 
+- Serviços
+  - Ridely Calc service (Node.js)
+  - Ridely Service (PHP + Laravel)
+    - Docs
+      - Coleção do Postman
+      - Api Docs
+        - [x] Docs/Swagger (ridely-service)
+        - [ ] Docs/Swagger (keycloack)
+      - [ ] README.md
+    - GitActions
+      - [ ] Templates
+      - [ ] Code review
+      - [ ] Guidelines
+    - Tests 
+      - [x] Unit tests
+      - [ ] Coverage
+      - [ ] Integration testes
+    - Segurança
+      - [ ] CORS
+      - [ ] UUID
+      - [ ] Auth implementação/integração
+    - Logs
+      - [ ] Json
+    - Restful
+      - [ ] HATEOS
+- Autenticação (Keycloak + Kong)
+  - [ ] Deploy do Keycloak com Helm
+  - [ ] Configurar banco de dados do Keycloak
+  - [ ] Criar realms, clients e roles no Keycloak
+  - [ ] Configurar Kong com plugin OIDC
+  - [ ] Proteger rotas do Laravel e cálculo via Kong + OIDC
+  - [ ] Validar tokens de autenticação nos serviços
+- Comunicação entre Serviços e Eventos
+  - [ ] Escolher entre RabbitMQ (local/dev) e AWS SQS (produção)
+  - [ ] Criar tópicos/filas (ex: corrida_solicitada, corrida_finalizada)
+  - [ ] Implementar produtores (publicadores) de eventos
+  - [ ] Implementar consumidores para os eventos
+  - [ ] Implementar tratamento de falhas e DLQ (Dead Letter Queue)
+- Gerenciamento de Segredos
+  - [ ] Definir estratégia de segredos:
+  - [ ] Kubernetes Secrets com criptografia
+  - [ ] Sealed Secrets + SOPS (com GitOps)
+  - [ ] Versionar segredos de forma segura (Git + Kustomize ou Helm)
+  - [ ] Avaliar uso futuro de Secret Manager da AWS em produção
+- CI/CD
+  - [ ] Criar pipelines com GitHub Actions (ou AWS CodePipeline)
+  - [ ] Automatizar:
+      - [ ] Build das imagens Docker
+      - [ ] Deploy via Helm por ambiente
+      - [ ] Rodar testes
+      - [ ] Scan de vulnerabilidades
+  - [ ] Adicionar versionamento de imagem/tag automático
+- Testes e Validações
+  - [ ] Escrever testes unitários dos serviços
+  - [ ] Escrever testes de integração (API + mensageria)
+  - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
+  - [ ] Testar escalabilidade dos serviços com HPA
+  - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)
+- Observabilidade e Monitoramento
+  - [ ] Deploy do Prometheus e Grafana via Helm
+  - [ ] Deploy do Loki para logs + Fluent Bit
+  - [ ] Deploy do Jaeger para tracing distribuído
+  - [ ] Instrumentar Laravel e Node.js com OpenTelemetry
+  - [ ] Criar dashboards no Grafana para métricas e logs
+  - [ ] Criar alertas com Prometheus e Grafana
+- Segurança
+  - [ ] Configurar HTTPS no Ingress do Kong
+  - [ ] Validar autenticação JWT/OIDC com Keycloak
+  - [ ] Criar RBAC para os serviços e usuários no cluster
+  - [ ] Adotar Network Policies para limitar tráfego
+  - [ ] Aplicar PodSecurityPolicies ou PodSecurityStandards (PSA)
+  - [ ] Validar segurança nas imagens Docker (ex: Trivy, Grype)
