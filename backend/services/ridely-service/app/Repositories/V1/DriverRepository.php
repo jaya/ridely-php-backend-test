@@ -7,6 +7,7 @@ use App\Exceptions\RepositoryException;
 use App\Http\Criteria\Criteria;
 use App\Models\Driver;
 use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorAlias;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class DriverRepository
     public function checkIfDatabaseConnectionIsAvailable(): void
     {
         try {
+            Log::debug('Checking database connection');
             DB::connection()->getPdo();
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -110,7 +112,7 @@ class DriverRepository
     /**
      * @throws RepositoryException
      */
-    public function all(Criteria $criteria): array
+    public function all(Criteria $criteria): LengthAwarePaginatorAlias
     {
         $this->checkIfDatabaseConnectionIsAvailable();
 
@@ -123,15 +125,35 @@ class DriverRepository
 
             $query->orderBy($criteria->orderBy, $criteria->sortBy);
 
-            if ($criteria->offset !== null) {
-                $query->offset($criteria->offset);
-            }
+            $perPage = $criteria->limit ?? Criteria::LIMIT;
+            $currentPage = $criteria->page ?? Criteria::PAGE;
 
-            if ($criteria->limit !== null) {
-                $query->limit($criteria->limit);
-            }
+            Log::debug($query->toSql());
+            Log::debug("pagination params: \$perPage: $perPage, \$currentPage: $currentPage");
+            return $query->paginate($perPage, ['*'], 'page', $currentPage);
 
-            return $query->get()->toArray();
+        } catch (QueryException $e) {
+            Log::error($e->getMessage());
+            throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
+        }
+    }
+
+    /**
+     * @throws RepositoryException
+     */
+    public function count(Criteria $criteria): int
+    {
+        $this->checkIfDatabaseConnectionIsAvailable();
+
+        try {
+            $query = Driver::query();
+
+            $query->select(DB::raw('count(*) as count'));
+
+            $query->orderBy($criteria->orderBy, $criteria->sortBy);
+
+            Log::debug(sprintf("Count query: %s", $query->toSql()));
+            return $query->count();
         } catch (QueryException $e) {
             Log::error($e->getMessage());
             throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);

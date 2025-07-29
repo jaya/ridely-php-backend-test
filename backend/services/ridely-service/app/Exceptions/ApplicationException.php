@@ -46,4 +46,9 @@ class ApplicationException extends Exception implements Throwable
     {
         return $this->statusCode;
     }
+
+    public function getParams(): array
+    {
+        return $this->params;
+    }
 }

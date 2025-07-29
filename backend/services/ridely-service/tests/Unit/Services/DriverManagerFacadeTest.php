@@ -5,8 +5,10 @@ namespace Tests\Unit\Services;
 use App\Converters\DriverConverter;
 use App\Http\Criteria\Criteria;
 use App\Services\DriverManagerFacade;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Mocks\Services\DriverManagerFacadeMock;
+use Tests\Helpers\DriverHelper;
 use Tests\Unit\UnitTestCase;
 
 // TODO revisar os nomes dos testes
@@ -30,16 +32,8 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        // TODO migrar para um Helper ou Util
-        $data = [
-            'name' => 'John Doe',
-            'car' => [
-                'license_plate' => 'XYZ1234',
-                'model' => 'Tesla Model S',
-                'color' => 'Black',
-            ],
-            'available' => true,
-        ];
+        $data = DriverHelper::getDriverSample();
+
 
         $expectedDriver = DriverConverter::convertFromArrayToModel($data);
         $expectedDriver->id = 1;
@@ -54,9 +48,9 @@ class DriverManagerFacadeTest extends UnitTestCase
         $this->facade = $this->mock->getObjectWithMockDependencies();
         $driver = $this->facade->create($data);
 
-        $this->assertEquals(1, $driver->id);
-        $this->assertEquals($data['name'], $driver->name);
-        $this->assertEquals($data['car']['license_plate'], $driver->car_license_plate);
+        $this->assertEquals(1, $driver['id']);
+        $this->assertEquals($data['name'], $driver['name']);
+        $this->assertEquals($data['car']['license_plate'], $driver['car_license_plate']);
 
     }
 
@@ -76,12 +70,19 @@ class DriverManagerFacadeTest extends UnitTestCase
         );
 
 
+        $drivers = collect(DriverHelper::getDriversModelListSample());
 
-        // TODO migrar para um Helper ou Util
-        $drivers = [
-            ['id' => 1, 'name' => 'John Doe'],
-            ['id' => 2, 'name' => 'Jane Smith']
-        ];
+
+        $paginator = new LengthAwarePaginator(
+            items: $drivers,
+            total: $drivers->count(),
+            perPage: 15,
+            currentPage: 1,
+            options: [
+                'path' => '/api/v1/drivers',
+                'query' => []
+            ]
+        );
 
         $criteria = new Criteria([]);
 
@@ -89,13 +90,16 @@ class DriverManagerFacadeTest extends UnitTestCase
             ->expects($this->once())
             ->method('all')
             ->with($criteria)
-            ->willReturn($drivers);
+            ->willReturn($paginator);
 
 
         $this->facade = $this->mock->getObjectWithMockDependencies();
+
+        $expectedResult =  $this->facade->addHateosLinksToItems($drivers, $paginator->path());
+
         $result = $this->facade->list($criteria);
 
-        $this->assertEquals($drivers, $result);
+        $this->assertEquals($expectedResult, $result->items());
     }
 
 

@@ -3,19 +3,29 @@
 namespace App\Http\Helpers;
 
 use App\Exceptions\ApplicationException;
+use App\Http\Hateos\HateosMetadata;
 use Illuminate\Http\JsonResponse;
 
 class ResponseHelper
 {
-    public static function success($data, $statusCode = 200): JsonResponse
+    public static function success($data, $statusCode = 200, HateosMetadata $metadata = null, bool $hateos = true): JsonResponse
     {
-        return response()->json([
+
+
+        $body = [
             'success' => true,
             'label' => 'success',
             'code' => 0,
             'message' => 'Success',
             'data' => $data,
-        ], $statusCode);
+        ];
+
+
+        if ($hateos && $metadata) {
+            $body['_meta'] = $metadata->meta()->toArray();
+            $body['_links'] = $metadata->links();
+        }
+        return response()->json($body, $statusCode);
     }
 
     public static function error(ApplicationException $exception): JsonResponse
@@ -25,8 +35,10 @@ class ResponseHelper
             'label' => $exception->getLabel(),
             'code' => $exception->getCode(),
             'message' => $exception->getMessage(),
-            'detail' => config('app.debug') ? $exception->getTrace() : null,
+            'params' => $exception->getParams(),
+            'details' => config('app.debug') ? $exception->getTrace() : null,
         ], $exception->getStatusCode());
+
     }
 
 }

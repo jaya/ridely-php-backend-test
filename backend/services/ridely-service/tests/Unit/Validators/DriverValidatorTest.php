@@ -148,7 +148,7 @@ class DriverValidatorTest extends UnitTestCase
         return [
             'basic valid criteria' => [
                 new Criteria([
-                    'offset' => 0,
+                    'page' => 0,
                     'limit' => 10,
                     'order_by' => 'name',
                     'sort_by' => 'asc',
@@ -172,10 +172,10 @@ class DriverValidatorTest extends UnitTestCase
     public static function getInvalidDataForValidateReadDataProvider(): array
     {
         return [
-            'negative offset' => [
+            'negative limit and page' => [
                 new Criteria([
-                    'offset' => -1,
-                    'limit' => 10
+                    'page' => -1,
+                    'limit' => -10
                 ])
             ],
             'invalid sort_by value' => [

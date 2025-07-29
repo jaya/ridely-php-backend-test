@@ -6,21 +6,23 @@ use Illuminate\Validation\Rule;
 
 class Criteria
 {
-    const OFFSET = 0;
-    const LIMIT = 100;
+    const PAGE = 1;
+    const LIMIT = 15;
 
-    public ?int $offset;
+    public ?int $page;
     public ?int $limit;
-    public ?string $orderBy;
+    public ?string $orderBy = 'asc';
     public ?string $sortBy;
     public ?array $fields;
-
     public function __construct(array $data)
     {
-        $this->offset = $data['offset'] ?? self::OFFSET;
+        $page = $data['page'] ?? self::PAGE;
+        if (intval($page) < 1) {$page = 1;}
+
+        $this->page = $page;
         $this->limit = $data['limit'] ?? self::LIMIT;
         $this->orderBy = $data['order_by'] ?? 'created_at';
-        $this->sortBy = $data['sort_by'] ?? 'desc';
+        $this->sortBy = $data['sort_by'] ?? 'asc';
         $this->fields = isset($data['fields'])
             ? array_filter(array_map('trim', is_array($data['fields']) ? $data['fields']: explode(',', $data['fields'])))
             : null;
@@ -29,7 +31,7 @@ class Criteria
     public function toArray(): array
     {
         return [
-            'offset' => $this->offset,
+            'page' => $this->page,
             'limit' => $this->limit,
             'order_by' => $this->orderBy,
             'sort_by' => $this->sortBy,
@@ -40,7 +42,7 @@ class Criteria
     public function rules($validFields = []): array
     {
         return [
-            'offset' => 'nullable|integer|min:0',
+            'page' => 'nullable|integer|min:1',
             'limit' => 'nullable|integer|min:1|max:100',
             'sort_by' => [
                 'nullable',

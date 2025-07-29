@@ -9,6 +9,7 @@ use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\Criteria;
+use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
 use App\Services\DriverManagerFacade;
@@ -25,9 +26,9 @@ class DriverController extends Controller
      *     summary="Lista os motoristas com filtros opcionais",
      *     tags={"Driver"},
      *     @OA\Parameter(
-     *         name="offset",
+     *         name="page",
      *         in="query",
-     *         description="Deslocamento (ponto de início da listagem)",
+     *         description="Referente a qual página dos itens da listagem deseja buscar",
      *         required=false,
      *         @OA\Schema(type="integer", minimum=0)
      *     ),
@@ -94,8 +95,9 @@ class DriverController extends Controller
         Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
         try {
-            $drivers = $manager->list($criteria);
-            return ResponseHelper::success($drivers);
+            $paginator = $manager->list($criteria);
+            $metadata = new HateosMetadata($paginator);
+            return ResponseHelper::success(DriverConverter::convertListFromArrayToResponse($paginator->items()), metadata: $metadata);
         } catch (ServiceException $e) {
             return ResponseHelper::error($e);
         } catch (RepositoryException $e) {
@@ -133,8 +135,7 @@ class DriverController extends Controller
 
         try {
             $driver = $manager->create($data);
-            $converter = new DriverConverter();
-            return ResponseHelper::success($converter->convertFromModelToArray($driver), Response::HTTP_CREATED);
+            return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);
         } catch (ServiceException $e) {
             return ResponseHelper::error($e);
         } catch (\Throwable $e) {

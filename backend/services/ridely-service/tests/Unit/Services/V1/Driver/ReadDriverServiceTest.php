@@ -6,10 +6,12 @@ use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\Criteria;
 use App\Services\V1\Driver\ReadDriverService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Mocks\Services\V1\Driver\ReadDriverServiceMock;
 use PHPUnit\Framework\MockObject\Exception;
+use Tests\Helpers\DriverHelper;
 use Tests\Unit\UnitTestCase;
 
 // TODO revisar os nomes dos testes
@@ -41,11 +43,18 @@ class ReadDriverServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        // TODO migrar para um Helper ou Util
-        $drivers = [
-            ['id' => 1, 'name' => 'John Doe'],
-            ['id' => 2, 'name' => 'Jane Smith']
-        ];
+        $drivers = collect(DriverHelper::getDriversListSample());
+
+        $paginator = new LengthAwarePaginator(
+            items: $drivers,
+            total: $drivers->count(),
+            perPage: 15,
+            currentPage: 1,
+            options: [
+                'path' => '/api/v1/drivers',
+                'query' => []
+            ]
+        );
 
         $this->criteria = new Criteria([]);
 
@@ -53,12 +62,13 @@ class ReadDriverServiceTest extends UnitTestCase
             ->expects($this->once())
             ->method('all')
             ->with($this->criteria)
-            ->willReturn($drivers);
+            ->willReturn($paginator);
 
         $this->service = $this->mock->getObjectWithMockDependencies();
         $result = $this->service->execute($this->criteria);
+        $items = $result->items();
 
-        $this->assertEquals($drivers, $result);
+        $this->assertEquals($drivers->toArray(), $items);
     }
 
     public function testExecuteWithInvalidCriteriaThrowsServiceException()

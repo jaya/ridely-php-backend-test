@@ -50,9 +50,9 @@
                 "operationId": "d7e939814aa58b3a941ed13b4b77955e",
                 "parameters": [
                     {
-                        "name": "offset",
+                        "name": "page",
                         "in": "query",
-                        "description": "Deslocamento (ponto de início da listagem)",
+                        "description": "Referente a qual página dos itens da listagem deseja buscar",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -741,6 +741,60 @@
                 },
                 "type": "object"
             },
+            "DriverListLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers?limit=2&fields=id&page=1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers/1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverPaginationLinks": {
+                "properties": {
+                    "self": {
+                        "$ref": "#/components/schemas/DriverListLink"
+                    },
+                    "next": {
+                        "$ref": "#/components/schemas/DriverListLink"
+                    },
+                    "previous": {
+                        "$ref": "#/components/schemas/DriverListLink"
+                    },
+                    "first": {
+                        "$ref": "#/components/schemas/DriverListLink"
+                    },
+                    "last": {
+                        "$ref": "#/components/schemas/DriverListLink"
+                    }
+                },
+                "type": "object"
+            },
             "DriverListResponse": {
                 "properties": {
                     "success": {
@@ -764,6 +818,12 @@
                         "items": {
                             "$ref": "#/components/schemas/Driver"
                         }
+                    },
+                    "_meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/DriverPaginationLinks"
                     }
                 },
                 "type": "object"
@@ -790,6 +850,23 @@
                     "available": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "_links": {
+                        "properties": {
+                            "self": {
+                                "$ref": "#/components/schemas/DriverLink"
+                            },
+                            "update": {
+                                "$ref": "#/components/schemas/DriverLink"
+                            },
+                            "replace": {
+                                "$ref": "#/components/schemas/DriverLink"
+                            },
+                            "delete": {
+                                "$ref": "#/components/schemas/DriverLink"
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -834,6 +911,40 @@
                         "items": {
                             "type": "object"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "PaginationMeta": {
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 17
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "previousPage": {
+                        "type": "integer",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "currentPage": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nextPage": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "lastPage": {
+                        "type": "integer",
+                        "example": 9
                     }
                 },
                 "type": "object"
