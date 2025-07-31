@@ -73,9 +73,12 @@ A solução com **Amazon ECS** utiliza serviços gerenciados para orquestração
 * **RabbitMQ**: Comunicação assíncrona entre serviços.
 
 
-#### Diagrama
+#### Diagramas
+Componentes:
+![ridely-ecs-component.png](architecture/diagrams/uml/ridely-ecs-component.png)
+Implantação:
+![ridely-ecs-deployment.png](architecture/diagrams/uml/ridely-ecs-deployment.png)
 
-![ridely-component-solution-ecs.png](architecture/diagrams/uml/ridely-component-solution-ecs.png)
 
 ### Solução B: Arquitetura baseada em EKS + Kong
 
@@ -92,9 +95,12 @@ A solução baseada em **EKS (Kubernetes)** usa um cluster Kubernetes para orque
 - **ElastiCache (Redis)**: Cache de alta performance.
 - **RabbitMQ**: Comunicação assíncrona entre os pods dos serviços.
 
-#### Diagrama
+#### Diagramas
+Componentes:
+![ridely-eks-component.png](architecture/diagrams/uml/ridely-eks-component.png)
+Implantação:
+![ridely-eks-deployment.png](architecture/diagrams/uml/ridely-eks-deployment.png)
 
-![ridely-component-solution-eks.png](architecture/diagrams/uml/ridely-component-solution-eks.png)
 
 ### Solução C: Arquitetura baseada em ECS + AWS Api Gateway
 
@@ -111,8 +117,11 @@ A solução com **Amazon ECS** usa serviços gerenciados para orquestração de 
 - **ElastiCache (Redis)**: Cache de alta performance.
 - **RabbitMQ**: Comunicação assíncrona entre serviços.
 
-#### Diagrama
-![ridely-component-solution-ecs+apigwt.png](architecture/diagrams/uml/ridely-component-solution-ecs%2Bapigwt.png)
+#### Diagramas
+Componentes:
+![ridely-ecs+apigwt-component.png](architecture/diagrams/uml/ridely-ecs%2Bapigwt-component.png)
+Implantação:
+![ridely-ecs+apigwt-deployment.png](architecture/diagrams/uml/ridely-ecs%2Bapigwt-deployment.png)
 
 
 
@@ -139,6 +148,8 @@ A escolha entre os cenários dependerá de:
 * **Custo x Controle**: EKS tende a apresentar custos maiores, mas oferece controle mais refinado e escalabilidade avançada.
 
 Todas as soluções são compatíveis com Terraform, Ansible e Helm Charts.
+
+> Nota: Para a solução atual deste desafio eu optei por montar as configurações para um cenário de EKS.
 
 
 ## Segurança

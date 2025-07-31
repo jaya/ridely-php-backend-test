@@ -5,14 +5,18 @@
   - Documentação
     - Arquitetura
       - Diagramas
-        - [ ] C4 Contexto
-        - [ ] C4 Container
+        - C4
+          - [x] C4 Contexto
+          - [x] C4 Container
+        - Uml
+          - [x] Componente
+          - [x] Deployment
+          - [ ] Sequence
       - Documentos
         - Serviços
     - Geral
-        - [ ] Criar README com visão geral do projeto
+        - [x] Criar README com visão geral do projeto
         - [ ] Documentar fluxo de autenticação e consumo de API
-        - [ ] Criar diagrama de componentes (PlantUML ou draw.io)
         - [ ] Documentar eventos/mensageria e serviços envolvidos
         - [ ] Documentar alertas e dashboards de observabilidade
 - Infraestrutura
@@ -36,7 +40,7 @@
       - [x] Auth Service (KeyCloak)
       - [x] Ridely Service
       - [x] Ridely Service Nginx
-      - [ ] Ridely Calc service (Node.js)
+      - [ ] Ridely Pricing service (Node.js)
       - [ ] RabbitMQ
     - Api Gateway
       - [ ] Kong
@@ -46,12 +50,13 @@
       - [ ] Configurar PVCs, se necessário
       - [ ] Separar ambientes (local, homologação, produção) com arquivos `values.yaml` 
 - Serviços
-  - Ridely Calc service (Node.js)
+  - Ridely Pricing service (Node.js)
   - Ridely Service (PHP + Laravel)
     - Docs
       - Coleção do Postman
       - Api Docs
         - [x] Docs/Swagger (ridely-service)
+        - [x] Docs/Swagger (pricing-service)
         - [ ] Docs/Swagger (keycloack)
       - [ ] README.md
     - GitActions
@@ -70,13 +75,16 @@
       - [x] Json
     - Restful
       - [x] HATEOS
-- Autenticação (Keycloak + Kong)
+    - Healthceheck inteligente
+- Autenticação (Keycloak)
   - [x] Deploy do Keycloak com Helm
   - [x] Configurar banco de dados do Keycloak
   - [ ] Criar realms, clients e roles no Keycloak
-  - [ ] Configurar Kong com plugin OIDC
-  - [ ] Proteger rotas do Laravel e cálculo via Kong + OIDC
+  - [ ] Proteger rotas do ridely-service e pricing-service com Tokens JWT
   - [ ] Validar tokens de autenticação nos serviços
+- Autenticação (Kong)
+  - [ ] Configurar Kong com plugin OIDC
+  - [ ] Proteger rotas do ridely-service e pricing-service via Kong + OIDC
 - Comunicação entre Serviços e Eventos
   - [ ] Escolher entre RabbitMQ (local/dev) e AWS SQS (produção)
   - [ ] Criar tópicos/filas (ex: corrida_solicitada, corrida_finalizada)
@@ -85,10 +93,10 @@
   - [ ] Implementar tratamento de falhas e DLQ (Dead Letter Queue)
 - Gerenciamento de Segredos
   - [ ] Definir estratégia de segredos:
-  - [ ] Kubernetes Secrets com criptografia
-  - [ ] Sealed Secrets + SOPS (com GitOps)
-  - [ ] Versionar segredos de forma segura (Git + Kustomize ou Helm)
-  - [ ] Avaliar uso futuro de Secret Manager da AWS em produção
+    - [ ] Kubernetes Secrets com criptografia
+    - [ ] Sealed Secrets + SOPS (com GitOps)
+    - [ ] Versionar segredos de forma segura (Git + Kustomize ou Helm)
+    - [ ] Avaliar uso futuro de Secret Manager da AWS em produção
 - CI/CD
   - [ ] Criar pipelines com GitHub Actions (ou AWS CodePipeline)
   - [ ] Automatizar:
@@ -99,6 +107,8 @@
   - [ ] Adicionar versionamento de imagem/tag automático
 - Testes e Validações
   - [ ] Escrever testes unitários dos serviços
+    - [ ] ridely-service
+    - [ ] pricing-service
   - [ ] Escrever testes de integração (API + mensageria)
   - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
   - [ ] Testar escalabilidade dos serviços com HPA

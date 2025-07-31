@@ -1,0 +1,81 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+'-----------------------------------------
+' People
+'-----------------------------------------
+Person(user, "Customer", "Uses the mobile app")
+
+'-----------------------------------------
+' Nodes (EKS cluster and outside systems)
+'-----------------------------------------
+
+Node(k8sCluster, "Amazon EKS", "Kubernetes Cluster") {
+
+    Node(node1, "Node Group A", "EC2 worker node") {
+        Container(kongProxy, "Kong Proxy", "Docker Container", "Routes incoming HTTP requests to backend services")
+        Container(kongIngress, "Kong Ingress Controller", "Docker Container", "Manages Ingress resources and updates Kong")
+        Container(authService, "Auth Service", "Keycloak Container", "Handles user authentication and authorization")
+    }
+
+    Node(node2, "Node Group B", "EC2 worker node") {
+        Container(ridelyService, "Ridely Service", "PHP/Laravel Container", "Manages rides, drivers, and ride events")
+        Container(pricingService, "Pricing Service", "Node.js Container", "Estimates ride prices dynamically")
+        Container(rabbitmq, "RabbitMQ", "Docker Container", "Message broker for async events between services")
+    }
+
+    Node(node3, "Node Group C", "EC2 worker node") {
+        Container(prometheus, "Prometheus", "Prometheus Container", "Collects metrics from services")
+        Container(grafana, "Grafana", "Grafana Container", "Visualizes collected metrics and logs")
+        Container(loki, "Loki", "Loki Container", "Aggregates service logs")
+        Container(jaeger, "Jaeger", "Jaeger Container", "Visualizes distributed traces across services")
+    }
+}
+
+'-----------------------------------------
+' Databases (Managed services or in-cluster)
+'-----------------------------------------
+Node(cloudServices, "Managed Databases", "Amazon RDS / ElastiCache") {
+    ContainerDb(mysql, "Ridely DB", "MySQL", "Stores rides, drivers, and users")
+    ContainerDb(postgres, "Keycloak DB", "PostgreSQL", "Stores user auth data")
+    ContainerDb(redis, "Pricing Cache", "Redis", "Temporary cache for fare calculations")
+}
+
+'-----------------------------------------
+' External Device
+'-----------------------------------------
+Node(userDevice, "User Device", "iOS / Android App") {
+    Container(ridelyMobile, "Ridely Mobile", "Mobile App", "Frontend app to request rides")
+}
+
+'-----------------------------------------
+' Relationships
+'-----------------------------------------
+Rel(user, ridelyMobile, "Uses")
+Rel(ridelyMobile, kongProxy, "Sends HTTPS requests")
+
+Rel(kongProxy, authService, "Routes /auth requests")
+Rel(kongProxy, ridelyService, "Routes /rides requests")
+Rel(kongProxy, pricingService, "Routes /pricing requests")
+
+Rel(authService, postgres, "Reads/Writes user auth data")
+
+Rel(ridelyService, mysql, "Reads/Writes ride and user data")
+Rel(ridelyService, rabbitmq, "Publishes events")
+Rel(ridelyService, redis, "Reads cached pricing data")
+
+Rel(pricingService, redis, "Reads/Writes pricing estimates")
+Rel(pricingService, rabbitmq, "Emits pricing events")
+
+Rel(prometheus, ridelyService, "Scrapes metrics")
+Rel(prometheus, pricingService, "Scrapes metrics")
+Rel(loki, ridelyService, "Collects logs")
+Rel(loki, pricingService, "Collects logs")
+Rel(jaeger, ridelyService, "Collects traces")
+Rel(jaeger, pricingService, "Collects traces")
+
+Rel(grafana, prometheus, "Queries metrics")
+Rel(grafana, loki, "Queries logs")
+Rel(grafana, jaeger, "Visualizes traces")
+
+@enduml

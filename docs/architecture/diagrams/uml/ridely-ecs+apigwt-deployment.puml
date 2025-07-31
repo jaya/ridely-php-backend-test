@@ -1,0 +1,89 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+'-----------------------------------------
+' People
+'-----------------------------------------
+Person(user, "Customer", "Uses the mobile app")
+
+Node(userDevice, "User Device", "iOS / Android") {
+    Container(ridelyMobile, "Ridely Mobile", "Mobile App", "Frontend app to request rides")
+}
+
+'-----------------------------------------
+' API Gateway + Load Balancer
+'-----------------------------------------
+Node(apiGateway, "Amazon API Gateway", "API Management") {
+    Container(apiGatewayComponent, "Public Gateway", "API Gateway", "Routes external HTTPS traffic to ECS or Lambda")
+}
+
+Node(alb, "Application Load Balancer", "AWS ALB") {
+    Container(albComponent, "Load Balancer", "ALB", "Distributes traffic to ECS services")
+}
+
+'-----------------------------------------
+' ECS Cluster
+'-----------------------------------------
+Node(ecsCluster, "ECS Cluster", "Amazon ECS") {
+
+    Node(ridelyTask, "Ridely Task", "Fargate Task or EC2") {
+        Container(ridelyService, "Ridely Service", "PHP/Laravel", "Ride management and event publishing")
+    }
+
+    Node(pricingTask, "Pricing Task", "Fargate Task or EC2") {
+        Container(pricingService, "Pricing Service", "Node.js", "Estimates pricing")
+    }
+
+    Node(authTask, "Auth Task", "Fargate Task or EC2") {
+        Container(authService, "Keycloak", "Identity Provider", "Handles OAuth2 authentication")
+    }
+
+    Node(brokerTask, "Broker Task", "Fargate Task or EC2") {
+        Container(rabbitmq, "RabbitMQ", "Broker", "Handles events")
+    }
+
+    Node(obsTask, "Observability Stack", "Fargate Task or EC2") {
+        Container(prometheus, "Prometheus", "Collects metrics")
+        Container(grafana, "Grafana", "Visualizes metrics")
+        Container(loki, "Loki", "Logs")
+        Container(jaeger, "Jaeger", "Tracing")
+    }
+}
+
+'-----------------------------------------
+' Databases
+'-----------------------------------------
+Node(databases, "Managed DBs", "Amazon RDS / ElastiCache") {
+    ContainerDb(mysql, "Ridely DB", "MySQL", "Stores core ride data")
+    ContainerDb(postgres, "Keycloak DB", "PostgreSQL", "Auth DB")
+    ContainerDb(redis, "Pricing Cache", "Redis", "TTL cache for pricing")
+}
+
+'-----------------------------------------
+' Relationships
+'-----------------------------------------
+Rel(user, ridelyMobile, "Uses")
+Rel(ridelyMobile, apiGatewayComponent, "HTTPS Request")
+
+Rel(apiGatewayComponent, albComponent, "Forward request")
+
+Rel(albComponent, ridelyService, "Routes to ECS service")
+Rel(albComponent, pricingService, "Routes to ECS service")
+Rel(albComponent, authService, "Routes to ECS service")
+
+Rel(ridelyService, mysql, "Reads/Writes")
+Rel(ridelyService, rabbitmq, "Publishes")
+Rel(ridelyService, authService, "Validates tokens")
+Rel(ridelyService, redis, "Reads cache")
+
+Rel(pricingService, redis, "Reads/Writes")
+Rel(pricingService, rabbitmq, "Publishes pricing events")
+
+Rel(authService, postgres, "Reads/Writes")
+
+Rel(prometheus, ridelyService, "Scrapes metrics")
+Rel(grafana, prometheus, "Displays")
+Rel(grafana, loki, "Reads logs")
+Rel(grafana, jaeger, "Shows traces")
+
+@enduml
