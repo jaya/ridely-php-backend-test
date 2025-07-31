@@ -1,0 +1,107 @@
+@startuml
+' Solução baseada em EKS e AWS com Kong e observabilidade
+
+[ridely-mobile] <<mobile>>
+
+package "EKS Cluster" {
+    package "kong-namespace" {
+        [kong-proxy] <<Pod>> <<Kong Proxy>>
+        [kong-ingress-controller] <<Pod>> <<Ingress Controller>>
+    }
+    package "ridely-namespace" {
+        [ridely-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+
+        [auth-service] <<Pod>> <<Keycloak>>
+        [ridely-service] <<Pod>> <<PHP/Laravel>>
+        [pricing-service] <<Pod>> <<Node.js/Express>>
+        [rabbitmq-service] <<Pod>> <<RabbitMQ>>
+    }
+}
+
+note left of "pricing-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 3
+    CPU Utilization target: 60%
+end note
+
+note bottom of "auth-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 2
+    CPU Utilization target: 60%
+end note
+
+note right of "ridely-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 3
+    CPU Utilization target: 60%
+end note
+
+package RDS {
+    rectangle "MySQL" {
+        [ridely-database] <<database>>
+        [ridely-database-replica] <<read-only database>>
+    }
+    rectangle "PostgreSQL" {
+        [auth-service-database] <<database>>
+    }
+}
+
+package ElastiCache {
+    rectangle "Redis" {
+        [ridely-cache-database] <<cache>>
+        [pricing-cache-database] <<cache>>
+    }
+}
+
+package Observability {
+    [prometheus] <<Service>>
+    [grafana] <<Service>>
+    [jaeger] <<Service>>
+    [loki] <<Service>>
+}
+
+' Conexões
+[ridely-mobile] --> [kong-proxy]
+[kong-proxy] -left-> [kong-ingress-controller] : config managed by
+
+' Kong ingress routing to backend services
+[kong-proxy] --> [ridely-service-nginx]
+[kong-proxy] --> [pricing-service-nginx]
+[kong-proxy] --> [auth-service]
+
+' Nginx proxies forwarding to services
+[ridely-service-nginx] --> [ridely-service]
+[pricing-service-nginx] --> [pricing-service]
+
+' Services access databases and cache
+[auth-service] ..> [auth-service-database] : Reads/Writes auth data
+[ridely-service] ..> [ridely-database] : Reads/Writes ride and user data
+[ridely-service] ..> [auth-service] : Token validation
+[ridely-service] ..> [ridely-cache-database] : Reads/Writes cache
+[ridely-database] ..> [ridely-database-replica] : Replication
+
+[pricing-service] ..> [auth-service] : Token validation
+[pricing-service] ..> [pricing-cache-database] : Reads/Writes pricing cache
+
+' Messaging with RabbitMQ
+[pricing-service] ..> [rabbitmq-service] : Publishes/Consumes events
+[ridely-service] ..> [rabbitmq-service] : Publishes/Consumes events
+
+' Observability integrations
+[ridely-service] --> [prometheus]
+[ridely-service] --> [loki]
+[ridely-service] --> [jaeger]
+
+[pricing-service] --> [prometheus]
+[pricing-service] --> [loki]
+[pricing-service] --> [jaeger]
+
+[grafana] --> [prometheus]
+[grafana] --> [loki]
+[grafana] --> [jaeger]
+
+@enduml

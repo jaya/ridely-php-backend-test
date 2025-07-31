@@ -23,7 +23,7 @@ fi
 #kubectl describe pod <nome-do-pod> -n $PROJECT_NAMESPACE
 #kubectl logs <nome-do-pod> -n $PROJECT_NAMESPACE
 
-# Suponha que você quer filtrar por pods com "ridely-database" no nome
+# Suponha que você quer filtrar por pods com "ridely-databases" no nome
 #POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep "$SHARED_DATABASE_CHART_NAME" | head -n 1 | awk '{print $1}')
 #
 ## Agora você pode usar $POD nos demais comandos:

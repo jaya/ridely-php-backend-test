@@ -25,7 +25,7 @@ CHART=$1
 if [ ! -z "$CHART" ]; then
   echo "Target chart: $CHART"
 
-  # Check if the chart required is "ridely-database"
+  # Check if the chart required is "ridely-databases"
   if [ "$CHART" = "ridely-database" ]; then
     CHART_PATH="./database/charts/$CHART"
   else
@@ -41,7 +41,7 @@ if [ ! -z "$CHART" ]; then
 
 else
 #  echo '----------------------------------------'
-#  echo 'Deleting database pvc'
+#  echo 'Deleting databases pvc'
 #  echo '----------------------------------------'
   # TODO talvez somente habilitar esse bloco quando necessário
   #echo 'kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" > /dev/null 2>&1'
@@ -53,13 +53,13 @@ else
   #fi
 
   echo '----------------------------------------'
-  echo 'Installing database chart'
+  echo 'Installing databases chart'
   echo '----------------------------------------'
-  helm install "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./database/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+  helm install "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./database/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
   fi
 
   echo '----------------------------------------'

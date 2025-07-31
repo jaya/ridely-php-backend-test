@@ -1,0 +1,1 @@
+Migrar o mysql para  bitnami Mysql

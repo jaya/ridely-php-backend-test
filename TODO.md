@@ -61,18 +61,18 @@
     - Tests 
       - [x] Unit tests
       - [ ] Coverage
-      - [ ] Integration testes
+      - [ ] Integration tests
     - Segurança
       - [ ] CORS
       - [ ] UUID
       - [ ] Auth implementação/integração
     - Logs
-      - [ ] Json
+      - [x] Json
     - Restful
-      - [ ] HATEOS
+      - [x] HATEOS
 - Autenticação (Keycloak + Kong)
-  - [ ] Deploy do Keycloak com Helm
-  - [ ] Configurar banco de dados do Keycloak
+  - [x] Deploy do Keycloak com Helm
+  - [x] Configurar banco de dados do Keycloak
   - [ ] Criar realms, clients e roles no Keycloak
   - [ ] Configurar Kong com plugin OIDC
   - [ ] Proteger rotas do Laravel e cálculo via Kong + OIDC

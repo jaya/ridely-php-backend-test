@@ -30,23 +30,23 @@ if [ ! -z "$CHART" ]; then
 
 else
 #  echo '----------------------------------------'
-#  echo 'Uninstalling database chart'
+#  echo 'Uninstalling databases chart'
 #  echo '----------------------------------------'
-  #helm uninstall "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
+  #helm uninstall "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
   #echo '----------------------------------------'
-  #echo 'Deleting database pvc'
+  #echo 'Deleting databases pvc'
   #echo '----------------------------------------'
   #if kubectl get pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" &>/dev/null; then
   #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" \
   #    --ignore-not-found --wait=false &
   #fi
   #echo '----------------------------------------'
-  #echo 'Uninstalling database chart'
+  #echo 'Uninstalling databases chart'
   #echo '----------------------------------------'
   #SERVICE="auth-service"
   #helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
   #echo '----------------------------------------'
-  #echo 'Deleting database pvc'
+  #echo 'Deleting databases pvc'
   #echo '----------------------------------------'
   #if kubectl get pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" &>/dev/null; then
   #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" \

@@ -23,7 +23,7 @@ echo 'Port forwarding...'
 echo '----------------------------------------'
 echo "kubectl port-forward svc/$SHARED_DATABASE_CHART_NAME 3306:3306 -n $PROJECT_NAMESPACE"
 kubectl port-forward "svc/$SHARED_DATABASE_CHART_NAME" 3306:3306 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
-# kubectl port-forward "svc/ridely-database" 3306:3306 -n "ridely" > /dev/null 2>&1 &
+# kubectl port-forward "svc/ridely-databases" 3306:3306 -n "ridely" > /dev/null 2>&1 &
 
 echo "kubectl port-forward svc/auth-service-postgresql 5432:5432 -n $PROJECT_NAMESPACE"
 kubectl port-forward "svc/auth-service-postgresql" 5432:5432 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &

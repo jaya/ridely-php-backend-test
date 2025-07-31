@@ -23,7 +23,7 @@ fi
 #kubectl describe pod <nome-do-pod> -n $PROJECT_NAMESPACE
 #kubectl logs <nome-do-pod> -n $PROJECT_NAMESPACE
 
-# Suponha que você quer filtrar por pods com "ridely-database" no nome
+# Suponha que você quer filtrar por pods com "ridely-databases" no nome
 #SERVICE=$SHARED_DATABASE_CHART_NAME
 #POD=$(kubectl get pods -n "$PROJECT_NAMESPACE" --no-headers | grep "$SERVICE" | head -n 1 | awk '{print $1}')
 

@@ -19,9 +19,9 @@ if [ -z "$SHARED_DATABASE_CHART_NAME" ]; then
 fi
 
 echo '----------------------------------------'
-echo 'Testing database chart...'
+echo 'Testing databases chart...'
 echo '----------------------------------------'
-# database helm
+# databases helm
 echo "helm test \"$SHARED_DATABASE_CHART_NAME\" -n \"$PROJECT_NAMESPACE\""
 helm test "$SHARED_DATABASE_CHART_NAME" -n "$PROJECT_NAMESPACE"
 

@@ -1,0 +1,95 @@
+@startuml
+' Diagrama de Componentes atualizado para arquitetura Kubernetes com Kong e Keycloak
+
+[ridely-mobile] <<mobile>>
+
+component "API Gateway (Kong)" {
+    component "Kong Proxy" {
+        [Kong Plugins (Auth, Rate Limiting, Logging)]
+        [Kong Proxy] --> [auth-service API]
+        [Kong Proxy] --> [ridely-service API]
+        [Kong Proxy] --> [pricing-service API]
+    }
+    component "Kong Ingress Controller"
+}
+
+component Kubernetes {
+    component "Ridely Namespace" {
+        [ridely-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+
+        [auth-service] <<Pod>> <<Keycloak>>
+        [ridely-service] <<Pod>> <<PHP/Laravel>>
+        [pricing-service] <<Pod>> <<Node.js/Express>>
+        [rabbitmq] <<Pod>> <<RabbitMQ>>
+    }
+}
+
+component Databases {
+    rectangle "MySQL" {
+        [ridely-database] <<database>>
+        [ridely-database-replica] <<read-only database>>
+    }
+    rectangle "PostgreSQL" {
+        [auth-service-database] <<database>>
+    }
+}
+
+component Cache {
+    rectangle "Redis" {
+        [ridely-cache-database] <<cache>>
+        [pricing-cache-database] <<cache>>
+    }
+}
+
+' ------------------------------------------
+' Autoscaling Policies (Notas)
+' ------------------------------------------
+note left of "pricing-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 3
+    CPU Utilization target: 60%
+end note
+
+note right of "auth-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 2
+    CPU Utilization target: 60%
+end note
+
+note right of "ridely-service"
+    Autoscaling Policy
+    Min pods: 1
+    Max pods: 3
+    CPU Utilization target: 60%
+end note
+
+' ------------------------------------------
+' Relacionamentos
+' ------------------------------------------
+[ridely-mobile] --> [Kong Proxy] : HTTPS requests
+
+[Kong Proxy] --> [auth-service]
+[Kong Proxy] --> [ridely-service]
+[Kong Proxy] --> [pricing-service]
+
+[ridely-service-nginx] --> [ridely-service]
+[pricing-service-nginx] --> [pricing-service]
+
+[auth-service] ..> [auth-service-database] : Reads/Writes auth data
+
+[ridely-service] ..> [ridely-database] : Reads/Writes ride data
+[ridely-service] ..> [ridely-cache-database] : Reads/Writes cache
+[ridely-service] ..> [auth-service] : Token validation
+
+[pricing-service] ..> [pricing-cache-database] : Reads/Writes pricing cache
+[pricing-service] ..> [auth-service] : Token validation
+
+[ridely-service] ..> [rabbitmq] : Publishes/Consumes events
+[pricing-service] ..> [rabbitmq] : Publishes/Consumes events
+
+[ridely-database] ..> [ridely-database-replica] : Replication
+
+@enduml

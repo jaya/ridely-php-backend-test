@@ -20,10 +20,10 @@ if [ -z "$SHARED_DATABASE_CHART_NAME" ]; then
 fi
 
 echo '----------------------------------------'
-echo 'Validating database chart...'
+echo 'Validating databases chart...'
 echo '----------------------------------------'
-# database helm
-helm template "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./database/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+# databases helm
+helm template "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
 
 echo '----------------------------------------'
 echo 'Validating services chart'
