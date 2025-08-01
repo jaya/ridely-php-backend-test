@@ -1,0 +1,2353 @@
+{
+	"info": {
+		"_postman_id": "b48a2d1a-7ade-4bb0-9ceb-ed1edc79ae87",
+		"name": "Ridely Service",
+		"description": "Provide Taxi services",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8729372"
+	},
+	"item": [
+		{
+			"name": "/",
+			"item": [
+				{
+					"name": "Root endpoint",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"app\": \"<string>\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "health",
+			"item": [
+				{
+					"name": "Health check endpoint",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/health",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"health"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "api",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "login",
+							"item": [
+								{
+									"name": "Realiza login via Keycloak",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Analisa a resposta JSON",
+													"const responseJson = pm.response.json();",
+													"",
+													"// Verifica se a resposta contém 'access_token'",
+													"if (responseJson && responseJson.access_token) {",
+													"    // Salva o access_token na variável de ambiente \"bearerToken\"",
+													"    pm.environment.set(\"bearerToken\", responseJson.access_token);",
+													"    pm.collectionVariables.set(\"bearerToken\", responseJson.access_token);",
+													"    console.log(\"Access Token salvo: \", responseJson.access_token);",
+													"} else {",
+													"    console.log(\"Access Token não encontrado na resposta.\");",
+													"}",
+													"",
+													"// Opcional: Salvar o refresh_token também, se precisar",
+													"if (responseJson && responseJson.refresh_token) {",
+													"    pm.environment.set(\"refreshToken\", responseJson.refresh_token);",
+													"    pm.collectionVariables.set(\"refreshToken\", responseJson.refresh_token);",
+													"    console.log(\"Refresh Token salvo: \", responseJson.refresh_token);",
+													"} else {",
+													"    console.log(\"Refresh Token não encontrado na resposta.\");",
+													"}",
+													"",
+													"// Verifica se o status da resposta é 200 OK",
+													"pm.test(\"Status code is 200 OK\", function () {",
+													"    pm.response.to.have.status(200);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/login",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"login"
+											]
+										},
+										"description": "Autentica o usuário usando grant_type=password no Keycloak."
+									},
+									"response": [
+										{
+											"name": "Login bem-sucedido",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"username\": \"anderson.contreira\",\n    \"password\": \"123\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/login",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"login"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"access_token\": \"<string>\",\n  \"refresh_token\": \"<string>\",\n  \"expires_in\": \"<integer>\"\n}"
+										},
+										{
+											"name": "Credenciais inválidas",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"username\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/login",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"login"
+													]
+												}
+											},
+											"status": "Unauthorized",
+											"code": 401,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "refresh",
+							"item": [
+								{
+									"name": "Renova o token de acesso",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/refresh",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"refresh"
+											]
+										},
+										"description": "Utiliza um refresh_token válido para renovar o token de acesso."
+									},
+									"response": [
+										{
+											"name": "Token renovado com sucesso",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/refresh",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"refresh"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"access_token\": \"<string>\",\n  \"refresh_token\": \"<string>\",\n  \"expires_in\": \"<integer>\"\n}"
+										},
+										{
+											"name": "Refresh token inválido ou expirado",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/refresh",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"refresh"
+													]
+												}
+											},
+											"status": "Unauthorized",
+											"code": 401,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "logout",
+							"item": [
+								{
+									"name": "Realiza logout no Keycloak",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/auth/logout",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"logout"
+											]
+										},
+										"description": "Finaliza a sessão do usuário no Keycloak usando o refresh_token."
+									},
+									"response": [
+										{
+											"name": "Logout bem-sucedido",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/logout",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"logout"
+													]
+												}
+											},
+											"status": "No Content",
+											"code": 204,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										},
+										{
+											"name": "Refresh token inválido ou erro de autenticação",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"refresh_token\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/auth/logout",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"auth",
+														"logout"
+													]
+												}
+											},
+											"status": "Unauthorized",
+											"code": 401,
+											"_postman_previewlanguage": "text",
+											"header": [],
+											"cookie": [],
+											"body": ""
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "v1",
+					"item": [
+						{
+							"name": "drivers",
+							"item": [
+								{
+									"name": "{id}",
+									"item": [
+										{
+											"name": "open-rides",
+											"item": [
+												{
+													"name": "Lista corridas abertas para um motorista",
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/drivers/:id/open-rides",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"drivers",
+																":id",
+																"open-rides"
+															],
+															"variable": [
+																{
+																	"key": "id",
+																	"value": "<integer>",
+																	"description": "(Required) ID do driver"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "Lista de rides abertas",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/v1/drivers/:id/open-rides",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"v1",
+																		"drivers",
+																		":id",
+																		"open-rides"
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "[\n  {\n    \"id\": \"<integer>\",\n    \"status\": \"<string>\",\n    \"drop_off\": \"<string>\",\n    \"pick_up\": \"<string>\",\n    \"passenger\": {\n      \"name\": \"<string>\",\n      \"email\": \"<email>\"\n    }\n  },\n  {\n    \"id\": \"<integer>\",\n    \"status\": \"<string>\",\n    \"drop_off\": \"<string>\",\n    \"pick_up\": \"<string>\",\n    \"passenger\": {\n      \"name\": \"<string>\",\n      \"email\": \"<email>\"\n    }\n  }\n]"
+														},
+														{
+															"name": "Nenhuma corrida aberta",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/v1/drivers/:id/open-rides",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"v1",
+																		"drivers",
+																		":id",
+																		"open-rides"
+																	],
+																	"variable": [
+																		{
+																			"key": "id"
+																		}
+																	]
+																}
+															},
+															"status": "Not Found",
+															"code": 404,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														}
+													]
+												}
+											]
+										},
+										{
+											"name": "Remove um motorista",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "<integer>",
+															"description": "(Required) ID do driver"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Driver removido com sucesso",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/drivers/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"drivers",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "No Content",
+													"code": 204,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												},
+												{
+													"name": "Driver não encontrado",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/drivers/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"drivers",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "{driverId}",
+									"item": [
+										{
+											"name": "open-rides",
+											"item": [
+												{
+													"name": "Listar corridas abertas para motorista",
+													"request": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/drivers/:driverId/open-rides",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"drivers",
+																":driverId",
+																"open-rides"
+															],
+															"variable": [
+																{
+																	"key": "driverId",
+																	"value": "<integer>",
+																	"description": "(Required) ID do motorista"
+																}
+															]
+														}
+													},
+													"response": [
+														{
+															"name": "Lista de corridas abertas",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/v1/drivers/:driverId/open-rides",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"v1",
+																		"drivers",
+																		":driverId",
+																		"open-rides"
+																	],
+																	"variable": [
+																		{
+																			"key": "driverId"
+																		}
+																	]
+																}
+															},
+															"status": "OK",
+															"code": 200,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "[\n  {\n    \"id\": \"<integer>\",\n    \"status\": \"<string>\",\n    \"pick_up\": \"<string>\",\n    \"drop_off\": \"<string>\"\n  },\n  {\n    \"id\": \"<integer>\",\n    \"status\": \"<string>\",\n    \"pick_up\": \"<string>\",\n    \"drop_off\": \"<string>\"\n  }\n]"
+														},
+														{
+															"name": "Motorista indisponível",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/v1/drivers/:driverId/open-rides",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"v1",
+																		"drivers",
+																		":driverId",
+																		"open-rides"
+																	],
+																	"variable": [
+																		{
+																			"key": "driverId"
+																		}
+																	]
+																}
+															},
+															"status": "Bad Request",
+															"code": 400,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														},
+														{
+															"name": "Nenhuma corrida aberta",
+															"originalRequest": {
+																"method": "GET",
+																"header": [
+																	{
+																		"key": "Accept",
+																		"value": "application/json"
+																	}
+																],
+																"url": {
+																	"raw": "{{baseUrl}}/api/v1/drivers/:driverId/open-rides",
+																	"host": [
+																		"{{baseUrl}}"
+																	],
+																	"path": [
+																		"api",
+																		"v1",
+																		"drivers",
+																		":driverId",
+																		"open-rides"
+																	],
+																	"variable": [
+																		{
+																			"key": "driverId"
+																		}
+																	]
+																}
+															},
+															"status": "Not Found",
+															"code": 404,
+															"_postman_previewlanguage": "json",
+															"header": [
+																{
+																	"key": "Content-Type",
+																	"value": "application/json"
+																}
+															],
+															"cookie": [],
+															"body": "{\n  \"message\": \"<string>\"\n}"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "Lista os motoristas com filtros opcionais",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/drivers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"drivers"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1",
+													"description": "Referente a qual página dos itens da listagem deseja buscar",
+													"disabled": true
+												},
+												{
+													"key": "limit",
+													"value": "<integer>",
+													"description": "Quantidade de resultados por página (máx: 100)",
+													"disabled": true
+												},
+												{
+													"key": "order_by",
+													"value": "<string>",
+													"description": "Campo para ordenação (ex: name, created_at)",
+													"disabled": true
+												},
+												{
+													"key": "sort_by",
+													"value": "desc",
+													"description": "Direção da ordenação: asc ou desc",
+													"disabled": true
+												},
+												{
+													"key": "fields",
+													"value": "<string>",
+													"description": "Campos específicos a retornar (ex: name,available)",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Lista de motoristas retornada com sucesso",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers?page=<integer>&limit=<integer>&order_by=<string>&sort_by=desc&fields=<string>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "<integer>",
+															"description": "Referente a qual página dos itens da listagem deseja buscar"
+														},
+														{
+															"key": "limit",
+															"value": "<integer>",
+															"description": "Quantidade de resultados por página (máx: 100)"
+														},
+														{
+															"key": "order_by",
+															"value": "<string>",
+															"description": "Campo para ordenação (ex: name, created_at)"
+														},
+														{
+															"key": "sort_by",
+															"value": "desc",
+															"description": "Direção da ordenação: asc ou desc"
+														},
+														{
+															"key": "fields",
+															"value": "<string>",
+															"description": "Campos específicos a retornar (ex: name,available)"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"success\": \"<boolean>\",\n  \"label\": \"<string>\",\n  \"code\": \"<integer>\",\n  \"message\": \"<string>\",\n  \"data\": [\n    {\n      \"id\": \"<integer>\",\n      \"name\": \"<string>\",\n      \"car\": {\n        \"license_plate\": \"<string>\",\n        \"model\": \"<string>\",\n        \"color\": \"<string>\"\n      },\n      \"available\": \"<boolean>\",\n      \"_links\": {\n        \"self\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"update\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"replace\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"delete\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        }\n      }\n    },\n    {\n      \"id\": \"<integer>\",\n      \"name\": \"<string>\",\n      \"car\": {\n        \"license_plate\": \"<string>\",\n        \"model\": \"<string>\",\n        \"color\": \"<string>\"\n      },\n      \"available\": \"<boolean>\",\n      \"_links\": {\n        \"self\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"update\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"replace\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        },\n        \"delete\": {\n          \"href\": \"<string>\",\n          \"rel\": \"<string>\",\n          \"method\": \"<string>\"\n        }\n      }\n    }\n  ],\n  \"_meta\": {\n    \"limit\": \"<integer>\",\n    \"total\": \"<integer>\",\n    \"count\": \"<integer>\",\n    \"previousPage\": \"<integer>\",\n    \"currentPage\": \"<integer>\",\n    \"nextPage\": \"<integer>\",\n    \"lastPage\": \"<integer>\"\n  },\n  \"_links\": {\n    \"self\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"next\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"previous\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"first\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"last\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    }\n  }\n}"
+										},
+										{
+											"name": "Erro de validação dos critérios",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers?page=<integer>&limit=<integer>&order_by=<string>&sort_by=desc&fields=<string>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "<integer>",
+															"description": "Referente a qual página dos itens da listagem deseja buscar"
+														},
+														{
+															"key": "limit",
+															"value": "<integer>",
+															"description": "Quantidade de resultados por página (máx: 100)"
+														},
+														{
+															"key": "order_by",
+															"value": "<string>",
+															"description": "Campo para ordenação (ex: name, created_at)"
+														},
+														{
+															"key": "sort_by",
+															"value": "desc",
+															"description": "Direção da ordenação: asc ou desc"
+														},
+														{
+															"key": "fields",
+															"value": "<string>",
+															"description": "Campos específicos a retornar (ex: name,available)"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"success\": \"<boolean>\",\n  \"label\": \"<string>\",\n  \"code\": \"<integer>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Não autorizado",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers?page=<integer>&limit=<integer>&order_by=<string>&sort_by=desc&fields=<string>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "<integer>",
+															"description": "Referente a qual página dos itens da listagem deseja buscar"
+														},
+														{
+															"key": "limit",
+															"value": "<integer>",
+															"description": "Quantidade de resultados por página (máx: 100)"
+														},
+														{
+															"key": "order_by",
+															"value": "<string>",
+															"description": "Campo para ordenação (ex: name, created_at)"
+														},
+														{
+															"key": "sort_by",
+															"value": "desc",
+															"description": "Direção da ordenação: asc ou desc"
+														},
+														{
+															"key": "fields",
+															"value": "<string>",
+															"description": "Campos específicos a retornar (ex: name,available)"
+														}
+													]
+												}
+											},
+											"status": "Unauthorized",
+											"code": 401,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"success\": \"<boolean>\",\n  \"label\": \"<string>\",\n  \"code\": \"<integer>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Outros erros",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers?page=<integer>&limit=<integer>&order_by=<string>&sort_by=desc&fields=<string>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "<integer>",
+															"description": "Referente a qual página dos itens da listagem deseja buscar"
+														},
+														{
+															"key": "limit",
+															"value": "<integer>",
+															"description": "Quantidade de resultados por página (máx: 100)"
+														},
+														{
+															"key": "order_by",
+															"value": "<string>",
+															"description": "Campo para ordenação (ex: name, created_at)"
+														},
+														{
+															"key": "sort_by",
+															"value": "desc",
+															"description": "Direção da ordenação: asc ou desc"
+														},
+														{
+															"key": "fields",
+															"value": "<string>",
+															"description": "Campos específicos a retornar (ex: name,available)"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"success\": \"<boolean>\",\n  \"label\": \"<string>\",\n  \"code\": \"<integer>\",\n  \"message\": \"<string>\"\n}"
+										},
+										{
+											"name": "Serviço indisponível",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers?page=<integer>&limit=<integer>&order_by=<string>&sort_by=desc&fields=<string>",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													],
+													"query": [
+														{
+															"key": "page",
+															"value": "<integer>",
+															"description": "Referente a qual página dos itens da listagem deseja buscar"
+														},
+														{
+															"key": "limit",
+															"value": "<integer>",
+															"description": "Quantidade de resultados por página (máx: 100)"
+														},
+														{
+															"key": "order_by",
+															"value": "<string>",
+															"description": "Campo para ordenação (ex: name, created_at)"
+														},
+														{
+															"key": "sort_by",
+															"value": "desc",
+															"description": "Direção da ordenação: asc ou desc"
+														},
+														{
+															"key": "fields",
+															"value": "<string>",
+															"description": "Campos específicos a retornar (ex: name,available)"
+														}
+													]
+												}
+											},
+											"status": "Service Unavailable",
+											"code": 503,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"success\": \"<boolean>\",\n  \"label\": \"<string>\",\n  \"code\": \"<integer>\",\n  \"message\": \"<string>\"\n}"
+										}
+									]
+								},
+								{
+									"name": "Cria um novo motorista",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{bearerToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"<string>\",\n  \"car\": {\n    \"license_plate\": \"<string>\",\n    \"model\": \"<string>\",\n    \"color\": \"<string>\"\n  },\n  \"available\": \"<boolean>\"\n}",
+											"options": {
+												"raw": {
+													"headerFamily": "json",
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/v1/drivers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"drivers"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "Driver criado com sucesso",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													},
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"name\": \"<string>\",\n  \"car\": {\n    \"license_plate\": \"<string>\",\n    \"model\": \"<string>\",\n    \"color\": \"<string>\"\n  },\n  \"available\": \"<boolean>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/drivers",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"drivers"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n  \"id\": \"<integer>\",\n  \"name\": \"<string>\",\n  \"car\": {\n    \"license_plate\": \"<string>\",\n    \"model\": \"<string>\",\n    \"color\": \"<string>\"\n  },\n  \"available\": \"<boolean>\",\n  \"_links\": {\n    \"self\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"update\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"replace\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    },\n    \"delete\": {\n      \"href\": \"<string>\",\n      \"rel\": \"<string>\",\n      \"method\": \"<string>\"\n    }\n  }\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "rides",
+							"item": [
+								{
+									"name": "{id}",
+									"item": [
+										{
+											"name": "Buscar detalhes de uma corrida",
+											"request": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "<string>",
+															"description": "(Required) ID da corrida"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Detalhes da corrida",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\",\n  \"driver\": {\n    \"name\": \"<string>\",\n    \"car\": {\n      \"license_plate\": \"<string>\",\n      \"model\": \"<string>\",\n      \"color\": \"<string>\"\n    }\n  },\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  },\n  \"price\": \"<float>\"\n}"
+												},
+												{
+													"name": "Corrida não encontrada",
+													"originalRequest": {
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										},
+										{
+											"name": "Remover uma corrida",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/:id",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														":id"
+													],
+													"variable": [
+														{
+															"key": "id",
+															"value": "<string>",
+															"description": "(Required) ID da corrida"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida removida",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "No Content",
+													"code": 204,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												},
+												{
+													"name": "Corrida não encontrada",
+													"originalRequest": {
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/:id",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																":id"
+															],
+															"variable": [
+																{
+																	"key": "id"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "request",
+									"item": [
+										{
+											"name": "Solicitar motorista",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  },\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/request",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														"request"
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida criada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  },\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/request",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"request"
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\",\n  \"driver\": {\n    \"name\": \"<string>\",\n    \"car\": {\n      \"license_plate\": \"<string>\",\n      \"model\": \"<string>\",\n      \"color\": \"<string>\"\n    }\n  },\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  },\n  \"price\": \"<float>\"\n}"
+												},
+												{
+													"name": "Não há motoristas disponíveis",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  },\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/request",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"request"
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"error\": \"<string>\"\n}"
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "cancel",
+									"item": [
+										{
+											"name": "Cancelar corrida",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"id\": \"<integer>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/cancel",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														"cancel"
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida cancelada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/cancel",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"cancel"
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"pick_up\": \"<string>\",\n  \"drop_off\": \"<string>\"\n}"
+												},
+												{
+													"name": "Corrida não encontrada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/cancel",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"cancel"
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "accept",
+									"item": [
+										{
+											"name": "Aceitar corrida",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"id\": \"<integer>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/accept",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														"accept"
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida aceita",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/accept",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"accept"
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"drop_off\": \"<string>\",\n  \"pick_up\": \"<string>\",\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  }\n}"
+												},
+												{
+													"name": "Corrida ou motorista não encontrado",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/accept",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"accept"
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "refuse",
+									"item": [
+										{
+											"name": "Recusar corrida",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"id\": \"<integer>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/refuse",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														"refuse"
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida recusada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/refuse",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"refuse"
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"drop_off\": \"<string>\",\n  \"pick_up\": \"<string>\",\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  }\n}"
+												},
+												{
+													"name": "Corrida não encontrada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/refuse",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"refuse"
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "finish",
+									"item": [
+										{
+											"name": "Finalizar corrida",
+											"request": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													},
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n  \"id\": \"<integer>\",\n  \"price\": \"<float>\"\n}",
+													"options": {
+														"raw": {
+															"headerFamily": "json",
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/api/v1/rides/finish",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"rides",
+														"finish"
+													]
+												}
+											},
+											"response": [
+												{
+													"name": "Corrida finalizada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															},
+															{
+																"key": "Accept",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\",\n  \"price\": \"<float>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/finish",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"finish"
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"body": "{\n  \"id\": \"<integer>\",\n  \"status\": \"<string>\",\n  \"drop_off\": \"<string>\",\n  \"price\": \"<float>\",\n  \"passenger\": {\n    \"name\": \"<string>\",\n    \"email\": \"<email>\"\n  }\n}"
+												},
+												{
+													"name": "Corrida não encontrada",
+													"originalRequest": {
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"id\": \"<integer>\",\n  \"price\": \"<float>\"\n}",
+															"options": {
+																"raw": {
+																	"headerFamily": "json",
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}/api/v1/rides/finish",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"api",
+																"v1",
+																"rides",
+																"finish"
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "text",
+													"header": [],
+													"cookie": [],
+													"body": ""
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "bearerToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": ""
+		}
+	]
+}
