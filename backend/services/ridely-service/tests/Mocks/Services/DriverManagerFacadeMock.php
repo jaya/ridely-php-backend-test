@@ -3,10 +3,9 @@
 namespace Mocks\Services;
 
 use App\Repositories\V1\DriverRepository;
-use App\Services\DriverManagerFacade;
+use App\Services\Facades\DriverManagerFacade;
 use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
-use App\Services\V1\Driver\ReadDriverService;
 use Mocks\AbstractMock;
 use Mocks\Repositories\V1\DriverRepositoryMock;
 use Mocks\Services\V1\Driver\CreateDriverServiceMock;

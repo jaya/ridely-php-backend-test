@@ -1,13 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Facades;
 
-use App\Exceptions\RepositoryException;
-use App\Exceptions\ServiceException;
 use App\Http\Criteria\Criteria;
 use App\Http\Hateos\HateosItemLinks;
-use App\Http\Hateos\HateosLinks;
-use App\Http\Hateos\HateosMetadata;
 use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;

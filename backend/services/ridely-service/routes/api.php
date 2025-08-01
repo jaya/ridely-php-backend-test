@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\V1\DriverController;
-use App\Http\Controllers\V1\RideController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,8 +13,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::prefix('v1')->middleware(['api'])->group(base_path('routes/api/v1.php'));
-Route::prefix('v2')->middleware(['api'])->group(base_path('routes/api/v2.php'));
+Route::prefix('auth')->middleware(['api'])->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('refresh-token', [AuthController::class, 'refreshToken']);
+    Route::post('logout', [AuthController::class, 'logout']);
+});
+
+Route::prefix('v1')->middleware(['api', 'keycloak.jwt'])->group(base_path('routes/api/v1.php'));
+Route::prefix('v2')->middleware(['api', 'keycloak.jwt'])->group(base_path('routes/api/v2.php'));
 
 
 

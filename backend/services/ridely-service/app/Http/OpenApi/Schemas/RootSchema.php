@@ -1,9 +1,6 @@
 <?php
 
-namespace App\Http\Schemas;
-
-use OpenApi\Annotations\Property;
-use OpenApi\Annotations\Schema;
+namespace App\Http\OpenApi\Schemas;
 
 /**
  * @OA\Schema(

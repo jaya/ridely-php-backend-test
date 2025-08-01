@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Schemas;
+namespace App\Http\OpenApi\Schemas;
 
 /**
 * @OA\Schema(

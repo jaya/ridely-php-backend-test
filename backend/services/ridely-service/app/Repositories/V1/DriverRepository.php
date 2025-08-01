@@ -114,6 +114,7 @@ class DriverRepository
      */
     public function all(Criteria $criteria): LengthAwarePaginatorAlias
     {
+        Log::debug("Query all...");
         $this->checkIfDatabaseConnectionIsAvailable();
 
         try {

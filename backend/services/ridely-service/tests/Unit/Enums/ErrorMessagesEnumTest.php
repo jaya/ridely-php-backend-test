@@ -55,6 +55,6 @@ class ErrorMessagesEnumTest extends UnitTestCase
         $this->assertEquals(1, ErrorMessagesEnum::OK->value);
         $this->assertEquals(2, ErrorMessagesEnum::NOK->value);
         $this->assertEquals(11, ErrorMessagesEnum::INVALID_REQUEST->value);
-        $this->assertEquals(34, ErrorMessagesEnum::DRIVER_NOT_FOUND->value);
+        $this->assertEquals(44, ErrorMessagesEnum::DRIVER_NOT_FOUND->value);
     }
 }

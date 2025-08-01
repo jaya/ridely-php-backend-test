@@ -21,4 +21,24 @@ class ServiceException extends ApplicationException
     {
         return new ServiceException(ErrorMessagesEnum::INVALID_REQUEST_PARAM, Response::HTTP_BAD_REQUEST, $message, $params, $previous);
     }
+
+    public static function unableToRequestAuthPublicKey($message, array $params, \Throwable $previous = null): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::UNABLE_TO_REQUEST_AUTH_PUBLIC_KEY, Response::HTTP_INTERNAL_SERVER_ERROR, $message, $params, $previous);
+    }
+
+    public static function unableToSaveAuthPublicKeyFile(string $message, array $params, \Throwable $previous = null): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE, Response::HTTP_INTERNAL_SERVER_ERROR, $message, $params, $previous);
+    }
+
+    public static function invalidToken(string $message, array $params, \Throwable $previous = null): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::INVALID_TOKEN, Response::HTTP_UNAUTHORIZED, $message, $params, $previous);
+    }
+
+    public static function missingBearerToken(): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::MISSING_BEARER_TOKEN, Response::HTTP_UNAUTHORIZED);
+    }
 } 

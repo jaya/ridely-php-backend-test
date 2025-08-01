@@ -44,6 +44,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "ridely-service.fullname" . }}-secret
                   key: app-key
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: keycloak-client-secret
           ports:
             - containerPort: 9000
           resources:

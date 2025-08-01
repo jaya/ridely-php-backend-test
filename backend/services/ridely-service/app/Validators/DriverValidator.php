@@ -5,6 +5,7 @@ namespace App\Validators;
 use App\Enums\ErrorMessagesEnum;
 use App\Http\Criteria\Criteria;
 use App\Models\Driver;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -35,6 +36,7 @@ class DriverValidator implements ValidatorInterface
         if ($validator->fails()) {
             $this->exception = new ValidationException($validator);
             $result = false;
+            Log::debug(sprintf("Validation fails: %s", $this->exception->getMessage()));
         }
 
         return $result;

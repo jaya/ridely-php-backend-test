@@ -12,7 +12,7 @@ use App\Http\Criteria\Criteria;
 use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
-use App\Services\DriverManagerFacade;
+use App\Services\Facades\DriverManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -25,6 +25,7 @@ class DriverController extends Controller
      *     path="/api/v1/drivers",
      *     summary="Lista os motoristas com filtros opcionais",
      *     tags={"Driver"},
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
@@ -92,6 +93,8 @@ class DriverController extends Controller
     {
         $criteria = new Criteria($request->all());
 
+        $user = $request->attributes->get('user') ?? null;
+        Log::debug("Request user: $user");
         Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
         try {
@@ -112,6 +115,7 @@ class DriverController extends Controller
      *     path="/api/v1/drivers",
      *     summary="Cria um novo motorista",
      *     tags={"Driver"},
+     *     security={{"bearerAuth": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(

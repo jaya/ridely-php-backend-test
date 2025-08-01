@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Unit\Services;
+namespace Tests\Unit\Services\Facades;
 
 use App\Converters\DriverConverter;
 use App\Http\Criteria\Criteria;
-use App\Services\DriverManagerFacade;
+use App\Services\Facades\DriverManagerFacade;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Mocks\Services\DriverManagerFacadeMock;
