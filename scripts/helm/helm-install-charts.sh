@@ -27,7 +27,7 @@ if [ ! -z "$CHART" ]; then
 
   # Check if the chart required is "ridely-databases"
   if [ "$CHART" = "ridely-database" ]; then
-    CHART_PATH="./database/charts/$CHART"
+    CHART_PATH="./databases/charts/$CHART"
   else
     CHART_PATH="./backend/charts/$CHART"
   fi
@@ -55,11 +55,11 @@ else
   echo '----------------------------------------'
   echo 'Installing databases chart'
   echo '----------------------------------------'
-  helm install "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+  helm install "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
   fi
 
   echo '----------------------------------------'

@@ -23,7 +23,7 @@ echo '----------------------------------------'
 echo 'Validating databases chart...'
 echo '----------------------------------------'
 # databases helm
-helm template "$SHARED_DATABASE_CHART_NAME" "./database/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+helm template "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
 
 echo '----------------------------------------'
 echo 'Validating services chart'
