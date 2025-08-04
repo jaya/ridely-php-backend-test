@@ -19,6 +19,8 @@
         - [ ] Documentar fluxo de autenticação e consumo de API
         - [ ] Documentar eventos/mensageria e serviços envolvidos
         - [ ] Documentar alertas e dashboards de observabilidade
+  - Execução
+    - [ ] Skaffold
 - Infraestrutura
   - IAC (Terraform)
     - [ ] EKS
@@ -53,7 +55,7 @@
   - Ridely Pricing service (Node.js)
   - Ridely Service (PHP + Laravel)
     - Docs
-      - Coleção do Postman
+      - [x] Coleção do Postman
       - Api Docs
         - [x] Docs/Swagger (ridely-service)
         - [x] Docs/Swagger (pricing-service)
@@ -65,17 +67,18 @@
       - [ ] Guidelines
     - Tests 
       - [x] Unit tests
-      - [ ] Coverage
+      - [x] Coverage
       - [ ] Integration tests
     - Segurança
       - [ ] CORS
       - [ ] UUID
-      - [ ] Auth implementação/integração
+      - [x] Auth implementação/integração
     - Logs
       - [x] Json
     - Restful
       - [x] HATEOS
     - Healthceheck inteligente
+      - [x] Spatie\Health 
 - Autenticação (Keycloak)
   - [x] Deploy do Keycloak com Helm
   - [x] Configurar banco de dados do Keycloak
@@ -107,7 +110,7 @@
   - [ ] Adicionar versionamento de imagem/tag automático
 - Testes e Validações
   - [ ] Escrever testes unitários dos serviços
-    - [ ] ridely-service
+    - [ ] ridely-service (WIP)
     - [ ] pricing-service
   - [ ] Escrever testes de integração (API + mensageria)
   - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
