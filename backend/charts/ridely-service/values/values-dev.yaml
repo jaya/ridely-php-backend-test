@@ -6,7 +6,7 @@ images:
     tag: latest
     pullPolicy: IfNotPresent
   php:
-    repository: ridely-service
+    repository: ridely-service-php
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -37,7 +37,8 @@ env:
   #DB_USERNAME=root
   #DB_PASSWORD=ridely
 
-  KEYCLOAK_ISSUER: http://localhost:8080/realms/spa-customers
-  KEYCLOAK_REALM_URL: http://localhost:8080/realms/spa-customers
+  KEYCLOAK_HEALTH_CHECK_URL: http://auth-service-keycloak:80/realms/master
+  KEYCLOAK_ISSUER: http://auth-service-keycloak/realms/spa-customers
+  KEYCLOAK_REALM_URL: http://auth-service-keycloak:80/realms/spa-customers
   KEYCLOAK_CLIENT_ID: ridely-service
 

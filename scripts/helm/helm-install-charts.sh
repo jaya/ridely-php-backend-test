@@ -84,23 +84,21 @@ else
   echo '----------------------------------------'
 
   echo "Preparing Nginx image"
-  if [ ! -f "./backend/services/ridely-service/docker/nginx/certificate.crt" ]; then
-    echo "Generating certificate files"
-    bash ./scripts/nginx/nginx-gen-certs.sh ./backend/services/ridely-service/docker/nginx
-  fi
+  echo "Generating certificate files..."
+  bash ./scripts/nginx/nginx-gen-certs.sh ./backend/services/ridely-service/docker/nginx
 
   echo "Building Docker images"
 
   echo "./scripts/docker/create-tag.sh ridely-service-nginx latest ./backend/services/ridely-service/docker/nginx/Dockerfile ./backend/services/ridely-service/docker/nginx"
   bash ./scripts/docker/create-tag.sh ridely-service-nginx latest ./backend/services/ridely-service/docker/nginx/Dockerfile ./backend/services/ridely-service/docker/nginx
 
-  echo "./scripts/docker/create-tag.sh ridely-service latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/"
-  bash ./scripts/docker/create-tag.sh ridely-service latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/
+  echo "./scripts/docker/create-tag.sh ridely-service-php latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/"
+  bash ./scripts/docker/create-tag.sh ridely-service-php latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/
 
   echo "Loading Docker images"
 
-  echo "./scripts/kind/kind-load-image.sh ridely-service:latest"
-  bash ./scripts/kind/kind-load-image.sh ridely-service:latest
+  echo "./scripts/kind/kind-load-image.sh ridely-service-php:latest"
+  bash ./scripts/kind/kind-load-image.sh ridely-service-php:latest
 
   echo "./scripts/kind/kind-load-image.sh ridely-service-nginx:latest"
   bash ./scripts/kind/kind-load-image.sh ridely-service-nginx:latest

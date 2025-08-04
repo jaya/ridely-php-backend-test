@@ -15,3 +15,6 @@
    kubectl get pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
 
 **WARNING:** Do not expose MySQL publicly without proper security measures.
+
+Internal communication:
+  "ridely-database:3306";

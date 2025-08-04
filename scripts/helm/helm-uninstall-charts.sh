@@ -1,6 +1,6 @@
 #!/bin/bash
 # use the set -u command to ensure all variables are set before using
-set -u
+#set -u
 
 # Include the project variables file
 if test -f .projectrc; then
@@ -29,29 +29,21 @@ if [ ! -z "$CHART" ]; then
   helm uninstall "$CHART" -n "$PROJECT_NAMESPACE"
 
 else
-#  echo '----------------------------------------'
-#  echo 'Uninstalling databases chart'
-#  echo '----------------------------------------'
-  #helm uninstall "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
-  #echo '----------------------------------------'
-  #echo 'Deleting databases pvc'
-  #echo '----------------------------------------'
-  #if kubectl get pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" &>/dev/null; then
-  #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" \
-  #    --ignore-not-found --wait=false &
-  #fi
-  #echo '----------------------------------------'
-  #echo 'Uninstalling databases chart'
-  #echo '----------------------------------------'
-  #SERVICE="auth-service"
-  #helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
-  #echo '----------------------------------------'
-  #echo 'Deleting databases pvc'
-  #echo '----------------------------------------'
-  #if kubectl get pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" &>/dev/null; then
-  #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "data-auth-service-postgresql-0" \
-  #    --ignore-not-found --wait=false &
-  #fi
-  echo "to be implemented"
+  echo '----------------------------------------'
+  echo 'Uninstalling databases chart'
+  echo '----------------------------------------'
+  helm uninstall "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"
+
+  echo '----------------------------------------'
+  echo 'Uninstalling Auth Service chart'
+  echo '----------------------------------------'
+  SERVICE="auth-service"
+  helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
+
+  echo '----------------------------------------'
+  echo 'Uninstalling Ridely Service chart'
+  echo '----------------------------------------'
+  SERVICE="ridely-service"
+  helm uninstall $SERVICE -n "$PROJECT_NAMESPACE"
 fi
 

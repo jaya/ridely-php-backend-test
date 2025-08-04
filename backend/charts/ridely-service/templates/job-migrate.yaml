@@ -3,6 +3,10 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "ridely-service.fullname" . }}-migrate
+  annotations:
+    #"helm.sh/resource-policy": keep
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   template:
     spec:

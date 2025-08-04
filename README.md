@@ -135,79 +135,22 @@ Essa solução garante alta disponibilidade, escalabilidade e monitoramento efic
 * **Pricing Service**
   Calcula tarifas dinâmicas das corridas com base em variáveis contextuais. Implementado em Node.js, utiliza Redis para cache e se comunica via RabbitMQ para eventos relacionados a preços.
 
-Claro! Aqui está um exemplo genérico e bem estruturado para as seções **"Como Rodar Localmente"** e **"Como Fazer Deploy"** em Markdown, que você pode adaptar facilmente ao seu projeto:
-
----
-
 ### Como Rodar Localmente
 
-Para rodar o projeto localmente, siga os passos abaixo. Certifique-se de ter os requisitos mínimos instalados, como `Docker`, `Docker Compose`, `Node.js`, `PHP`, `Composer`, entre outros, conforme necessário.
-
---- Em progresso ---
-Abaixo apenas um template
-
+#### Aplicação completa
+Execute o comando a seguir na raiz do projeto:
 ```bash
-# Clone o repositório
-git clone https://github.com/sua-org/ridely.git
-cd ridely
-
-# Copie os arquivos de ambiente
-cp .env.example .env
-
-# Suba os serviços com Docker Compose
-docker-compose up --build
+  ENVIRONMENT_TYPE=dev skaffold dev --no-prune --namespace=ridely
 ```
 
-Depois de iniciado:
-
-* Backend estará disponível em: `http://localhost:8000`
-* Frontend (caso exista): `http://localhost:3000`
-* Keycloak: `http://localhost:8080`
-* RabbitMQ: `http://localhost:15672` (usuário: `guest`, senha: `guest`)
-
-> Alguns serviços podem exigir seeders, migrations ou configurações adicionais. Consulte a documentação do serviço correspondente em `/backend/services`.
-
----
-
-### Como Fazer Deploy
-
-Este projeto pode ser implantado em ambientes **ECS** ou **EKS**, utilizando **Terraform**, **Helm** e **Ansible**. Abaixo, um fluxo genérico de implantação para ambientes Kubernetes:
-
---- Em progresso ---
-Abaixo apenas um template
-
-#### 1. Provisionar infraestrutura (ex: com Terraform)
-
+#### Apenas a autenticação
+Execute o comando a seguir na raiz do projeto:
 ```bash
-cd infrastructure/terraform/aws
-terraform init
-terraform plan
-terraform apply
+  ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p auth-service-only --namespace=ridely
 ```
 
-#### 2. Aplicar configurações com Ansible (opcional)
-
+#### Apenas a aplicação PHP + Banco de Dados
+Execute o comando a seguir na raiz do projeto:
 ```bash
-cd infrastructure/ansible
-ansible-playbook -i inventories/prod main.yml
+  ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p ridely-service-only --namespace=ridely
 ```
-
-#### 3. Fazer deploy com Helm
-
-```bash
-cd backend/charts
-helm upgrade --install ridely-service ./ridely-service \
-  --namespace ridely \
-  --create-namespace \
-  -f values.prod.yaml
-```
-
-#### 4. Acompanhar status
-
-```bash
-kubectl get pods -n ridely
-kubectl logs -f deploy/ridely-service -n ridely
-```
-
-> 💡 Dica: para testar APIs localmente mesmo após o deploy, use `kubectl port-forward` ou configure um `Ingress`.
-

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Health\Checks\Checks\DatabaseCheck;
 use Spatie\Health\Checks\Checks\PingCheck;
@@ -24,14 +25,17 @@ class HealthCheckProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $keycloakUrl = config('keycloak.health_check_url');
+        Log::debug("Keycloak url: $keycloakUrl");
+        // TODO adicionar o token
         Health::checks([
             UsedDiskSpaceCheck::new(),
+            // TODO remover a meta connection_name
             DatabaseCheck::new(),
-            RedisCheck::new(),
+//            RedisCheck::new(),
             PingCheck::new()
                 ->name('Keycloak Auth Service')
-                ->url('http://localhost:8080/realms/master') // ajuste para o seu path
+                ->url($keycloakUrl)
                 ->timeout(2),
         ]);
     }

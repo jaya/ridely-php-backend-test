@@ -1,0 +1,106 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: ridely
+build:
+  artifacts:
+    - &ridely-service-artifact
+      image: ridely-service-php
+      context: backend/services/ridely-service
+      docker:
+        dockerfile: ./docker/php/Dockerfile
+      sync:
+        manual:
+          - src: '**/*.php'
+            dest: /var/www
+    - &ridely-service-nginx-artifact
+      image: ridely-service-nginx
+      context: backend/services/ridely-service/docker/nginx/
+      docker:
+        dockerfile: Dockerfile
+      hooks:
+        before:
+          - command: [ "bash", "./scripts/nginx/nginx-gen-certs.sh", "./backend/services/ridely-service/docker/nginx" ]
+  local:
+    push: false
+  tagPolicy:
+    sha256: { }
+
+deploy:
+  helm:
+    releases: # keep the order of dependency here
+      - &ridely-database-release
+        name: ridely-database
+        chartPath: databases/charts/ridely-database
+        valuesFiles:
+          - databases/charts/ridely-database/values/values-{{ or .ENVIRONMENT_TYPE "dev" }}.yaml
+      - &auth-service-release
+        name: auth-service
+        chartPath: backend/charts/auth-service
+        valuesFiles:
+          - backend/charts/auth-service/values/values-{{ or .ENVIRONMENT_TYPE "dev" }}.yaml
+      - &ridely-service-release
+        name: ridely-service
+        chartPath: backend/charts/ridely-service
+        setValueTemplates:
+          images.php.repository: "{{.IMAGE_REPO_ridely_service_php}}"
+          images.php.tag: "{{.IMAGE_TAG_ridely_service_php}}"
+          images.nginx.repository: "{{.IMAGE_REPO_ridely_service_nginx}}"
+          images.nginx.tag: "{{.IMAGE_TAG_ridely_service_nginx}}"
+        valuesFiles:
+          - backend/charts/ridely-service/values/values-{{ or .ENVIRONMENT_TYPE "dev" }}.yaml
+
+portForward:
+  - resourceType: service
+    resourceName: auth-service-keycloak
+    port: 80
+    localPort: 8080
+  - resourceType: service
+    resourceName: auth-service-postgresql
+    port: 5432
+    localPort: 5432
+  - resourceType: service
+    resourceName: ridely-service
+    port: 80
+    localPort: 8000
+  - resourceType: service
+    resourceName: ridely-database
+    port: 3306
+    localPort: 3306
+
+profiles:
+  - name: dev
+    activation:
+      - kubeContext: kind-ridely-cluster
+  - name: staging
+  - name: prod
+  - name: auth-service-only
+    portForward:
+      - resourceType: service
+        resourceName: auth-service-keycloak
+        port: 80
+        localPort: 8080
+      - resourceType: service
+        resourceName: auth-service-postgresql
+        port: 5432
+        localPort: 5432
+    deploy:
+      helm:
+        releases:
+          - *auth-service-release
+  - name: ridely-service-only
+    portForward:
+      - resourceType: service
+        resourceName: ridely-service
+        port: 80
+        localPort: 8000
+      - resourceType: service
+        resourceName: ridely-database
+        port: 3306
+        localPort: 3306
+    deploy:
+      helm:
+        releases: #keep the order of dependency here
+          - *ridely-database-release
+          - *ridely-service-release
+
