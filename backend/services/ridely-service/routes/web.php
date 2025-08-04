@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AppController;
 use Illuminate\Support\Facades\Route;
+use Spatie\Health\Http\Controllers\HealthCheckJsonResultsController;
+use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,4 +21,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', [AppController::class, 'index']);
-Route::get('/health', [AppController::class, 'alive']);
+//Route::get('/health', [AppController::class, 'alive']);
+//Route::get('health', HealthCheckResultsController::class);
+Route::get('health', HealthCheckJsonResultsController::class);

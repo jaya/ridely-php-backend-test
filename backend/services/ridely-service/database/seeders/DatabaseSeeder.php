@@ -5,10 +5,11 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+//TODO preparar esse arquivo para falar a alimentação inicial
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's databases.
+     * Seed the application's database.
      */
     public function run(): void
     {
