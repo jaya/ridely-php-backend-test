@@ -26,6 +26,14 @@ spec:
             - name: nginx-conf
               mountPath: /etc/nginx/conf.d/app.conf
               subPath: app.conf
+{{/*          readinessProbe:*/}}
+{{/*            httpGet:*/}}
+{{/*              port: 80*/}}
+{{/*              path: /health*/}}
+{{/*            initialDelaySeconds: 5*/}}
+{{/*            periodSeconds: 10*/}}
+{{/*            timeoutSeconds: 3*/}}
+{{/*            failureThreshold: 3*/}}
         - name: laravel
           image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
           imagePullPolicy: {{ .Values.images.php.pullPolicy }}
@@ -58,6 +66,8 @@ spec:
             requests:
               cpu: 200m
               memory: 400Mi
+
+
       volumes:
         - name: nginx-conf
           configMap:
