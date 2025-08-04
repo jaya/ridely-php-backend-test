@@ -11,6 +11,7 @@ NAME="$1"
 TAG="$2"
 PATH="$3"
 CONTEXT_PATH="$4"
+NO_CACHE=false
 if [ -z "$1" ]; then
   echo 'Name not defined'
   exit 1
@@ -31,5 +32,18 @@ if [ -z "$4" ]; then
   exit 1
 fi
 
-echo "docker build -t \"$NAME\":\"$TAG\" -f \"$PATH\" \"$CONTEXT_PATH\""
-/usr/bin/docker build -t "$NAME":"$TAG" -f "$PATH" "$CONTEXT_PATH"
+if [ -n "$5" ]; then
+  NO_CACHE=true
+fi
+
+if [ "$NO_CACHE" = true ]; then
+  echo "docker build --no-cache -t \"$NAME\":\"$TAG\" -f \"$PATH\" \"$CONTEXT_PATH\""
+  /usr/bin/docker build --no-cache -t "$NAME":"$TAG" -f "$PATH" "$CONTEXT_PATH"
+else
+  echo "docker build -t \"$NAME\":\"$TAG\" -f \"$PATH\" \"$CONTEXT_PATH\""
+  /usr/bin/docker build -t "$NAME":"$TAG" -f "$PATH" "$CONTEXT_PATH"
+fi
+
+
+# No cache
+# docker build --no-cache -t name
