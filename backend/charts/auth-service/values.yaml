@@ -8,6 +8,8 @@ keycloak:
     value: /opt/bitnami/keycloak/data/import/realm.json
   - name: KEYCLOAK_EXTRA_ARGS
     value: "--import-realm"
+  - name: KC_HEALTH_ENABLED
+    value: "true"
 
   global:
     postgresql:

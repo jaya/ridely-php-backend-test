@@ -12,6 +12,7 @@ Then open your browser and go to:
 
 Test endpoint:
   "http://auth-service-keycloak.{{ .Release.Namespace }}.svc.cluster.local:80/realms/master";
+  "http://localhost:8080/realms/master";
 
 Login with:
   Username: {{ .Values.keycloak.auth.adminUser }}
