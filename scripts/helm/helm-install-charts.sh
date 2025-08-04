@@ -40,18 +40,6 @@ if [ ! -z "$CHART" ]; then
   fi
 
 else
-#  echo '----------------------------------------'
-#  echo 'Deleting databases pvc'
-#  echo '----------------------------------------'
-  # TODO talvez somente habilitar esse bloco quando necessário
-  #echo 'kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" > /dev/null 2>&1'
-  #kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" > /dev/null 2>&1
-
-  #if kubectl get pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" &>/dev/null; then
-  #  kubectl delete pvc -n "$PROJECT_NAMESPACE" "$SHARED_DATABASE_CHART_NAME-pvc" \
-  #    --ignore-not-found --wait=false &
-  #fi
-
   echo '----------------------------------------'
   echo 'Installing databases chart'
   echo '----------------------------------------'
@@ -74,8 +62,6 @@ else
   cd ./backend/charts/auth-service/
 
   if [ -z "$(ls -A ./charts)" ]; then
-  #   echo 'Building dependency'
-  #   helm dependency build
      echo 'Updating dependency'
      helm dependency update
   else
@@ -85,7 +71,6 @@ else
   echo "returning to root directory: $ROOT_DIR "
   cd $ROOT_DIR
 
-  #helm dependency update "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"
   helm install "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values/values-dev.yaml
 
   if [ $? -ne 0 ]; then
