@@ -23,10 +23,10 @@ echo '----------------------------------------'
 echo 'Validating databases chart...'
 echo '----------------------------------------'
 # databases helm
-helm template "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+helm template "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE"  --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values/values-dev.yaml
 
 echo '----------------------------------------'
 echo 'Validating services chart'
 echo '----------------------------------------'
-helm template "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values.yaml
-helm template "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/ridely-service/values.yaml --debug
+helm template "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values/values-dev.yaml
+helm template "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/ridely-service/values/values-dev.yaml --debug

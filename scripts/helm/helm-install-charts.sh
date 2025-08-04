@@ -32,11 +32,11 @@ if [ ! -z "$CHART" ]; then
     CHART_PATH="./backend/charts/$CHART"
   fi
 
-  helm install "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values.yaml" --set rollme=$(date +%s)
+  helm install "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values/values-dev.yaml" --set rollme=$(date +%s)
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-    helm upgrade "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values.yaml" --set rollme=$(date +%s)
+    helm upgrade "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values/values-dev.yaml" --set rollme=$(date +%s)
   fi
 
 else
@@ -55,11 +55,11 @@ else
   echo '----------------------------------------'
   echo 'Installing databases chart'
   echo '----------------------------------------'
-  helm install "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+  helm install "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values/values-dev.yaml
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values.yaml
+     helm upgrade "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values/values-dev.yaml
   fi
 
   echo '----------------------------------------'
@@ -86,11 +86,11 @@ else
   cd $ROOT_DIR
 
   #helm dependency update "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"
-  helm install "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values.yaml
+  helm install "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/auth-service/values/values-dev.yaml
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-    helm upgrade "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/auth-service/values.yaml
+    helm upgrade "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/auth-service/values/values-dev.yaml
   fi
 
   echo ''
@@ -120,11 +120,10 @@ else
   echo "./scripts/kind/kind-load-image.sh ridely-service-nginx:latest"
   bash ./scripts/kind/kind-load-image.sh ridely-service-nginx:latest
 
-  helm install "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/ridely-service/values.yaml
+  helm install "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/ridely-service/values/values-dev.yaml
 
   if [ $? -ne 0 ]; then
     echo 'Trying to upgrade the existing one...'
-  #  helm upgrade "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/ridely-service/values.yaml  --recreate-pods
-     helm upgrade "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/ridely-service/values.yaml  --set rollme=$(date +%s)
+     helm upgrade "ridely-service" "./backend/charts/ridely-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/ridely-service/values/values-dev.yaml  --set rollme=$(date +%s)
   fi
 fi
