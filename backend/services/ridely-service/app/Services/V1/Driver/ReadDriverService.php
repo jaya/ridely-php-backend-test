@@ -4,7 +4,7 @@ namespace App\Services\V1\Driver;
 
 use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Repositories\V1\DriverRepository;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
 use App\Validators\DriverValidator;
@@ -25,7 +25,7 @@ class ReadDriverService implements ReadDriverServiceInterface
      * @throws ServiceException
      * @throws RepositoryException
      */
-    public function execute(Criteria $criteria): LengthAwarePaginator
+    public function execute(ListCriteria $criteria): LengthAwarePaginator
     {
         Log::debug("Validating criteria");
         if ($this->validate($criteria)) {
@@ -41,7 +41,7 @@ class ReadDriverService implements ReadDriverServiceInterface
      * @throws RepositoryException
      * @throws ServiceException
      */
-    public function count(Criteria $criteria): int
+    public function count(ListCriteria $criteria): int
     {
         Log::debug("Validating criteria");
         if ($this->validate($criteria)) {
@@ -53,7 +53,7 @@ class ReadDriverService implements ReadDriverServiceInterface
         }
     }
 
-    public function validate(Criteria $criteria): bool {
+    public function validate(ListCriteria $criteria): bool {
         $result = $this->validator->validateRead($criteria);
         if (!$result) {
             $this->exception = $this->validator->getException();

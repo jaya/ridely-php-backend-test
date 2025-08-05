@@ -2,7 +2,7 @@
 
 namespace App\Services\Facades;
 
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Http\Hateos\HateosItemLinks;
 use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
@@ -48,7 +48,7 @@ class DriverManagerFacade
 
     }
 
-    public function list(Criteria $criteria, $hateos = true):LengthAwarePaginator
+    public function list(ListCriteria $criteria, $hateos = true):LengthAwarePaginator
     {
         $paginator = $this->readService->execute($criteria);
         if ($hateos && is_array($paginator->items())) {
@@ -74,7 +74,7 @@ class DriverManagerFacade
 
     /**
      */
-    public function count(Criteria $criteria): int
+    public function count(ListCriteria $criteria): int
     {
         return $this->readService->count($criteria);
     }

@@ -4,7 +4,7 @@ namespace App\Repositories\V1;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\RepositoryException;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorAlias;
@@ -112,7 +112,7 @@ class DriverRepository
     /**
      * @throws RepositoryException
      */
-    public function all(Criteria $criteria): LengthAwarePaginatorAlias
+    public function all(ListCriteria $criteria): LengthAwarePaginatorAlias
     {
         Log::debug("Query all...");
         $this->checkIfDatabaseConnectionIsAvailable();
@@ -126,8 +126,8 @@ class DriverRepository
 
             $query->orderBy($criteria->orderBy, $criteria->sortBy);
 
-            $perPage = $criteria->limit ?? Criteria::LIMIT;
-            $currentPage = $criteria->page ?? Criteria::PAGE;
+            $perPage = $criteria->limit ?? ListCriteria::LIMIT;
+            $currentPage = $criteria->page ?? ListCriteria::PAGE;
 
             Log::debug($query->toSql());
             Log::debug("pagination params: \$perPage: $perPage, \$currentPage: $currentPage");
@@ -142,7 +142,7 @@ class DriverRepository
     /**
      * @throws RepositoryException
      */
-    public function count(Criteria $criteria): int
+    public function count(ListCriteria $criteria): int
     {
         $this->checkIfDatabaseConnectionIsAvailable();
 

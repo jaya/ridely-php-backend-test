@@ -1,0 +1,107 @@
+[
+  {
+    "place_id": 14239849,
+    "licence": "[Mockfile] Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 857962256,
+    "lat": "-10.9410164",
+    "lon": "-37.0505956",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida Beira Mar",
+    "display_name": "Avenida Beira Mar, Jardins, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49025-330, Brazil",
+    "boundingbox": [
+      "-10.9413925",
+      "-10.9404862",
+      "-37.0508388",
+      "-37.0501295"
+    ]
+  },
+  {
+    "place_id": 14313665,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 83433214,
+    "lat": "-10.9502955",
+    "lon": "-37.0515826",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida Paulo Barreto de Menezes",
+    "display_name": "Avenida Paulo Barreto de Menezes, Jardins, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49025-040, Brazil",
+    "boundingbox": [
+      "-10.9578663",
+      "-10.9423892",
+      "-37.0539597",
+      "-37.0509437"
+    ]
+  },
+  {
+    "place_id": 14166756,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 81947348,
+    "lat": "-10.9690593",
+    "lon": "-37.0536814",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida Paulo Barreto de Menezes",
+    "display_name": "Avenida Paulo Barreto de Menezes, Senhor do Bomfim, Farolândia, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49032-283, Brazil",
+    "boundingbox": [
+      "-10.9793020",
+      "-10.9591389",
+      "-37.0549268",
+      "-37.0533308"
+    ]
+  },
+  {
+    "place_id": 14313461,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 1006498489,
+    "lat": "-10.9332081",
+    "lon": "-37.0492530",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida Paulo Barreto de Menezes",
+    "display_name": "Avenida Paulo Barreto de Menezes, 13 de Julho, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49020-210, Brazil",
+    "boundingbox": [
+      "-10.9355581",
+      "-10.9312661",
+      "-37.0504173",
+      "-37.0474300"
+    ]
+  },
+  {
+    "place_id": 14106813,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 176961468,
+    "lat": "-10.9398501",
+    "lon": "-37.0509186",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida Paulo Barreto de Menezes",
+    "display_name": "Avenida Paulo Barreto de Menezes, Bairro Garcia, Jardins, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49025-330, Brazil",
+    "boundingbox": [
+      "-10.9441643",
+      "-10.9355581",
+      "-37.0511576",
+      "-37.0504173"
+    ]
+  }
+]

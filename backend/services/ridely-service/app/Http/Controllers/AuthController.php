@@ -93,7 +93,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/auth/refresh",
+     *     path="/api/auth/refresh-token",
      *     tags={"Auth"},
      *     summary="Renova o token de acesso",
      *     description="Utiliza um refresh_token válido para renovar o token de acesso.",

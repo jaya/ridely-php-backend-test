@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\ServiceException;
 use Exception;
 use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
@@ -80,5 +81,14 @@ class JWTKeysService
         }
     }
 
+    /**
+     * @param string $token
+     * @param array $publicKeys
+     * @return \stdClass
+     */
+    public function decodeToken(string $token, array $publicKeys): \stdClass
+    {
+        return JWT::decode($token, $publicKeys);
+    }
 
 }

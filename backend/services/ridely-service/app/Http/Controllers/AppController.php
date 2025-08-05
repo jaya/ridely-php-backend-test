@@ -35,20 +35,4 @@ class AppController extends Controller
         return response()->json(['app' => "${APP_NAME}:${APP_VERSION}"]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/health",
-     *     summary="Health check endpoint",
-     *     tags={"Public"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Success"
-     *     )
-     * )
-     */
-    public function alive()
-    {
-        return response()->json(['status' => 'ok']);
-    }
-
 }

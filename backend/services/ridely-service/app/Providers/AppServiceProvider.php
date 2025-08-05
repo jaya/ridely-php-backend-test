@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Repositories\V1\DriverRepository;
 use App\Services\Facades\DriverManagerFacade;
+use App\Services\Facades\RideManagerFacade;
 use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
+use App\Services\Interfaces\Location\LocationServiceInterface;
 use App\Services\V1\Driver\CreateDriverService as CreateDriverServiceV1;
 use App\Services\V1\Driver\ReadDriverService;
+use App\Services\V1\Location\LocationService;
 use App\Services\V2\Driver\CreateDriverServiceServiceInterface as CreateDriverServiceV2;
 use App\Validators\DriverValidator;
+use App\Validators\LocationValidator;
 use Illuminate\Support\ServiceProvider;
 use L5Swagger\L5SwaggerServiceProvider;
 
@@ -57,6 +61,21 @@ class AppServiceProvider extends ServiceProvider
             return new DriverManagerFacade(
                 $app->make(CreateDriverServiceInterface::class),
                 $app->make(ReadDriverServiceInterface::class)
+            );
+        });
+
+        $this->app->bind(LocationServiceInterface::class, LocationService::class);
+        $this->app->singleton(LocationService::class, function ($app) {
+            $locationServiceUrl = env('LOCATION_SERVICE_URL', 'https://nominatim.openstreetmap.org/search');
+            return new LocationService(
+                $app->make(LocationValidator::class),
+                $locationServiceUrl
+            );
+        });
+
+        $this->app->singleton(RideManagerFacade::class, function ($app) {
+            return new RideManagerFacade(
+                $app->make(LocationServiceInterface::class)
             );
         });
 

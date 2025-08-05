@@ -2,17 +2,17 @@
 
 namespace App\Validators;
 
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 
 interface ValidatorInterface
 {
-    public function criteriaRules(Criteria $criteria): array;
+    public function criteriaRules(ListCriteria $criteria): array;
 
     public function rules(): array;
 
     public function validateCreate($data);
 
-    public function validateRead(Criteria $criteria);
+    public function validateRead(ListCriteria $criteria);
 
     public function validateUpdate($data);
 

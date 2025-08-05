@@ -2,22 +2,35 @@
 
 namespace App\Exceptions;
 
-use Exception;
+use App\Enums\ErrorMessagesEnum;
+use Symfony\Component\HttpFoundation\Response;
 
-class RideException extends Exception
+class RideException extends ApplicationException
 {
-    public static function notFound()
+
+    public static function notFound(): RideException
     {
-        return new self('Ride not found');
+        return new self(ErrorMessagesEnum::RIDE_NOT_FOUND, Response::HTTP_BAD_REQUEST);
     }
 
-    public static function invalidState($message)
+    public static function invalidState($message): RideException
     {
-        return new self($message);
+        return new self(ErrorMessagesEnum::RIDE_INVALID_STATE, Response::HTTP_BAD_REQUEST, $message);
     }
 
-    public static function noDriversAvailable()
+    public static function noDriversAvailable(): RideException
     {
-        return new self('We do not have drivers available');
+        return new self(ErrorMessagesEnum::RIDE_NO_DRIVERS_AVAILABLE, Response::HTTP_NOT_FOUND);
+    }
+
+    public static function unableToLocateAddressData()
+    {
+        return new self(ErrorMessagesEnum::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA, Response::HTTP_BAD_REQUEST);
+    }
+
+    public static function pricingRuleNotFound()
+    {
+        //throw new \Exception("Pricing rule not found");
+        return new self(ErrorMessagesEnum::RIDE_PRICING_RULE_NOT_FOUND, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 } 

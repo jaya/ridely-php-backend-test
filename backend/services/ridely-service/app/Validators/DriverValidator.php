@@ -3,7 +3,7 @@
 namespace App\Validators;
 
 use App\Enums\ErrorMessagesEnum;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -26,7 +26,7 @@ class DriverValidator implements ValidatorInterface
         return $this->commonValidator($data, null);
     }
 
-    public function validateRead(Criteria $criteria): bool
+    public function validateRead(ListCriteria $criteria): bool
     {
         $result = true;
 
@@ -112,10 +112,10 @@ class DriverValidator implements ValidatorInterface
     }
 
     /**
-     * @param Criteria $criteria
+     * @param ListCriteria $criteria
      * @return array|\Illuminate\Validation\Rules\In[][]|\string[][]
      */
-    public function criteriaRules(Criteria $criteria): array
+    public function criteriaRules(ListCriteria $criteria): array
     {
         return $criteria->rules($this->validFields);
     }

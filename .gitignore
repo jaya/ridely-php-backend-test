@@ -19,3 +19,4 @@
 /backend/charts/auth-service/charts/keycloak-19.3.4.tgz
 /backend/services/ridely-service/docker/nginx/certificate.crt
 /backend/services/ridely-service/docker/nginx/certificate.key
+/databases/charts/ridely-cache-database/charts/redis-19.3.4.tgz

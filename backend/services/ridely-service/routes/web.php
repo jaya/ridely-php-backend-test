@@ -21,6 +21,5 @@ use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 // });
 
 Route::get('/', [AppController::class, 'index']);
-//Route::get('/health', [AppController::class, 'alive']);
-//Route::get('health', HealthCheckResultsController::class);
+Route::get('status', HealthCheckResultsController::class);
 Route::get('health', HealthCheckJsonResultsController::class);

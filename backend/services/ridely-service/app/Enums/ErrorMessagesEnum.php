@@ -35,8 +35,19 @@ enum ErrorMessagesEnum: int
     case UNABLE_TO_LIST_DRIVERS = 45;
     case INVALID_DRIVER_DATA = 46;
 
+    // Ride errors 61 - 80
+    case RIDE_NOT_FOUND = 61;
+
+    case RIDE_INVALID_STATE = 62;
+
+    case RIDE_NO_DRIVERS_AVAILABLE = 63;
+
+    case RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA = 64;
+
+    case RIDE_PRICING_RULE_NOT_FOUND = 65;
 
 
+    case UNABLE_TO_ESTIMATE_RIDE = 66;
 
     public function label(): string
     {
@@ -59,6 +70,13 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'common.error.driver_not_found',
             self::UNABLE_TO_LIST_DRIVERS => 'common.error.unable_to_list_drivers',
             self::INVALID_DRIVER_DATA => 'common.error.invalid_driver_data',
+
+            self::RIDE_NOT_FOUND => 'common.error.ride_not_found',
+            self::RIDE_INVALID_STATE => 'common.error.ride_invalid_state',
+            self::RIDE_NO_DRIVERS_AVAILABLE => 'common.error.ride_drivers_available',
+            self::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA => 'common.error.ride_unable_to_locate_address_data',
+            self::RIDE_PRICING_RULE_NOT_FOUND => 'common.error.ride_pricing_rule_not_found',
+            self::UNABLE_TO_ESTIMATE_RIDE => 'common.error.unable_to_estimate_ride',
 
 
         };
@@ -85,6 +103,13 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'Driver not found.',
             self::UNABLE_TO_LIST_DRIVERS => 'Unable to list drivers.',
             self::INVALID_DRIVER_DATA => 'Invalid Driver Data.',
+
+            self::RIDE_NOT_FOUND => 'Ride not found.',
+            self::RIDE_INVALID_STATE => 'Ride invalid state: %s',
+            self::RIDE_NO_DRIVERS_AVAILABLE => 'We do not have drivers available',
+            self::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA => 'Unable to locate address data.',
+            self::RIDE_PRICING_RULE_NOT_FOUND => 'Pricing rule not found.',
+            self::UNABLE_TO_ESTIMATE_RIDE => 'Unable to estimate ride.',
         };
 
         if ($args) {

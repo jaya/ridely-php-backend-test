@@ -67,11 +67,11 @@
                                 "properties": {
                                     "username": {
                                         "type": "string",
-                                        "example": "user@example.com"
+                                        "example": "anderson.contreira"
                                     },
                                     "password": {
                                         "type": "string",
-                                        "example": "secret"
+                                        "example": "123"
                                     }
                                 },
                                 "type": "object"
@@ -107,14 +107,14 @@
                 }
             }
         },
-        "/api/auth/refresh": {
+        "/api/auth/refresh-token": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Renova o token de acesso",
                 "description": "Utiliza um refresh_token válido para renovar o token de acesso.",
-                "operationId": "b85dc68d77bf1027ae72f69c6e6a0ce8",
+                "operationId": "d293d02cfa895a696bb2f9180bf517b1",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -398,13 +398,13 @@
                 }
             }
         },
-        "/api/v1/drivers/{id}/open-rides": {
+        "/api/v1/drivers/{id}/get-rides": {
             "get": {
                 "tags": [
                     "Driver"
                 ],
                 "summary": "Lista corridas abertas para um motorista",
-                "operationId": "22eae3a965c896cdab0250aad9391f3e",
+                "operationId": "1e91ae6a7e7f76ddc842d69403e6cd09",
                 "parameters": [
                     {
                         "name": "id",

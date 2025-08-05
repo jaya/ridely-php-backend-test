@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Converters\DriverConverter;
+use App\Enums\ErrorMessagesEnum;
+use App\Exceptions\ApplicationException;
+use App\Exceptions\RideException;
+use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
+use App\Http\Criteria\EstimateRideCriteria;
+use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Services\Facades\RideManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class RideController extends Controller
 {
@@ -84,7 +94,7 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/v1/rides/request",
+     *     path="/api/v1/rides/request-driver",
      *     summary="Solicitar motorista",
      *     tags={"Ride"},
      *     @OA\RequestBody(
@@ -389,5 +399,27 @@ class RideController extends Controller
                 'status' => $ride->status,
             ];
         }));
+    }
+
+    public function estimateRide(Request $request, RideManagerFacade $facade): JsonResponse
+    {
+        $estimateRideData = new EstimateRideCriteria($request->all());
+        try {
+
+            $request->validate($estimateRideData->rules());
+
+            $rideData = $facade->estimateRide($estimateRideData);
+            return ResponseHelper::success($rideData, Response::HTTP_OK);
+
+        } catch (ServiceException $e) {
+            return ResponseHelper::error($e);
+        } catch (RideException $e) {
+            return ResponseHelper::error($e);
+        } catch (ValidationException $e) {
+            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
+        } catch (\Throwable $e) {
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_ESTIMATE_RIDE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
+        }
+
     }
 }

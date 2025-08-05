@@ -39,4 +39,6 @@ env:
   KEYCLOAK_REALM_URL: http://auth-service-keycloak:80/realms/spa-customers
   KEYCLOAK_CLIENT_ID: ridely-service
 
+  LOCATION_SERVICE_URL: 'https://nominatim:openstreetmap:org/search'
+
 

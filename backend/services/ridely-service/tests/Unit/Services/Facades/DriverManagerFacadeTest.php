@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services\Facades;
 
 use App\Converters\DriverConverter;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Services\Facades\DriverManagerFacade;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
@@ -14,7 +14,7 @@ use Tests\Unit\UnitTestCase;
 // TODO revisar os nomes dos testes
 class DriverManagerFacadeTest extends UnitTestCase
 {
-    protected Criteria $criteria;
+    protected ListCriteria $criteria;
 
     protected DriverManagerFacade $facade;
 
@@ -84,7 +84,7 @@ class DriverManagerFacadeTest extends UnitTestCase
             ]
         );
 
-        $criteria = new Criteria([]);
+        $criteria = new ListCriteria([]);
 
         $this->mock->repository
             ->expects($this->once())

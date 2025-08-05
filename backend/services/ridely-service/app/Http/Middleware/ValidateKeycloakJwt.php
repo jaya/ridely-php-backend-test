@@ -7,7 +7,6 @@ use App\Exceptions\ServiceException;
 use App\Http\Helpers\ResponseHelper;
 use App\Services\JWTKeysService;
 use Closure;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Exception;
@@ -46,7 +45,7 @@ class ValidateKeycloakJwt
                 Log::error("Unable to get public keys");
             }
 
-            $decoded = JWT::decode($token, $publicKeys);
+            $decoded = $this->jwtKeysService->decodeToken($token, $publicKeys);
 
             // extra validations
             if ($decoded->iss !== config('keycloak.issuer')) {
@@ -74,4 +73,6 @@ class ValidateKeycloakJwt
 
         return $next($request);
     }
+
+
 }

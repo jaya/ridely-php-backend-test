@@ -4,7 +4,7 @@ namespace Tests\Unit\Repositories\V1;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\RepositoryException;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Repositories\V1\DriverRepository;
 use Tests\Unit\UnitTestCase;
@@ -79,7 +79,7 @@ class DriverRepositoryTest extends UnitTestCase
     {
         Driver::factory()->count(3)->create();
 
-        $criteria = new Criteria([
+        $criteria = new ListCriteria([
             'fields' => ['id', 'name'],
             'order_by' => 'id',
             'sort_by' => 'asc',

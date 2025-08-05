@@ -4,7 +4,7 @@ namespace App\Http\Criteria;
 
 use Illuminate\Validation\Rule;
 
-class Criteria
+class ListCriteria
 {
     const PAGE = 1;
     const LIMIT = 15;

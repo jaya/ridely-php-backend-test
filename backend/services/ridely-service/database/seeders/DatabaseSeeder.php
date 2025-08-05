@@ -5,7 +5,6 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-//TODO preparar esse arquivo para falar a alimentação inicial
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -19,5 +18,10 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
+        $this->call([
+            DriverSeeder::class,
+            PricingRulesSeeder::class,
+        ]);
     }
 }

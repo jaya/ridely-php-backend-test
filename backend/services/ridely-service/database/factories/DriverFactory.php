@@ -21,7 +21,7 @@ class DriverFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'car_license_plate' => strtoupper($this->faker->bothify('???####')),
+            'car_license_plate' => strtoupper($this->faker->bothify('???-####')),
             'car_model' => $this->faker->word,
             'car_color' => $this->faker->safeColorName,
             'available' => true,

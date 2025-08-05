@@ -4,7 +4,7 @@ namespace Tests\Unit\Services\V1\Driver;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ServiceException;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Services\V1\Driver\ReadDriverService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +17,7 @@ use Tests\Unit\UnitTestCase;
 // TODO revisar os nomes dos testes
 class ReadDriverServiceTest extends UnitTestCase
 {
-    protected Criteria $criteria;
+    protected ListCriteria $criteria;
 
     protected ReadDriverService $service;
 
@@ -56,7 +56,7 @@ class ReadDriverServiceTest extends UnitTestCase
             ]
         );
 
-        $this->criteria = new Criteria([]);
+        $this->criteria = new ListCriteria([]);
 
         $this->mock->repository
             ->expects($this->once())
@@ -78,7 +78,7 @@ class ReadDriverServiceTest extends UnitTestCase
         );
 
         $expectedErrorMessage = 'The selected fields.0 is invalid.';
-        $this->criteria = new Criteria(["fields" => "invalid_field"]);
+        $this->criteria = new ListCriteria(["fields" => "invalid_field"]);
         $this->service = $this->mock->getObjectWithMockDependencies();
 
         $this->expectException(ServiceException::class);
@@ -94,7 +94,7 @@ class ReadDriverServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $this->criteria = new Criteria(["fields" => "id, name"]);
+        $this->criteria = new ListCriteria(["fields" => "id, name"]);
         $this->service = $this->mock->getObjectWithMockDependencies();
 
         $this->assertTrue($this->service->validate($this->criteria));
@@ -108,7 +108,7 @@ class ReadDriverServiceTest extends UnitTestCase
         );
 
         $expectedErrorMessage = "The limit field must not be greater than 100.";
-        $this->criteria = new Criteria(["limit" => 1001]);
+        $this->criteria = new ListCriteria(["limit" => 1001]);
         $this->service = $this->mock->getObjectWithMockDependencies();
 
         $this->assertFalse($this->service->validate($this->criteria));

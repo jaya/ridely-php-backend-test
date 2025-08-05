@@ -3,7 +3,7 @@
 namespace App\Services\Interfaces\Driver;
 
 use App\Exceptions\ServiceException;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Repositories\V1\DriverRepository;
 use App\Validators\DriverValidator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -13,11 +13,11 @@ interface ReadDriverServiceInterface
 {
 
 
-    public function execute(Criteria $criteria):LengthAwarePaginator;
+    public function execute(ListCriteria $criteria):LengthAwarePaginator;
 
-    public function count(Criteria $criteria);
+    public function count(ListCriteria $criteria);
 
-    public function validate(Criteria $criteria): bool;
+    public function validate(ListCriteria $criteria): bool;
 
 
 }

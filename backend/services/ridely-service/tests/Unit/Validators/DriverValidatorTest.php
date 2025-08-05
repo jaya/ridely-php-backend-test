@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Validators;
 
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Validators\DriverValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -97,10 +97,10 @@ class DriverValidatorTest extends UnitTestCase
 
     /**
      * @dataProvider getValidDataForValidateReadDataProvider
-     * @param Criteria $criteria
+     * @param ListCriteria $criteria
      * @return void
      */
-    public function testValidateReadReturnsTrueWithValidData(Criteria $criteria)
+    public function testValidateReadReturnsTrueWithValidData(ListCriteria $criteria)
     {
         Log::info(
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
@@ -111,10 +111,10 @@ class DriverValidatorTest extends UnitTestCase
 
     /**
      * @dataProvider getInvalidDataForValidateReadDataProvider
-     * @param Criteria $criteria
+     * @param ListCriteria $criteria
      * @return void
      */
-    public function testValidateReadReturnsFalseWithInvalidData(Criteria $criteria)
+    public function testValidateReadReturnsFalseWithInvalidData(ListCriteria $criteria)
     {
         Log::info(
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
@@ -147,7 +147,7 @@ class DriverValidatorTest extends UnitTestCase
     {
         return [
             'basic valid criteria' => [
-                new Criteria([
+                new ListCriteria([
                     'page' => 0,
                     'limit' => 10,
                     'order_by' => 'name',
@@ -156,12 +156,12 @@ class DriverValidatorTest extends UnitTestCase
                 ])
             ],
             'partial criteria (only required)' => [
-                new Criteria([
+                new ListCriteria([
                     'limit' => 5
                 ])
             ],
             'criteria with only sorting' => [
-                new Criteria([
+                new ListCriteria([
                     'order_by' => 'created_at',
                     'sort_by' => 'desc'
                 ])
@@ -173,24 +173,24 @@ class DriverValidatorTest extends UnitTestCase
     {
         return [
             'negative limit and page' => [
-                new Criteria([
+                new ListCriteria([
                     'page' => -1,
                     'limit' => -10
                 ])
             ],
             'invalid sort_by value' => [
-                new Criteria([
+                new ListCriteria([
                     'order_by' => 'name',
                     'sort_by' => 'random'
                 ])
             ],
             'limit too high' => [
-                new Criteria([
+                new ListCriteria([
                     'limit' => 9999
                 ])
             ],
             'fields not string or array' => [
-                new Criteria([
+                new ListCriteria([
                     'fields' => 123 // em vez de string/array
                 ])
             ]

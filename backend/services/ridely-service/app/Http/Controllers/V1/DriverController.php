@@ -8,7 +8,7 @@ use App\Exceptions\ApplicationException;
 use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
-use App\Http\Criteria\Criteria;
+use App\Http\Criteria\ListCriteria;
 use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
@@ -16,6 +16,7 @@ use App\Services\Facades\DriverManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class DriverController extends Controller
@@ -89,20 +90,26 @@ class DriverController extends Controller
      * )
      * // TODO revisar os exemplos dos erros, pois estão todos com a mesma mensagem, qualquer coisa criar outros schemas ou ver como passar os valores para o schema
      */
-    public function index(Request $request, DriverManagerFacade $manager)
+    public function index(Request $request, DriverManagerFacade $facade)
     {
-        $criteria = new Criteria($request->all());
+        $criteria = new ListCriteria($request->all());
 
         $user = $request->attributes->get('user') ?? null;
         Log::debug("Request user: $user");
         Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
         try {
-            $paginator = $manager->list($criteria);
+
+            $request->validate($criteria->toArray());
+
+            $paginator = $facade->list($criteria);
             $metadata = new HateosMetadata($paginator);
             return ResponseHelper::success(DriverConverter::convertListFromArrayToResponse($paginator->items()), metadata: $metadata);
+
         } catch (ServiceException $e) {
             return ResponseHelper::error($e);
+        } catch (ValidationException $e) {
+            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
         } catch (RepositoryException $e) {
             return ResponseHelper::error($e);
         } catch (\Throwable $e) {
@@ -138,12 +145,15 @@ class DriverController extends Controller
         $data = $request->all();
 
         try {
+            //$request->validate();
+
+            // TODO isso pode ser convertido para uma Criteria
             $driver = $manager->create($data);
             return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);
         } catch (ServiceException $e) {
             return ResponseHelper::error($e);
         } catch (\Throwable $e) {
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, 500, previous: $e));
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
         }
     }
 
@@ -180,7 +190,7 @@ class DriverController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/v1/drivers/{id}/open-rides",
+     *     path="/api/v1/drivers/{id}/get-rides",
      *     summary="Lista corridas abertas para um motorista",
      *     tags={"Driver"},
      *     @OA\Parameter(

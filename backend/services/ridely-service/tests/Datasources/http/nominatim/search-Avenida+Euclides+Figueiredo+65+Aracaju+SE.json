@@ -1,0 +1,86 @@
+[
+  {
+    "place_id": 14331151,
+    "licence": "[Mocked] Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 425691943,
+    "lat": "-10.8819106",
+    "lon": "-37.0808969",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida General Euclides Figueiredo",
+    "display_name": "Avenida General Euclides Figueiredo, Dom Luciano, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49089-005, Brazil",
+    "boundingbox": [
+      "-10.8856586",
+      "-10.8781468",
+      "-37.0833857",
+      "-37.0784336"
+    ]
+  },
+  {
+    "place_id": 14231217,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 150933166,
+    "lat": "-10.8905251",
+    "lon": "-37.0846562",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida General Euclides Figueiredo",
+    "display_name": "Avenida General Euclides Figueiredo, Santos Dumont, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49087-580, Brazil",
+    "boundingbox": [
+      "-10.8930582",
+      "-10.8877891",
+      "-37.0857661",
+      "-37.0846483"
+    ]
+  },
+  {
+    "place_id": 14296770,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 81729348,
+    "lat": "-10.8976176",
+    "lon": "-37.0882507",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida General Euclides Figueiredo",
+    "display_name": "Avenida General Euclides Figueiredo, Santos Dumont, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49087-648, Brazil",
+    "boundingbox": [
+      "-10.8981580",
+      "-10.8971638",
+      "-37.0885154",
+      "-37.0878603"
+    ]
+  },
+  {
+    "place_id": 14317421,
+    "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+    "osm_type": "way",
+    "osm_id": 425691945,
+    "lat": "-10.8858933",
+    "lon": "-37.0835467",
+    "category": "highway",
+    "type": "primary",
+    "place_rank": 26,
+    "importance": 0.0533950385290303,
+    "addresstype": "road",
+    "name": "Avenida General Euclides Figueiredo",
+    "display_name": "Avenida General Euclides Figueiredo, Soledade, Aracaju, Região Geográfica Imediata de Aracaju, Região Metropolitana de Aracaju, Região Geográfica Intermediária de Aracaju, Sergipe, Northeast Region, 49089-005, Brazil",
+    "boundingbox": [
+      "-10.8861268",
+      "-10.8856586",
+      "-37.0837095",
+      "-37.0833857"
+    ]
+  }
+]
