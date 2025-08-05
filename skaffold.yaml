@@ -34,6 +34,11 @@ deploy:
         chartPath: databases/charts/ridely-database
         valuesFiles:
           - databases/charts/ridely-database/values/values-{{ or .ENVIRONMENT_TYPE "dev" }}.yaml
+      - &ridely-cache-database-release
+        name: ridely-cache-database
+        chartPath: databases/charts/ridely-cache-database
+        valuesFiles:
+          - databases/charts/ridely-cache-database/values/values-{{ or .ENVIRONMENT_TYPE "dev" }}.yaml
       - &auth-service-release
         name: auth-service
         chartPath: backend/charts/auth-service
@@ -52,6 +57,14 @@ deploy:
 
 portForward:
   - resourceType: service
+    resourceName: ridely-database
+    port: 3306
+    localPort: 3306
+  - resourceType: service
+    resourceName: ridely-cache-database-redis-master
+    port: 6379
+    localPort: 6379
+  - resourceType: service
     resourceName: auth-service-keycloak
     port: 80
     localPort: 8080
@@ -63,10 +76,6 @@ portForward:
     resourceName: ridely-service
     port: 80
     localPort: 8000
-  - resourceType: service
-    resourceName: ridely-database
-    port: 3306
-    localPort: 3306
 
 profiles:
   - name: dev
@@ -74,6 +83,21 @@ profiles:
       - kubeContext: kind-ridely-cluster
   - name: staging
   - name: prod
+  - name: databases-only
+    portForward:
+      - resourceType: service
+        resourceName: ridely-database
+        port: 3306
+        localPort: 3306
+      - resourceType: service
+        resourceName: ridely-cache-database-redis-master
+        port: 6379
+        localPort: 6379
+    deploy:
+      helm:
+        releases: #keep the order of dependency here
+          - *ridely-database-release
+          - *ridely-cache-database-release
   - name: auth-service-only
     portForward:
       - resourceType: service
@@ -98,9 +122,14 @@ profiles:
         resourceName: ridely-database
         port: 3306
         localPort: 3306
+      - resourceType: service
+        resourceName: ridely-cache-database-redis-master
+        port: 6379
+        localPort: 6379
     deploy:
       helm:
         releases: #keep the order of dependency here
           - *ridely-database-release
+          - *ridely-cache-database-release
           - *ridely-service-release
 

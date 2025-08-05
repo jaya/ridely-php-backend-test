@@ -28,6 +28,21 @@ if [ ! -z "$CHART" ]; then
   # Check if the chart required is "ridely-databases"
   if [ "$CHART" = "ridely-database" ]; then
     CHART_PATH="./databases/charts/$CHART"
+  elif [ "$CHART" = "ridely-cache-database" ]; then
+    CHART_PATH="./databases/charts/$CHART"
+
+    cd $CHART_PATH
+
+    if [ -z "$(ls -A ./charts)" ]; then
+       echo 'Updating dependency'
+       helm dependency update
+    else
+      echo "Dependency already installed"
+    fi
+
+    echo "returning to root directory: $ROOT_DIR "
+    cd $ROOT_DIR
+
   else
     CHART_PATH="./backend/charts/$CHART"
   fi
@@ -49,6 +64,17 @@ else
     echo 'Trying to upgrade the existing one...'
      helm upgrade "$SHARED_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_DATABASE_CHART_NAME/values/values-dev.yaml
   fi
+
+  echo '----------------------------------------'
+  echo 'Installing cache databases chart'
+  echo '----------------------------------------'
+  helm install "$SHARED_CACHE_DATABASE_CHART_NAME" "./databases/charts/$SHARED_CACHE_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_CACHE_DATABASE_CHART_NAME/values/values-dev.yaml
+
+  if [ $? -ne 0 ]; then
+    echo 'Trying to upgrade the existing one...'
+     helm upgrade "$SHARED_CACHE_DATABASE_CHART_NAME" "./databases/charts/$SHARED_DATABASE_CHART_NAME/" -n "$PROJECT_NAMESPACE" --values ./databases/charts/$SHARED_CACHE_DATABASE_CHART_NAME/values/values-dev.yaml
+  fi
+
 
   echo '----------------------------------------'
   echo 'Installing services chart'

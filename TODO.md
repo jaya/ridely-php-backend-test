@@ -20,7 +20,7 @@
         - [ ] Documentar eventos/mensageria e serviços envolvidos
         - [ ] Documentar alertas e dashboards de observabilidade
   - Execução
-    - [ ] Skaffold
+    - [x] Skaffold
 - Infraestrutura
   - IAC (Terraform)
     - [ ] EKS
@@ -36,7 +36,7 @@
     - [ ] Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)
   - Healm e Kubernetes configuration
     - Databases
-      - [ ] Redis chart
+      - [x] Redis chart
       - [x] MYSQL chart
     - Services
       - [x] Auth Service (KeyCloak)
@@ -113,6 +113,7 @@
     - [ ] ridely-service (WIP)
     - [ ] pricing-service
   - [ ] Escrever testes de integração (API + mensageria)
+  - [ ] Escrever testes de integração (API + Auth)
   - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
   - [ ] Testar escalabilidade dos serviços com HPA
   - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)

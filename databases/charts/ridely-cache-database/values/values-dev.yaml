@@ -1,0 +1,29 @@
+architecture: standalone
+
+global:
+  redis:
+    password: "redis-pass"
+auth:
+  enabled: true
+
+master:
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+replica:
+  replicaCount: 1  # standalone
+
+service:
+  type: ClusterIP
+
+metrics:
+  enabled: true

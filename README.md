@@ -143,6 +143,12 @@ Execute o comando a seguir na raiz do projeto:
   ENVIRONMENT_TYPE=dev skaffold dev --no-prune --namespace=ridely
 ```
 
+#### Apenas databases
+Execute o comando a seguir na raiz do projeto:
+```bash
+  ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p databases-only --namespace=ridely
+```
+
 #### Apenas a autenticação
 Execute o comando a seguir na raiz do projeto:
 ```bash

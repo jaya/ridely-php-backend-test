@@ -31,8 +31,8 @@ class HealthCheckProvider extends ServiceProvider
         Health::checks([
             UsedDiskSpaceCheck::new(),
             // TODO remover a meta connection_name
-            DatabaseCheck::new(),
-//            RedisCheck::new(),
+            DatabaseCheck::new()->name("Database")->connectionName(""),
+            RedisCheck::new(),
             PingCheck::new()
                 ->name('Keycloak Auth Service')
                 ->url($keycloakUrl)

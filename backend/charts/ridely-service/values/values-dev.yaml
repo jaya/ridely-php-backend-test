@@ -22,23 +22,21 @@ env:
   LOG_STACK_CHANNELS: json
   LOG_LEVEL: debug
 
-  APP_ENV: production
+  APP_ENV: development
   APP_DEBUG: "false"
   DB_CONNECTION: mysql
   DB_HOST: ridely-database
   DB_PORT: 3306
-#  DB_DATABASE: laravel
-#  DB_USERNAME: laravel
   DB_DATABASE: ridely
   DB_USERNAME: root
-  #DB_HOST=0.0.0.0
-  #DB_PORT=3306
-  #DB_DATABASE=ridely
-  #DB_USERNAME=root
-  #DB_PASSWORD=ridely
+
+  REDIS_HOST: ridely-cache-database-redis
+  REDIS_PASSWORD: redis-pass
+  REDIS_PORT: 6379
 
   KEYCLOAK_HEALTH_CHECK_URL: http://auth-service-keycloak:80/realms/master
   KEYCLOAK_ISSUER: http://auth-service-keycloak/realms/spa-customers
   KEYCLOAK_REALM_URL: http://auth-service-keycloak:80/realms/spa-customers
   KEYCLOAK_CLIENT_ID: ridely-service
+
 

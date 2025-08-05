@@ -1,0 +1,18 @@
+1. Get the Redis root password:
+   kubectl get secret --namespace {{ .Release.Namespace }} {{ template "ridely-cache-database.name" . }}-redis -o jsonpath="{.data.redis-password}" | base64 --decode; echo
+
+
+2. Expose Redis externally (for testing purposes):
+   kubectl port-forward svc/{{ template "ridely-cache-database.name" . }}-redis-master 6379:6379 -n {{ .Release.Namespace }}
+
+3. Connect to Redis:
+    redis-cli -h localhost auth <password>
+    Or:
+    redis-cli -h localhost -a '<password>'
+
+4. Internal connection details:
+   Host: {{ template "ridely-cache-database.name" . }}-redis-master.{{ .Release.Namespace }}.svc.cluster.local
+   Port: 6379
+
+   Or:
+   "{{ template "ridely-cache-database.name" . }}-redis-master:6379";

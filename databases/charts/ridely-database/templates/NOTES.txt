@@ -1,5 +1,5 @@
 1. Get the MySQL root password:
-   kubectl get secret --namespace {{ .Release.Namespace }} {{ template "ridely-database.name" . }}-secret -o jsonpath="{.data.mysql-root-password}" | base64 --decode; echo
+   kubectl get secret --namespace {{ .Release.Namespace }} {{ template "ridely-database.name" . }}-redis -o jsonpath="{.data.mysql-root-password}" | base64 --decode; echo
 
 2. Connect to MySQL from within the cluster:
    kubectl run mysql-client --rm --tty -i --restart='Never' --image mysql:8 --namespace {{ .Release.Namespace }} --command -- mysql -h {{ template "ridely-database.name" . }} -p
@@ -11,10 +11,11 @@
    Host: {{ template "ridely-database.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
    Port: 3306
 
+   Or:
+   "{{ template "ridely-database.name" . }}:3306";
+
 5. PVCs used for persistence:
    kubectl get pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
 
-**WARNING:** Do not expose MySQL publicly without proper security measures.
+    **WARNING:** Do not expose MySQL publicly without proper security measures.
 
-Internal communication:
-  "ridely-database:3306";

@@ -18,6 +18,6 @@ Test endpoint:
 Internal communication:
   "http://auth-service-keycloak:80/realms/master";
 
-Login with:
-  Username: {{ .Values.keycloak.auth.adminUser }}
-  Password: {{ .Values.keycloak.auth.adminPassword }}
+{{/*Login with:*/}}
+{{/*  Username: {{ .Values.keycloak.auth.adminUser }}*/}}
+{{/*  Password: {{ .Values.keycloak.auth.adminPassword }}*/}}
