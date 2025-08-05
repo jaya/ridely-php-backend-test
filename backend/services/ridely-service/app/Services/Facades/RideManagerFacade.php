@@ -21,9 +21,7 @@ class RideManagerFacade
     public function estimateRide(EstimateRideCriteria $criteria): array
     {
         $origin = $this->getCoordinatesFromAddress($criteria->getPickUp());
-        // wait one second between the calls
-        sleep(1);
-        $destination = $this->getCoordinatesFromAddress($criteria->getDropOff());
+        $destination = $this->getCoordinatesFromAddress($criteria->getDropOff(), true);
 
         if (!$origin || !$destination) {
             throw RideException::unableToLocateAddressData();
@@ -45,8 +43,8 @@ class RideManagerFacade
         ];
     }
 
-    private function getCoordinatesFromAddress(string $address)
+    private function getCoordinatesFromAddress(string $address, $wait = false)
     {
-        return $this->locationService->execute($address);
+        return $this->locationService->execute($address, $wait);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\PricingRule;
 use App\Services\Interfaces\Location\LocationServiceInterface;
 use App\Validators\LocationValidator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -36,28 +37,43 @@ class LocationService implements LocationServiceInterface
         $this->pricingRule = $pricingRule;
 
     }
-    public function execute(string $address): ?array
+    public function execute(string $address, $wait = false): ?array
     {
+        // Use a consistent cache key
+        $cacheKey = 'geocode:' . md5($address);
 
-        $response = Http::withHeaders([
-            'User-Agent' => 'RidelyApp/1.0 (www.ridely.com.br)'
-        ])->get($this->locationServiceUrl, [
-            'format' => 'jsonv2',
-            'q' => $address,
-        ]);
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($wait, $address) {
+            if ($wait) {
+                // wait one second between the calls
+                // This is because the limitation of the API for test usage
+                sleep(1);
+            }
 
-        $data = $response->json();
+            $encodedAddress = rawurldecode($address);
+            $url = "$this->locationServiceUrl?format=jsonv2&q=$encodedAddress";
+            Log::info("Requesting data from the locationService: $url");
 
-        if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
-            return null;
-        }
+            $response = Http::withHeaders([
+                'User-Agent' => 'RidelyApp/1.0 (www.ridely.com.br)'
+            ])->get($this->locationServiceUrl, [
+                'format' => 'jsonv2',
+                'q' => $address,
+            ]);
 
-        $locationData = $data[0];
+            $data = $response->json();
 
-        return [
-            'lat' => (float) $locationData['lat'],
-            'lon' => (float) $locationData['lon'],
-        ];
+            if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
+                return null;
+            }
+
+            $locationData = $data[0];
+
+            return [
+                'lat' => (float) $locationData['lat'],
+                'lon' => (float) $locationData['lon'],
+            ];
+
+        });
 
     }
 

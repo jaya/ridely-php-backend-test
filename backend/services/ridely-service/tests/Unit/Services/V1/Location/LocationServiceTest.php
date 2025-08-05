@@ -8,6 +8,7 @@ use App\Services\V1\Location\LocationService;
 use App\Validators\LocationValidator;
 use Carbon\Carbon;
 use Database\Seeders\PricingRulesSeeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 use Tests\Helpers\LocationHelper;
 use Tests\Unit\UnitTestCase;
@@ -25,7 +26,7 @@ class LocationServiceTest extends UnitTestCase
 
         $this->seed(PricingRulesSeeder::class);
     }
-    public function testExecuteWithValidApiResponseReturnsLatLon()
+    public function testExecuteWithSuccess()
     {
         $address = LocationHelper::$pickUp;
 
@@ -38,6 +39,29 @@ class LocationServiceTest extends UnitTestCase
         $this->assertIsArray($result);
         $this->assertEquals(-10.8819106, $result['lat']);
         $this->assertEquals(-37.0808969, $result['lon']);
+    }
+
+    public function testExecuteUsingCacheWithSuccess()
+    {
+        $address = LocationHelper::$pickUp;
+        $lat = -10.8819106;
+        $lon = -37.0808969;
+
+        $this->mockCalls(LocationHelper::getDatasourceDataForDropOffSuccessResponse());
+
+        Cache::shouldReceive('remember')
+            ->once()
+            ->andReturn([
+                'lat' => $lat,
+                'lon' => $lon,
+            ]);
+        
+        $result = $this->service->execute($address);
+
+        $this->assertIsArray($result);
+
+        $this->assertEquals($lat, $result['lat']);
+        $this->assertEquals($lon, $result['lon']);
     }
 
     public function testExecuteWithEmptyApiResponseReturnsNull()

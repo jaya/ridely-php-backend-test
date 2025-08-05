@@ -27,12 +27,12 @@ class HealthCheckProvider extends ServiceProvider
     {
         $keycloakUrl = config('keycloak.health_check_url');
         Log::debug("Keycloak url: $keycloakUrl");
+
         // TODO adicionar o token
         Health::checks([
             UsedDiskSpaceCheck::new(),
-            // TODO remover a meta connection_name
             DatabaseCheck::new()->name("Database")->connectionName(""),
-            RedisCheck::new(),
+            RedisCheck::new()->name("Cache")->connectionName(""),
             PingCheck::new()
                 ->name('Keycloak Auth Service')
                 ->url($keycloakUrl)

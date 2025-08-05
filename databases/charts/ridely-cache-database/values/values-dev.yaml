@@ -16,11 +16,11 @@ master:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 100m
+      memory: 128Mi
 
 replica:
-  replicaCount: 1  # standalone
+  replicaCount: 0  # standalone
 
 service:
   type: ClusterIP

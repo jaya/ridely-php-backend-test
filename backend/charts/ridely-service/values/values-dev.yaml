@@ -22,6 +22,8 @@ env:
   LOG_STACK_CHANNELS: json
   LOG_LEVEL: debug
 
+  CACHE_DRIVER: redis
+
   APP_ENV: development
   APP_DEBUG: "false"
   DB_CONNECTION: mysql
@@ -33,6 +35,7 @@ env:
   REDIS_HOST: ridely-cache-database-redis
   REDIS_PASSWORD: redis-pass
   REDIS_PORT: 6379
+  REDIS_DB: 0
 
   KEYCLOAK_HEALTH_CHECK_URL: http://auth-service-keycloak:80/realms/master
   KEYCLOAK_ISSUER: http://auth-service-keycloak/realms/spa-customers

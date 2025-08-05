@@ -13,7 +13,7 @@ interface LocationServiceInterface
 {
 
 
-    public function execute(string $address);
+    public function execute(string $address, bool $wait = false);
 
     public function validate(string $address): bool;
 
