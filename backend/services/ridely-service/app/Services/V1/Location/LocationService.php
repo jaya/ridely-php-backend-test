@@ -3,7 +3,6 @@
 namespace App\Services\V1\Location;
 
 use App\Exceptions\RideException;
-use App\Exceptions\ServiceException;
 use App\Models\PricingRule;
 use App\Services\Interfaces\Location\LocationServiceInterface;
 use App\Validators\LocationValidator;
@@ -21,8 +20,10 @@ class LocationService implements LocationServiceInterface
     protected ValidationException $exception;
 
     protected LocationValidator $validator;
+    protected PricingRule $pricingRule;
 
     public function __construct(
+        PricingRule $pricingRule,
         LocationValidator $validator,
         string $locationServiceUrl = null)
     {
@@ -32,6 +33,7 @@ class LocationService implements LocationServiceInterface
 
         $this->locationServiceUrl = $locationServiceUrl;
         $this->validator = $validator;
+        $this->pricingRule = $pricingRule;
 
     }
     public function execute(string $address): ?array
@@ -97,9 +99,7 @@ class LocationService implements LocationServiceInterface
     {
         $now = now();
         $hour = $now->hour;
-
-        // Rush hour is between 7–9 AM and 5–7 PM
-        $isRushHour = ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
+        $isRushHour = $this->isRushHour($hour);
 
         // Average speed: 30 km/h during rush hour, 45 km/h otherwise
         $averageSpeed = $isRushHour ? 30 : 45;
@@ -121,20 +121,15 @@ class LocationService implements LocationServiceInterface
         $hour = $now->hour;
 
         // Define rush hour time range
-        $isRushHour = ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
+        $isRushHour = $this->isRushHour($hour);
 
         $isFlag2 = $hour < 7 || $hour >= 17;
 
         $rule = null;
 
         try {
-            // Select rule based on conditions
-            $rule = PricingRule::query()
-                ->when($isFlag2, fn($q) => $q->where('is_flag_2', true))
-                ->when(!$isFlag2 && $isRushHour, fn($q) => $q->where('is_rush_hour', true))
-                ->when(!$isFlag2 && !$isRushHour, fn($q) => $q->where('name', 'default'))
-                ->first();
 
+            $rule = $this->pricingRule->filterRuleBasedOnTime($isRushHour, $isFlag2);
 
         } catch (\Throwable $e) {
             Log::error($e->getMessage());
@@ -147,5 +142,16 @@ class LocationService implements LocationServiceInterface
         $price = $rule->base_fare + ($rule->price_per_km * $distanceKm);
 
         return round($price, 2);
+    }
+
+    /**
+     * @param int $hour
+     * @return bool
+     */
+    public function isRushHour(int $hour): bool
+    {
+// Rush hour is between 7–9 AM and 5–7 PM
+        $isRushHour = ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
+        return $isRushHour;
     }
 }

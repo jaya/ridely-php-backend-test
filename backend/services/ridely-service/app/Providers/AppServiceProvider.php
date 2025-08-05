@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\PricingRule;
 use App\Repositories\V1\DriverRepository;
 use App\Services\Facades\DriverManagerFacade;
 use App\Services\Facades\RideManagerFacade;
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(LocationService::class, function ($app) {
             $locationServiceUrl = env('LOCATION_SERVICE_URL', 'https://nominatim.openstreetmap.org/search');
             return new LocationService(
+                $app->make(PricingRule::class),
                 $app->make(LocationValidator::class),
                 $locationServiceUrl
             );

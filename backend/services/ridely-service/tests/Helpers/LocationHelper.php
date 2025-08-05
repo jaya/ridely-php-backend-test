@@ -27,8 +27,13 @@ class LocationHelper
 
     public static function mockCall($locationServiceUrl, $address, $result, $statusCode = 200)
     {
-        $q = rawurlencode($address);
-        $url = "$locationServiceUrl?format=jsonv2&q=$q*";
+        if ($locationServiceUrl == '*') {
+            $url = '*';
+        } else {
+            $q = rawurlencode($address);
+            $url = "$locationServiceUrl?format=jsonv2&q=$q*";
+        }
+
         Http::fake([
             $url => Http::response($result, $statusCode),
         ]);
