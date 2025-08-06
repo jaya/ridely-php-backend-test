@@ -100,7 +100,7 @@ class DriverController extends Controller
 
         try {
 
-            $request->validate($criteria->toArray());
+            $request->validate($criteria->rules());
 
             $paginator = $facade->list($criteria);
             $metadata = new HateosMetadata($paginator);
@@ -113,6 +113,7 @@ class DriverController extends Controller
         } catch (RepositoryException $e) {
             return ResponseHelper::error($e);
         } catch (\Throwable $e) {
+            Log::error($e->getMessage());
             return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, Response::HTTP_BAD_REQUEST, previous: $e));
         }
 

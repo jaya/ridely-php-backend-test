@@ -26,7 +26,7 @@ class HealthCheckProvider extends ServiceProvider
     public function boot(): void
     {
         $keycloakUrl = config('keycloak.health_check_url');
-        Log::debug("Keycloak url: $keycloakUrl");
+//        Log::debug("Keycloak url: $keycloakUrl");
 
         // TODO adicionar o token
         Health::checks([
