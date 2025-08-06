@@ -26,3 +26,4 @@
 # tests
 /tests/load-tests/.env
 /tests/load-tests/node_modules/
+/backend/services/ridely-service/target/unit/
