@@ -135,27 +135,50 @@ Essa solução garante alta disponibilidade, escalabilidade e monitoramento efic
 * **Pricing Service**
   Calcula tarifas dinâmicas das corridas com base em variáveis contextuais. Implementado em Node.js, utiliza Redis para cache e se comunica via RabbitMQ para eventos relacionados a preços.
 
-### Como Rodar Localmente
+## Instalando as dependencies do projeto
 
-#### Aplicação completa
+...
+
+### Preparando o ambiente
+
+#### Criando o cluster
+Execute o comando a seguir na raiz do projeto:
+```bash
+  ./scripts/kind/kind-create-cluster.sh
+```
+#### Configurando o contexto
+Execute o comando a seguir na raiz do projeto:
+```bash
+  ./scripts/kubectl/kubectl-config-context.sh
+```
+#### Criando o namespace
+Execute o comando a seguir na raiz do projeto:
+```bash
+  ./scripts/kubectl/kubectl-create-namespace.sh 
+```
+
+
+## Como Rodar Localmente
+
+### Aplicação completa
 Execute o comando a seguir na raiz do projeto:
 ```bash
   ENVIRONMENT_TYPE=dev skaffold dev --no-prune --namespace=ridely
 ```
 
-#### Apenas databases
+### Apenas databases
 Execute o comando a seguir na raiz do projeto:
 ```bash
   ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p databases-only --namespace=ridely
 ```
 
-#### Apenas a autenticação
+### Apenas a autenticação
 Execute o comando a seguir na raiz do projeto:
 ```bash
   ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p auth-service-only --namespace=ridely
 ```
 
-#### Apenas a aplicação PHP + Banco de Dados
+### Apenas a aplicação PHP + Banco de Dados
 Execute o comando a seguir na raiz do projeto:
 ```bash
   ENVIRONMENT_TYPE=dev skaffold dev --no-prune -p ridely-service-only --namespace=ridely
