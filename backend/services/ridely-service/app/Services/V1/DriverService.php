@@ -3,12 +3,15 @@
 namespace App\Services\V1;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Exceptions\DriverException;
 use App\Exceptions\ServiceException;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
 use App\Services\Interfaces\DriverServiceInterface;
 use App\Validators\DriverValidator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
@@ -20,15 +23,18 @@ class DriverService extends AbstractService implements DriverServiceInterface
 
     public function __construct(
         protected DriverValidator $validator
-    ) {}
+    )
+    {
+    }
 
-    public function create(array $data): Driver
+    public function create(CreateDriverCriteria $criteria): Driver
     {
 
-        if ($this->validator->validateCreate($data)) {
+        if ($this->validator->validateCreate($criteria)) {
 
             $this->checkDatabase();
 
+            $data = $criteria->toArray();
             try {
                 return Driver::create([
                     'name' => $data['name'],
@@ -67,7 +73,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
         }
     }
 
-    public function update()
+    public function update(): Driver
     {
         throw ServiceException::notImplemented();
         // TODO: Implement update() method.
@@ -84,26 +90,40 @@ class DriverService extends AbstractService implements DriverServiceInterface
 //        }
     }
 
-    public function delete()
+    public function softDelete($id): bool
     {
         throw ServiceException::notImplemented();
-        // TODO: Implement delete() method.
-//        try {
-//
-//
-//            $deleted = Driver::destroy($id);
-//
-//            // If no rows were affected, it means the driver wasn't found
-//            if ($deleted === 0) {
-//                throw new ModelNotFoundException();
-//            }
-//        } catch (ModelNotFoundException $e) {
-//            Log::warning("Driver not found for deletion with ID: $id");
-//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
-//        } catch (QueryException $e) {
-//            Log::error($e->getMessage());
-//            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_DELETE_DRIVER, ["id" => $id], $e);
-//        }
+    }
+
+    /**
+     * @throws ServiceException
+     * @throws DriverException
+     */
+    public function delete($id): bool
+    {
+        if ($this->validator->validateDelete($id)) {
+            try {
+                $driver = Driver::findOrFail($id);
+                $deleted = $driver->delete();
+
+                if (!$deleted) {
+                    throw new ModelNotFoundException();
+                }
+            } catch (ModelNotFoundException $e) {
+                Log::warning("Driver not found for deletion with ID: $id");
+                throw DriverException::notFound(["id" => $id]);
+            } catch (QueryException $e) {
+                Log::error($e->getMessage());
+                throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_DELETE_DRIVER, ["id" => $id], $e);
+            }
+        } else {
+            $this->exception = $this->validator->getException();
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['id' => $id], $this->exception);
+        }
+
+        return true;
+
     }
 
     public function find(int $id): Driver

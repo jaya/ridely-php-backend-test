@@ -47,6 +47,6 @@ env:
   KEYCLOAK_CLIENT_ID: ridely-service
 
   LOCATION_SERVICE_URL: 'https://nominatim:openstreetmap:org/search'
-  REQUEST_LIMIT_PER_MINUTE: 2048
+  REQUEST_LIMIT_PER_MINUTE: 1200
 
 

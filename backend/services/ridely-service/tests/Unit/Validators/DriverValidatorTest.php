@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Validators;
 
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Validators\DriverValidator;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +35,9 @@ class DriverValidatorTest extends UnitTestCase
             'available' => true,
         ];
 
-        $result = $this->validator->validateCreate($data);
+        $criteria = new CreateDriverCriteria($data);
+
+        $result = $this->validator->validateCreate($criteria);
         $this->assertTrue($result);
     }
 
@@ -49,7 +52,9 @@ class DriverValidatorTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $result = $this->validator->validateCreate($data);
+        $criteria = new CreateDriverCriteria($data);
+
+        $result = $this->validator->validateCreate($criteria);
         $this->assertFalse($result);
 
         $this->expectException(ValidationException::class);
@@ -88,7 +93,9 @@ class DriverValidatorTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $result = $this->validator->validateCreate($data);
+        $criteria = new CreateDriverCriteria($data);
+
+        $result = $this->validator->validateCreate($criteria);
         $this->assertFalse($result);
 
         $this->expectException(ValidationException::class);

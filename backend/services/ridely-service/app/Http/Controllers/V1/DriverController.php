@@ -7,6 +7,7 @@ use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ApplicationException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
@@ -92,7 +93,6 @@ class DriverController extends Controller
     {
         try {
 
-
             $user = $request->attributes->get('user') ?? null;
             $userStr = json_encode($user);
             Log::debug("Request user: $userStr");
@@ -136,17 +136,15 @@ class DriverController extends Controller
     public function store(Request $request, DriverManagerFacade $facade): JsonResponse
     {
 
-        $data = $request->all();
-        dd($data);
         try {
-            //$request->validate();
 
-            $driver = $facade->create($data);
+            $criteria = new CreateDriverCriteria($request->all());
+            $request->validate($criteria->rules());
+
+            $driver = $facade->create($criteria);
             return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);
-        } catch (ServiceException $e) {
+        } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
-        } catch (\Throwable $e) {
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
         }
     }
 
@@ -172,13 +170,14 @@ class DriverController extends Controller
      *     )
      * )
      */
-    public function destroy($id): JsonResponse
+    public function destroy($id, DriverManagerFacade $facade): JsonResponse
     {
-        // TODO incluir coluna active para deletar logicamente
-        $driver = Driver::findOrFail($id);
-        $driver->delete();
-
-        return response()->json(null, 204);
+        try {
+            $facade->delete($id);
+            return ResponseHelper::success(null, Response::HTTP_NO_CONTENT);
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
     }
 
     /**

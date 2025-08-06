@@ -3,6 +3,7 @@
 namespace App\Services\V2;
 
 use App\Exceptions\ServiceException;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
@@ -19,7 +20,7 @@ class V2DriverService extends AbstractService implements DriverServiceInterface
         protected DriverValidator $validator
     ) {}
 
-    public function create(array $data): Driver
+    public function create(CreateDriverCriteria $data): Driver
     {
         throw ServiceException::notImplemented();
     }

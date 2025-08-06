@@ -7,8 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DriverException extends ApplicationException
 {
-    public static function notFound(): DriverException
+    public static function notFound($params): DriverException
     {
-        return new self(ErrorMessagesEnum::DRIVER_NOT_FOUND, Response::HTTP_NOT_FOUND);
+        return new self(ErrorMessagesEnum::DRIVER_NOT_FOUND, Response::HTTP_NOT_FOUND, params: $params);
     }
 } 

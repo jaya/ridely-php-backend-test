@@ -2,8 +2,6 @@
 
 namespace App\Http\Criteria;
 
-use Illuminate\Validation\Rule;
-
 class EstimateRideCriteria
 {
     const CITY = 'Aracaju';

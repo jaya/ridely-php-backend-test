@@ -2,6 +2,7 @@
 
 namespace App\Services\Facades;
 
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Http\Hateos\HateosItemLinks;
 use App\Services\Interfaces\DriverServiceInterface;
@@ -18,9 +19,10 @@ class DriverManagerFacade
         $this->driverService = $driverService;
     }
 
-    public function create($data): array
+    public function create(CreateDriverCriteria $criteria): array
     {
-        $data = $this->driverService->create($data);
+
+        $data = $this->driverService->create($criteria);
         $path = request()->path();
         $newData = $this->addHateosLinksToItems($data, $path);
         return $newData[0];
@@ -35,7 +37,13 @@ class DriverManagerFacade
 
     }
 
-    public function delete()
+    public function delete($id)
+    {
+        $this->driverService->delete($id);
+        return true;
+    }
+
+    public function softDelete($id)
     {
 
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Enums\RideStatusEnum;
 use App\Exceptions\RideException;
 use App\Exceptions\ServiceException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,11 +26,6 @@ class Ride extends Model
         'price' => 'decimal:2',
     ];
 
-    const STATUS_REQUESTED = 'REQUESTED';
-    const STATUS_ACCEPTED = 'ACCEPTED';
-    const STATUS_FINISHED = 'FINISHED';
-    const STATUS_CANCELLED = 'CANCELLED';
-    const STATUS_REFUSED = 'REFUSED';
 
     public function driver()
     {
@@ -42,13 +38,13 @@ class Ride extends Model
             throw RideException::invalidState('Ride already has a status');
         }
 
-        $this->status = self::STATUS_REQUESTED;
+        $this->status = RideStatusEnum::REQUESTED;
         $this->save();
     }
 
     public function accept(Driver $driver)
     {
-        if ($this->status !== self::STATUS_REQUESTED) {
+        if ($this->status !== RideStatusEnum::REQUESTED) {
             throw RideException::invalidState('Ride must be in REQUESTED state to be accepted');
         }
 
@@ -57,7 +53,7 @@ class Ride extends Model
         }
 
         $this->driver_id = $driver->id;
-        $this->status = self::STATUS_ACCEPTED;
+        $this->status = RideStatusEnum::ACCEPTED;
         $this->save();
 
         $driver->available = false;
@@ -66,11 +62,11 @@ class Ride extends Model
 
     public function finish()
     {
-        if ($this->status !== self::STATUS_ACCEPTED) {
+        if ($this->status !== RideStatusEnum::ACCEPTED) {
             throw RideException::invalidState('Ride must be in ACCEPTED state to be finished');
         }
 
-        $this->status = self::STATUS_FINISHED;
+        $this->status = RideStatusEnum::FINISHED;
         $this->save();
 
         if ($this->driver) {
@@ -81,11 +77,11 @@ class Ride extends Model
 
     public function cancel()
     {
-        if (!in_array($this->status, [self::STATUS_REQUESTED, self::STATUS_ACCEPTED])) {
+        if (!in_array($this->status, [RideStatusEnum::REQUESTED, RideStatusEnum::ACCEPTED])) {
             throw RideException::invalidState('Ride can only be cancelled in REQUESTED or ACCEPTED state');
         }
 
-        $this->status = self::STATUS_CANCELLED;
+        $this->status = RideStatusEnum::CANCELLED;
         $this->save();
 
         if ($this->driver) {
@@ -96,20 +92,22 @@ class Ride extends Model
 
     public function refuse()
     {
-        if ($this->status !== self::STATUS_REQUESTED) {
+        if ($this->status !== RideStatusEnum::REQUESTED) {
             throw RideException::invalidState('Ride must be in REQUESTED state to be refused');
         }
 
-        $this->status = self::STATUS_REFUSED;
+        $this->status = RideStatusEnum::REFUSED;
         $this->save();
     }
 
+    // TODO revisar se é o driver ou ride, revisar nome do metodo
     public function getRideWithDriver(int $id)
     {
         try {
             return self::with('driver')->findOrFail($id);
         } catch (\Exception $e) {
-            throw ServiceException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
+            //throw ServiceException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
+            throw RideException::notFound(["id" => $id]);
         }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Validators;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Log;
@@ -21,16 +22,16 @@ class DriverValidator implements ValidatorInterface
         $this->validFields = Driver::$fields;
     }
 
-    public function validateCreate($data): bool
+    public function validateCreate(CreateDriverCriteria $criteria): bool
     {
-        return $this->commonValidator($data, null);
+        return $this->commonValidator($criteria->toArray(), $criteria->rules());
     }
 
     public function validateRead(ListCriteria $criteria): bool
     {
         $result = true;
 
-        $rules = $this->criteriaRules($criteria);
+        $rules = $this->appendDatabaseFields($criteria);
         $validator = Validator::make($criteria->toArray(), $rules);
 
         if ($validator->fails()) {
@@ -51,6 +52,14 @@ class DriverValidator implements ValidatorInterface
             'id' => 'required|numeric',
         ]);
         return $this->commonValidator($data, $rules);
+    }
+
+    public function validateDelete($id): bool
+    {
+        $rules = [
+            'id' => 'required|numeric',
+        ];
+        return $this->commonValidator(['id' => $id], $rules);
     }
 
     public function getException(): ValidationException
@@ -97,6 +106,7 @@ class DriverValidator implements ValidatorInterface
     }
 
     /**
+     * TODO remover
      * @return string[]
      */
     public function rules(): array
@@ -115,7 +125,7 @@ class DriverValidator implements ValidatorInterface
      * @param ListCriteria $criteria
      * @return array|\Illuminate\Validation\Rules\In[][]|\string[][]
      */
-    public function criteriaRules(ListCriteria $criteria): array
+    public function appendDatabaseFields(ListCriteria $criteria): array
     {
         return $criteria->rules($this->validFields);
     }

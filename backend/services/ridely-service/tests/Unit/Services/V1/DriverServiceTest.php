@@ -3,12 +3,17 @@
 namespace Tests\Unit\Services\V1;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Enums\RideStatusEnum;
+use App\Exceptions\DriverException;
 use App\Exceptions\ServiceException;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
+use App\Models\Ride;
 use App\Services\V1\DriverService;
 use App\Validators\DriverValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\MockObject\Exception;
 use Tests\Helpers\DriverHelper;
 use Tests\Unit\UnitTestCase;
@@ -37,10 +42,16 @@ class DriverServiceTest extends UnitTestCase
 
     public function testCreateSuccess()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $data = DriverHelper::getDriverSample();
         $data['id'] = null;
 
-        $result = $this->service->create($data);
+        $criteria = new CreateDriverCriteria($data);
+
+        $result = $this->service->create($criteria);
 
         $this->assertNotNull($result);
         $this->assertEquals($data['name'], $result->name);
@@ -48,15 +59,20 @@ class DriverServiceTest extends UnitTestCase
 
     public function testCreateFail()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $expectedErrorMessage = 'The name field is required.';
         $data = DriverHelper::getDriverSample();
         $data['name'] = null;
 
+        $criteria = new CreateDriverCriteria($data);
 
         $this->expectException(ServiceException::class);
         $this->expectExceptionMessage(ErrorMessagesEnum::INVALID_REQUEST->message($expectedErrorMessage));
 
-        $this->service->create($data);
+        $this->service->create($criteria);
 
 
     }
@@ -66,6 +82,10 @@ class DriverServiceTest extends UnitTestCase
      */
     public function testAllWithCriteria()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Driver::factory()->count(3)->create();
 
         $criteria = new ListCriteria([
@@ -92,13 +112,52 @@ class DriverServiceTest extends UnitTestCase
 //        $this->repository->update(999, ['name' => 'Test']);
 //    }
 //
-//    public function testDeleteDriverNotFound()
+    public function testDeleteSuccess()
+    {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        $driver = Driver::factory()->create();
+
+        $deleted = $this->service->delete($driver->id);
+        $this->assertTrue($deleted);
+    }
+
+    public function testDeleteFailDriverNotFound()
+    {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
+
+
+        $deleted = $this->service->delete(999);
+        $this->assertTrue($deleted);
+    }
+
+//    public function testDeleteFailDriverHasDependencies()
 //    {
+//        Log::info(
+//            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+//        );
 //
-//        $this->expectException(RepositoryException::class);
+//        self::markTestSkipped("Test needs to be fixed, as it is not working as expected");
+//
+//        $this->expectException(DriverException::class);
 //        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
 //
-//        $this->repository->delete(999);
+//        $driver = Driver::factory()->create();
+//        $ride = Ride::factory()->create();
+//        $ride->status = RideStatusEnum::REQUESTED;
+//        $ride->accept($driver);
+//
+//
+//        $deleted = $this->service->delete($driver->id);
+//        $this->assertTrue($deleted);
 //    }
 //
 //    public function testFindSuccess()

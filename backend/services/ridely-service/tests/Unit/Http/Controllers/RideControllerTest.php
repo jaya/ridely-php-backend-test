@@ -3,6 +3,7 @@
 namespace Tests\Unit\Http\Controllers;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Enums\RideStatusEnum;
 use App\Http\Middleware\ValidateKeycloakJwt;
 use App\Models\Driver;
 use App\Models\Ride;
@@ -17,7 +18,6 @@ use Tests\Unit\UnitTestCase;
 
 class RideControllerTest extends UnitTestCase
 {
-
     use RefreshDatabase;
 
     private $locationServiceUrl;
@@ -44,7 +44,7 @@ class RideControllerTest extends UnitTestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => Ride::STATUS_REQUESTED
+            'status' => RideStatusEnum::REQUESTED
         ]);
 
 
@@ -90,7 +90,7 @@ class RideControllerTest extends UnitTestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => Ride::STATUS_REQUESTED
+            'status' => RideStatusEnum::REQUESTED
         ]);
 
         $ride->accept($driver);

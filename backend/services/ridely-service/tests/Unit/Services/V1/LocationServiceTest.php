@@ -9,6 +9,7 @@ use App\Validators\LocationValidator;
 use Carbon\Carbon;
 use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Tests\Helpers\LocationHelper;
 use Tests\Unit\UnitTestCase;
@@ -28,6 +29,10 @@ class LocationServiceTest extends UnitTestCase
     }
     public function testExecuteWithSuccess()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $address = LocationHelper::$pickUp;
 
         $this->mockCalls(LocationHelper::getDatasourceDataForDropOffSuccessResponse());
@@ -43,6 +48,11 @@ class LocationServiceTest extends UnitTestCase
 
     public function testExecuteUsingCacheWithSuccess()
     {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $address = LocationHelper::$pickUp;
         $lat = -10.8819106;
         $lon = -37.0808969;
@@ -66,6 +76,11 @@ class LocationServiceTest extends UnitTestCase
 
     public function testExecuteWithEmptyApiResponseReturnsNull()
     {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $this->mockCalls([]);
 
 
@@ -76,6 +91,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testExecuteWithMissingLatOrLonReturnsNull()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $this->mockCalls([['lat' => '-10.9472']]);
 
 
@@ -86,6 +105,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testValidateWithValidAddressReturnsTrue()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $validator = $this->createMock(LocationValidator::class);
         $validator->method('validate')->willReturn(true);
 
@@ -96,6 +119,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testValidateFailWithNullAddress()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $exception = $this->createMock(ValidationException::class);
 
         $validator = $this->createMock(LocationValidator::class);
@@ -109,18 +136,12 @@ class LocationServiceTest extends UnitTestCase
     }
 
 
-    /**
-     * @param array $fakeResponse
-     * @param int $statusCode
-     * @return void
-     */
-    public function mockCalls(array $fakeResponse, int $statusCode = 200): void
-    {
-        LocationHelper::mockCall('*', null, $fakeResponse, $statusCode);
-    }
-
     public function testCalculateArea()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $lat1 = -10.9472;
         $lon1 = -37.0731;
         $lat2 = -10.9121;
@@ -134,6 +155,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testCalculateDurationTimeDuringRushHour()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 8, 0)); // 8h da manhã
 
         $distanceKm = 15;
@@ -145,6 +170,11 @@ class LocationServiceTest extends UnitTestCase
 
     public function testCalculateDurationTimeOutsideRushHour()
     {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 14, 0)); // 14h
 
         $distanceKm = 45;
@@ -159,6 +189,10 @@ class LocationServiceTest extends UnitTestCase
      */
     public function testCalculatePriceWithFlag2()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 6, 30)); // antes das 7h
 
         $distanceKm = 10;
@@ -169,6 +203,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testCalculatePriceWithRushHour()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 8, 0)); // 8h
 
         $distanceKm = 10;
@@ -179,6 +217,11 @@ class LocationServiceTest extends UnitTestCase
 
     public function testCalculatePriceWithDefaultRule()
     {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 14, 0)); // 14h
 
         $distanceKm = 5;
@@ -189,6 +232,10 @@ class LocationServiceTest extends UnitTestCase
 
     public function testCalculatePriceFailsIfNoRuleFound()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 14, 0));
 
         $pricingRuleMock = $this->createMock(PricingRule::class);
@@ -205,4 +252,14 @@ class LocationServiceTest extends UnitTestCase
         $service->calculatePrice($distanceKm);
     }
 
+
+    /**
+     * @param array $fakeResponse
+     * @param int $statusCode
+     * @return void
+     */
+    public function mockCalls(array $fakeResponse, int $statusCode = 200): void
+    {
+        LocationHelper::mockCall('*', null, $fakeResponse, $statusCode);
+    }
 }

@@ -3,7 +3,9 @@
 namespace Tests\Unit\Services\Facades;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Exceptions\DriverException;
 use App\Exceptions\ServiceException;
+use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\Facades\DriverManagerFacade;
@@ -72,7 +74,8 @@ class DriverManagerFacadeTest extends UnitTestCase
 
         $data = DriverHelper::getDriverSample();
 
-        $driver = $this->facade->create($data);
+        $criteria = new CreateDriverCriteria($data);
+        $driver = $this->facade->create($criteria);
 
         $this->assertEquals(1, $driver['id']);
         $this->assertEquals($data['name'], $driver['name']);
@@ -168,6 +171,25 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $this->markTestSkipped('Not implemented yet');
+        $driver = Driver::factory()->create();
+
+
+        $result = $this->facade->delete($driver->id);
+
+        $this->assertTrue($result);
+    }
+
+    public function testDeleteFailDriverNotFound()
+    {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
+
+
+        $deleted = $this->facade->delete(999);
+        $this->assertTrue($deleted);
     }
 }
