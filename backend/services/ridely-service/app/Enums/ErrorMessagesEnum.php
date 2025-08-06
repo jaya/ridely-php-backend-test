@@ -94,7 +94,7 @@ enum ErrorMessagesEnum: int
             self::SERVICE_TEMPORARILY_UNAVAILABLE => 'Service temporarily unavailable',
             self::UNABLE_TO_REQUEST_AUTH_PUBLIC_KEY => 'Unable to request auth public key',
             self::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE => 'Unable to save auth public key file',
-            self::INVALID_TOKEN => 'Invalid token',
+            self::INVALID_TOKEN => 'Invalid token: %s',
             self::MISSING_BEARER_TOKEN => 'Missing bearer token',
 
             self::UNABLE_TO_CREATE_DRIVER => 'Unable to create driver.',

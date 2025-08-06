@@ -5,6 +5,7 @@
   },
   "scripts": {
     "test:ridely-service:list-drivers": "artillery run ./artillery/ridely-service/list-drivers.yaml",
+    "test:ridely-service:list-drivers-60-10": "artillery run ./artillery/ridely-service/list-drivers-60-10.yaml",
     "test:ridely-service:estimate-ride": "artillery run ./artillery/ridely-service/estimate-ride.yaml"
   }
 }

@@ -53,6 +53,7 @@ class ValidateKeycloakJwt
 
             $decoded = $this->jwtKeysService->decodeToken($token, $publicKeys);
 
+
             // extra validations
             if ($decoded->iss !== config('keycloak.issuer')) {
                 Log::error(ErrorMessagesEnum::INVALID_TOKEN->message(),
@@ -65,14 +66,34 @@ class ValidateKeycloakJwt
                 throw new Exception(sprintf('Invalid token issuer: %s', $decoded->iss));
             }
 
+
+
+
             // Scope validation etc...
             // if (!in_array('app.read', $decoded->scope ?? [])) ...
 
             // Disponibiliza os claims no request
             $request->attributes->set('jwt', (array) $decoded);
-            $request->attributes->set('user', $decoded->preferred_username ?? null);
+            try {
+                $userData = null;
+
+                if (isset($decoded->preferred_username)) {
+                    $userData = [
+                        'id' => $decoded->id ?? $decoded->sid,
+                        'preferred_username' => $decoded->preferred_username,
+                    ];
+                }
+
+                $request->attributes->set('user', $userData);
+
+            } catch (\Exception $ex) {
+                Log::error($ex->getMessage());
+                throw $ex;
+            }
+
 
         } catch (\Throwable $e) {
+            Log::error($e->getMessage());
             Log::error(ErrorMessagesEnum::INVALID_TOKEN->message($e->getMessage()), ['token' => $token]);
             return ResponseHelper::error(ServiceException::invalidToken($e->getMessage(), [], $e ));
         }

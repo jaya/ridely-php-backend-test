@@ -1,5 +1,9 @@
 replicaCount: 1
 
+hpa:
+  minReplicas: 1
+  maxReplicas: 4
+
 images:
   nginx:
     repository: ridely-service-nginx
@@ -32,7 +36,7 @@ env:
   DB_DATABASE: ridely
   DB_USERNAME: root
 
-  REDIS_HOST: ridely-cache-database-redis
+  REDIS_HOST: ridely-cache-database-redis-master
   REDIS_PASSWORD: redis-pass
   REDIS_PORT: 6379
   REDIS_DB: 0
@@ -43,5 +47,6 @@ env:
   KEYCLOAK_CLIENT_ID: ridely-service
 
   LOCATION_SERVICE_URL: 'https://nominatim:openstreetmap:org/search'
+  REQUEST_LIMIT_PER_MINUTE: 2048
 
 

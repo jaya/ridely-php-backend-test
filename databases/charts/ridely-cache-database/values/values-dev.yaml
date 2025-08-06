@@ -20,7 +20,7 @@ master:
       memory: 128Mi
 
 replica:
-  replicaCount: 0  # standalone
+  replicaCount: 1  # standalone
 
 service:
   type: ClusterIP

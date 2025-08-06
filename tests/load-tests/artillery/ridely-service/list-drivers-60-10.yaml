@@ -1,0 +1,19 @@
+config:
+  target: "http://localhost:8000"
+  phases:
+    - duration: 60   # duração do teste em segundos
+      arrivalRate: 10  # 10 usuários por segundo
+  processor: "./functions.js"
+  http:
+    requestTimeout: 60 # 10000
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: List Drivers (Authenticated)
+    flow:
+      - function: "authenticate"
+      - get:
+          url: "/api/v1/drivers"
+          headers:
+            Authorization: "Bearer {{ token }}"

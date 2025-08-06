@@ -95,7 +95,8 @@ class DriverController extends Controller
         $criteria = new ListCriteria($request->all());
 
         $user = $request->attributes->get('user') ?? null;
-        Log::debug("Request user: $user");
+        $userStr = json_encode($user);
+        Log::debug("Request user: $userStr");
         Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
         try {

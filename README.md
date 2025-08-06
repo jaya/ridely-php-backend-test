@@ -128,12 +128,12 @@ Essa solução garante alta disponibilidade, escalabilidade e monitoramento efic
 
 * **Ridely Service**
   Serviço central que gerencia a lógica das corridas, incluindo solicitações, status e histórico. Desenvolvido em Laravel, interage com banco de dados MySQL e cache Redis.
+  Calcula tarifas dinâmicas das corridas com base em variáveis contextuais. utiliza Redis para cache e eventos relacionados a preços.
 
 * **Auth Service**
   Responsável pela autenticação e autorização dos usuários, utilizando Keycloak para emissão e validação de tokens via OAuth2/OpenID Connect. Persiste dados em banco PostgreSQL.
 
-* **Pricing Service**
-  Calcula tarifas dinâmicas das corridas com base em variáveis contextuais. Implementado em Node.js, utiliza Redis para cache e se comunica via RabbitMQ para eventos relacionados a preços.
+  
 
 ## Instalando as dependencies do projeto
 
