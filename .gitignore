@@ -1,22 +1,28 @@
+/.fleet
+/.idea
+/.vscode
+
 # backend
 # ridely-service
 /backend/services/ridely-service/.phpunit.cache
 /backend/services/ridely-service/public/build
 /backend/services/ridely-service/public/hot
 /backend/services/ridely-service/public/storage
-/backend/apis/ridely_api/storage/*.key
 /backend/services/ridely-service/vendor
 /backend/services/ridely-service/.env
 /backend/services/ridely-service/.env.backup
 /backend/services/ridely-service/.env.production
 /backend/services/ridely-service/.phpunit.result.cache
-/.fleet
-/.idea
-/.vscode
+/backend/services/ridely-service/docker/nginx/certificate.crt
+/backend/services/ridely-service/docker/nginx/certificate.key
 
 # docs
 /docs/plantuml.jar
+
+# charts
 /backend/charts/auth-service/charts/keycloak-19.3.4.tgz
-/backend/services/ridely-service/docker/nginx/certificate.crt
-/backend/services/ridely-service/docker/nginx/certificate.key
 /databases/charts/ridely-cache-database/charts/redis-19.3.4.tgz
+
+# tests
+/tests/load-tests/.env
+/tests/load-tests/node_modules/

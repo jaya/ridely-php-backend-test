@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:8000"
+  phases:
+    - duration: 30
+      arrivalRate: 5
+  processor: "./functions.js"
+  http:
+    requestTimeout: 30
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: Estimate Ride (Authenticated)
+    flow:
+      - function: "authenticate"
+      - post:
+          url: "/api/v1/rides/estimate-ride"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            pick_up: "Avenida Beira Mar, 25"
+            drop_off: "Avenida Euclides Figueiredo, 71"
