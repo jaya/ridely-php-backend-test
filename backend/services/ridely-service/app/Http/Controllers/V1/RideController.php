@@ -43,13 +43,14 @@ class RideController extends Controller
      *         description="Corrida não encontrada"
      *     )
      * )
+     * TODO revisar por causa do HATEOS
      */
     public function show(string $id, RideManagerFacade $facade): JsonResponse
     {
         try {
             $ride = $facade->getRide($id);
             return ResponseHelper::success(($ride) ? RideConverter::convertFromModelToResponse($ride): null);
-        } catch (RepositoryException | ServiceException | RideException $e) {
+        } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
         } catch (ValidationException $e) {
             return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
