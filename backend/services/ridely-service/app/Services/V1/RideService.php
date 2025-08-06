@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\V1\Ride;
+namespace App\Services\V1;
 
 use App\Exceptions\ServiceException;
 use App\Models\Ride;
-use App\Services\Interfaces\Ride\RideServiceInterface;
+use App\Services\Interfaces\RideServiceInterface;
 use App\Validators\RideValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;

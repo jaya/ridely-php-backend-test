@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ErrorMessagesEnum;
-use App\Exceptions\RepositoryException;
 use App\Exceptions\RideException;
+use App\Exceptions\ServiceException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -109,7 +109,7 @@ class Ride extends Model
         try {
             return self::with('driver')->findOrFail($id);
         } catch (\Exception $e) {
-            throw RepositoryException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
+            throw ServiceException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
         }
     }
 }

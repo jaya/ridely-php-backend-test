@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Interfaces\Ride;
+namespace App\Services\Interfaces;
 
 interface RideServiceInterface
 {

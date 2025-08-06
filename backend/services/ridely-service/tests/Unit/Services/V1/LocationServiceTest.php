@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Unit\Services\V1\Location;
+namespace Tests\Unit\Services\V1;
 
 use App\Exceptions\RideException;
 use App\Models\PricingRule;
-use App\Services\V1\Location\LocationService;
+use App\Services\V1\LocationService;
 use App\Validators\LocationValidator;
 use Carbon\Carbon;
 use Database\Seeders\PricingRulesSeeder;

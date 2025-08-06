@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Converters\DriverConverter;
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ApplicationException;
-use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\ListCriteria;
@@ -16,7 +15,6 @@ use App\Services\Facades\DriverManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class DriverController extends Controller
@@ -92,14 +90,15 @@ class DriverController extends Controller
      */
     public function index(Request $request, DriverManagerFacade $facade)
     {
-        $criteria = new ListCriteria($request->all());
-
-        $user = $request->attributes->get('user') ?? null;
-        $userStr = json_encode($user);
-        Log::debug("Request user: $userStr");
-        Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
-
         try {
+
+
+            $user = $request->attributes->get('user') ?? null;
+            $userStr = json_encode($user);
+            Log::debug("Request user: $userStr");
+
+            $criteria = new ListCriteria($request->all());
+            Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
             $request->validate($criteria->rules());
 
@@ -107,15 +106,8 @@ class DriverController extends Controller
             $metadata = new HateosMetadata($paginator);
             return ResponseHelper::success(DriverConverter::convertListFromArrayToResponse($paginator->items()), metadata: $metadata);
 
-        } catch (ServiceException $e) {
+        } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
-        } catch (ValidationException $e) {
-            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
-        } catch (RepositoryException $e) {
-            return ResponseHelper::error($e);
-        } catch (\Throwable $e) {
-            Log::error($e->getMessage());
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, Response::HTTP_BAD_REQUEST, previous: $e));
         }
 
     }
@@ -141,16 +133,15 @@ class DriverController extends Controller
      *     )
      * )
      */
-    public function store(Request $request, DriverManagerFacade $manager): JsonResponse
+    public function store(Request $request, DriverManagerFacade $facade): JsonResponse
     {
 
         $data = $request->all();
-
+        dd($data);
         try {
             //$request->validate();
 
-            // TODO isso pode ser convertido para uma Criteria
-            $driver = $manager->create($data);
+            $driver = $facade->create($data);
             return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);
         } catch (ServiceException $e) {
             return ResponseHelper::error($e);

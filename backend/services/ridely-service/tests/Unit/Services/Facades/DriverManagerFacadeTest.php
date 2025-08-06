@@ -7,7 +7,7 @@ use App\Exceptions\ServiceException;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\Facades\DriverManagerFacade;
-use App\Services\V1\Driver\DriverService;
+use App\Services\V1\DriverService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Mocks\Services\DriverManagerFacadeMock;

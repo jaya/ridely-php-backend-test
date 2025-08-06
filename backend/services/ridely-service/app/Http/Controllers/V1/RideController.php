@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Converters\RideConverter;
-use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ApplicationException;
-use App\Exceptions\RepositoryException;
-use App\Exceptions\RideException;
-use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\EstimateRideCriteria;
 use App\Http\Helpers\ResponseHelper;
@@ -16,7 +12,6 @@ use App\Models\Ride;
 use App\Services\Facades\RideManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class RideController extends Controller
@@ -52,10 +47,6 @@ class RideController extends Controller
             return ResponseHelper::success(($ride) ? RideConverter::convertFromModelToResponse($ride): null);
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
-        } catch (ValidationException $e) {
-            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
-        } catch (\Throwable $e) {
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
         }
 
     }
@@ -408,12 +399,8 @@ class RideController extends Controller
             $rideData = $facade->estimateRide($estimateRideData);
             return ResponseHelper::success($rideData, Response::HTTP_OK);
 
-        } catch (ServiceException | RideException $e) {
+        } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
-        } catch (ValidationException $e) {
-            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
-        } catch (\Throwable $e) {
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
         }
 
     }

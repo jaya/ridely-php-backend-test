@@ -3,7 +3,7 @@
 namespace Mocks\Services;
 
 use App\Services\Facades\DriverManagerFacade;
-use App\Services\V1\Driver\DriverService;
+use App\Services\V1\DriverService;
 use App\Validators\DriverValidator;
 use Mocks\AbstractMock;
 use Mocks\Validators\DriverValidatorMock;

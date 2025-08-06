@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\RepositoryException;
+use App\Exceptions\ServiceException;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 abstract class AbstractService
 {
     /**
-     * @throws RepositoryException
+     * @throws ServiceException
      */
     public function checkDatabase(): void
     {
@@ -19,7 +19,7 @@ abstract class AbstractService
             DB::connection()->getPdo();
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            throw RepositoryException::databaseTemporarilyUnavailable($e->getMessage(), $e);
+            throw ServiceException::databaseTemporarilyUnavailable($e->getMessage(), $e);
         }
     }
 }

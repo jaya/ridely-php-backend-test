@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Enums\ErrorMessagesEnum;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class ServiceException extends ApplicationException
 {
@@ -45,5 +46,15 @@ class ServiceException extends ApplicationException
     public static function notImplemented(): ServiceException
     {
         return new ServiceException(ErrorMessagesEnum::SERVICE_NOT_IMPLEMENTED, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    public static function queryException(ErrorMessagesEnum $enum, array $params, \Throwable $previous = null): ServiceException
+    {
+        return new ServiceException($enum, Response::HTTP_INTERNAL_SERVER_ERROR, "Query exception", $params, $previous);
+    }
+
+    public static function databaseTemporarilyUnavailable($message, Throwable $previous = null): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_SERVICE_UNAVAILABLE, $message, [], $previous);
     }
 } 

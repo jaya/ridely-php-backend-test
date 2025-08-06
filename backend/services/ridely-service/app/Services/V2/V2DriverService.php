@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\V2\Driver;
+namespace App\Services\V2;
 
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
-use App\Services\Interfaces\Driver\DriverServiceInterface;
+use App\Services\Interfaces\DriverServiceInterface;
 use App\Validators\DriverValidator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;

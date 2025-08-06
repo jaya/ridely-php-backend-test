@@ -2,13 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\ErrorMessagesEnum;
-use App\Exceptions\DriverException;
-use App\Exceptions\RepositoryException;
 use App\Http\Criteria\ListCriteria;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 

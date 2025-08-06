@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Services\V1\Location;
+namespace App\Services\V1;
 
 use App\Exceptions\RideException;
 use App\Models\PricingRule;
-use App\Services\Interfaces\Location\LocationServiceInterface;
+use App\Services\Interfaces\LocationServiceInterface;
 use App\Validators\LocationValidator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class LocationService implements LocationServiceInterface
 {
@@ -37,6 +38,7 @@ class LocationService implements LocationServiceInterface
         $this->pricingRule = $pricingRule;
 
     }
+    // TODO renomear
     public function execute(string $address, $wait = false): ?array
     {
         // Use a consistent cache key
@@ -147,7 +149,7 @@ class LocationService implements LocationServiceInterface
 
             $rule = $this->pricingRule->filterRuleBasedOnTime($isRushHour, $isFlag2);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error($e->getMessage());
         }
 
@@ -166,8 +168,7 @@ class LocationService implements LocationServiceInterface
      */
     public function isRushHour(int $hour): bool
     {
-// Rush hour is between 7–9 AM and 5–7 PM
-        $isRushHour = ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
-        return $isRushHour;
+        // Rush hour is between 7–9 AM and 5–7 PM
+        return ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
     }
 }

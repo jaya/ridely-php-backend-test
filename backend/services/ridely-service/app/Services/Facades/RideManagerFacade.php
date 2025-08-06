@@ -4,8 +4,8 @@ namespace App\Services\Facades;
 
 use App\Exceptions\RideException;
 use App\Http\Criteria\EstimateRideCriteria;
-use App\Services\Interfaces\Location\LocationServiceInterface;
-use App\Services\Interfaces\Ride\RideServiceInterface;
+use App\Services\Interfaces\LocationServiceInterface;
+use App\Services\Interfaces\RideServiceInterface;
 
 class RideManagerFacade
 {

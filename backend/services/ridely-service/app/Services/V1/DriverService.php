@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Services\V1\Driver;
+namespace App\Services\V1;
 
 use App\Enums\ErrorMessagesEnum;
-use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
-use App\Services\Interfaces\Driver\DriverServiceInterface;
+use App\Services\Interfaces\DriverServiceInterface;
 use App\Validators\DriverValidator;
 use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -40,7 +39,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
                 ]);
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
-                throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, [], $e);
+                throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, [], $e);
             }
         } else {
             $this->exception = $this->validator->getException();
@@ -59,7 +58,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
                 return Driver::allDrivers($criteria);
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
-                throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
+                throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
             }
         } else {
             $this->exception = $this->validator->getException();
@@ -78,7 +77,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
 //            return $driver;
 //        } catch (ModelNotFoundException $e) {
 //            Log::warning("Driver not found with ID: $id");
-//            throw RepositoryException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
+//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
 //        } catch (QueryException $e) {
 //            Log::error($e->getMessage());
 //            throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_UPDATE_DRIVER, ["id" => $id], $e);
@@ -100,10 +99,10 @@ class DriverService extends AbstractService implements DriverServiceInterface
 //            }
 //        } catch (ModelNotFoundException $e) {
 //            Log::warning("Driver not found for deletion with ID: $id");
-//            throw RepositoryException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
+//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
 //        } catch (QueryException $e) {
 //            Log::error($e->getMessage());
-//            throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_DELETE_DRIVER, ["id" => $id], $e);
+//            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_DELETE_DRIVER, ["id" => $id], $e);
 //        }
     }
 
@@ -115,7 +114,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
 //            return Driver::findOrFail($id);
 //        } catch (ModelNotFoundException $e) {
 //            Log::warning("Driver not found with ID: $id");
-//            throw RepositoryException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
+//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
 //        }
     }
 
@@ -133,7 +132,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
 //            return $query->count();
 //        } catch (QueryException $e) {
 //            Log::error($e->getMessage());
-//            throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
+//            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
 //        }
 //    }
 }

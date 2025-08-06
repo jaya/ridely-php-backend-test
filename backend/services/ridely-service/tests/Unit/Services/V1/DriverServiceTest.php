@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\Unit\Services\V1\Driver;
+namespace Tests\Unit\Services\V1;
 
 use App\Enums\ErrorMessagesEnum;
-use App\Exceptions\RepositoryException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
-use App\Services\V1\Driver\DriverService;
+use App\Services\V1\DriverService;
 use App\Validators\DriverValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\MockObject\Exception;
@@ -63,7 +62,6 @@ class DriverServiceTest extends UnitTestCase
     }
 
     /**
-     * @throws RepositoryException
      * @throws ServiceException
      */
     public function testAllWithCriteria()

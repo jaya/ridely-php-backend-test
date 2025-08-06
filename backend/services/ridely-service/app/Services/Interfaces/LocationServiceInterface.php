@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Interfaces\Location;
+namespace App\Services\Interfaces;
 
 interface LocationServiceInterface
 {

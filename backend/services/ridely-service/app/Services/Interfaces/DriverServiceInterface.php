@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Interfaces\Driver;
+namespace App\Services\Interfaces;
 
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
