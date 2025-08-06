@@ -27,6 +27,8 @@ enum ErrorMessagesEnum: int
 
     case INVALID_TOKEN = 25;
 
+    case SERVICE_NOT_IMPLEMENTED = 26;
+
     // Driver errors 41 - 60
     case UNABLE_TO_CREATE_DRIVER = 41;
     case UNABLE_TO_UPDATE_DRIVER = 42;
@@ -63,6 +65,7 @@ enum ErrorMessagesEnum: int
             self::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE => 'common.error.unable_to_save_auth_public_key_file',
             self::INVALID_TOKEN => 'common.error.invalid_token',
             self::MISSING_BEARER_TOKEN => 'common.error.missing_bearer',
+            self::SERVICE_NOT_IMPLEMENTED => 'common.error.service_not_implemented',
 
             self::UNABLE_TO_CREATE_DRIVER =>  'common.error.unable_to_create_driver',
             self::UNABLE_TO_UPDATE_DRIVER => 'common.error.unable_to_update_driver',
@@ -103,6 +106,7 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'Driver not found.',
             self::UNABLE_TO_LIST_DRIVERS => 'Unable to list drivers.',
             self::INVALID_DRIVER_DATA => 'Invalid Driver Data.',
+            self::SERVICE_NOT_IMPLEMENTED => 'This service is not implemented yet.',
 
             self::RIDE_NOT_FOUND => 'Ride not found.',
             self::RIDE_INVALID_STATE => 'Ride invalid state: %s',

@@ -41,4 +41,9 @@ class ServiceException extends ApplicationException
     {
         return new ServiceException(ErrorMessagesEnum::MISSING_BEARER_TOKEN, Response::HTTP_UNAUTHORIZED);
     }
+
+    public static function notImplemented(): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::SERVICE_NOT_IMPLEMENTED, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
 } 

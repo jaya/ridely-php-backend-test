@@ -4,38 +4,30 @@ namespace App\Services\Facades;
 
 use App\Http\Criteria\ListCriteria;
 use App\Http\Hateos\HateosItemLinks;
-use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
-use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
+use App\Services\Interfaces\Driver\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class DriverManagerFacade
 {
-    protected CreateDriverServiceInterface $createService;
-    protected ReadDriverServiceInterface $readService;
+    protected DriverServiceInterface $driverService;
     public function __construct(
-        CreateDriverServiceInterface $createService,
-        ReadDriverServiceInterface $readService
+        DriverServiceInterface $driverService
     )
     {
-        $this->createService = $createService;
-        $this->readService = $readService;
+        $this->driverService = $driverService;
     }
 
-    public function create($data, $hateos = true):array
+    public function create($data): array
     {
-        if ($hateos) {
-            $data = $this->createService->execute($data);
-            $path = request()->path();
-            $newData = $this->addHateosLinksToItems($data, $path);
-            return $newData[0];
-        }
-        return $this->createService->execute($data);
+        $data = $this->driverService->create($data);
+        $path = request()->path();
+        $newData = $this->addHateosLinksToItems($data, $path);
+        return $newData[0];
     }
 
     public function read($id)
     {
-        //return $this->readService->execute($id);
     }
 
     public function update()
@@ -48,10 +40,10 @@ class DriverManagerFacade
 
     }
 
-    public function list(ListCriteria $criteria, $hateos = true):LengthAwarePaginator
+    public function list(ListCriteria $criteria):LengthAwarePaginator
     {
-        $paginator = $this->readService->execute($criteria);
-        if ($hateos && is_array($paginator->items())) {
+        $paginator = $this->driverService->read($criteria);
+        if (is_array($paginator->items())) {
             $data = $paginator->items();
             $path = $paginator->path();
 
@@ -70,13 +62,6 @@ class DriverManagerFacade
 
         return $paginator;
 
-    }
-
-    /**
-     */
-    public function count(ListCriteria $criteria): int
-    {
-        return $this->readService->count($criteria);
     }
 
     /**

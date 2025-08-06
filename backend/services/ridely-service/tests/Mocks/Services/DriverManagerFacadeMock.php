@@ -2,42 +2,27 @@
 
 namespace Mocks\Services;
 
-use App\Repositories\V1\DriverRepository;
 use App\Services\Facades\DriverManagerFacade;
-use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
-use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
+use App\Services\V1\Driver\DriverService;
+use App\Validators\DriverValidator;
 use Mocks\AbstractMock;
-use Mocks\Repositories\V1\DriverRepositoryMock;
-use Mocks\Services\V1\Driver\CreateDriverServiceMock;
-use Mocks\Services\V1\Driver\ReadDriverServiceMock;
+use Mocks\Validators\DriverValidatorMock;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class DriverManagerFacadeMock extends AbstractMock
 {
-    public CreateDriverServiceInterface $createService;
-    public ReadDriverServiceInterface $readService;
+    public DriverService $driverService;
 
-    public DriverRepository $repository;
+    public DriverValidator $validator;
 
-    /**
-     * @throws Exception
-     */
     public function __construct()
     {
         parent::__construct();
 
-        $this->repository = (new DriverRepositoryMock())->getMock();
+        $this->validator = (new DriverValidatorMock())->getObjectWithMockDependencies();
 
-        $createServiceMock = new CreateDriverServiceMock();
-        $createServiceMock->repository = $this->repository;
-
-        $this->createService = $createServiceMock->getObjectWithMockDependencies();
-
-        $readServiceMock = new ReadDriverServiceMock();
-        $readServiceMock->repository = $this->repository;
-
-        $this->readService = $readServiceMock->getObjectWithMockDependencies();
+        $this->driverService = new DriverService($this->validator);
     }
 
     /**
@@ -50,6 +35,6 @@ class DriverManagerFacadeMock extends AbstractMock
 
     public function getObjectWithMockDependencies(): object
     {
-        return new DriverManagerFacade($this->createService, $this->readService);
+        return new DriverManagerFacade($this->driverService);
     }
 }

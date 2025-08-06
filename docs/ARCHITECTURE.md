@@ -43,6 +43,7 @@ No nível de containers, a solução é composta por:
     * **Prometheus** coleta métricas expostas pelos serviços;
     * **Grafana** consulta e exibe dashboards com dados de métricas, logs e tracing;
     * **Loki** centraliza e indexa os logs dos serviços;
+    * **Fluentd** coleta e envio de logs dos serviços para o Loki;
     * **Jaeger** realiza tracing distribuído, permitindo rastrear o fluxo de uma requisição entre os microsserviços.
 
 Essa arquitetura proporciona alta disponibilidade, rastreabilidade e controle operacional sobre todo o sistema.
