@@ -16,9 +16,10 @@ fi
 # get the clusters
 echo "kind get clusters | grep -q \"^${CLUSTER_NAME}$\""
 if kind get clusters | grep -q "^${CLUSTER_NAME}$"; then
-  echo "Cluster already exists"
+  echo "Cluster exists"
+  echo "kind delete cluster --name ${CLUSTER_NAME}"
+  kind delete cluster --name ${CLUSTER_NAME}
 else
-  echo "Cluster doesn't exists, creating..."
-  echo "kind create cluster --name ${CLUSTER_NAME} --config ./infrastructure/kind/kind-config.yaml"
-  kind create cluster --name ${CLUSTER_NAME} --config ./infrastructure/kind/kind-config.yaml
+  echo "Cluster doesn't exists"
+
 fi

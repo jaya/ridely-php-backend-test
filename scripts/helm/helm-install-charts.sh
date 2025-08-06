@@ -104,6 +104,29 @@ else
     helm upgrade "auth-service" "./backend/charts/auth-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/auth-service/values/values-dev.yaml
   fi
 
+#  echo ''
+#  echo '----------------------------------------'
+#  echo 'Installing Location Service chart'
+#  echo '----------------------------------------'
+#
+#  echo "Building Docker images"
+#
+#  echo "./scripts/docker/create-tag.sh location-service latest ./backend/services/location-service/docker/nominatim/Dockerfile ./backend/services/location-service/"
+#  bash ./scripts/docker/create-tag.sh location-service latest ./backend/services/location-service/docker/nominatim/Dockerfile ./backend/services/location-service/
+#
+#
+#  echo "Loading Docker images"
+#
+#  echo "./scripts/kind/kind-load-image.sh location-service:latest"
+#  bash ./scripts/kind/kind-load-image.sh location-service:latest
+#
+#  helm install "location-service" "./backend/charts/location-service/" -n "$PROJECT_NAMESPACE" --values ./backend/charts/location-service/values/values-dev.yaml
+#
+#  if [ $? -ne 0 ]; then
+#    echo 'Trying to upgrade the existing one...'
+#     helm upgrade "location-service" "./backend/charts/location-service/" -n "$PROJECT_NAMESPACE"  --values ./backend/charts/location-service/values/values-dev.yaml  --set rollme=$(date +%s)
+#  fi
+
   echo ''
   echo '----------------------------------------'
   echo 'Installing Ridely Service chart'
