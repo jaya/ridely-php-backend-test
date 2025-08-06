@@ -13,6 +13,8 @@
     - Implementar Doctrine ORM para abstração de banco de dados
   - Transações
     - Implementar transações em pontos críticos do serviço
+  - Soft Deletes
+    - Implementar Soft Deletes em tabelas usando (deleted_at)
 - Filas
   - Implementar filas com Redis em pontos criticos
 - Cache
