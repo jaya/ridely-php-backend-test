@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ErrorMessagesEnum;
+use App\Exceptions\RepositoryException;
 use App\Exceptions\RideException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -100,5 +102,14 @@ class Ride extends Model
 
         $this->status = self::STATUS_REFUSED;
         $this->save();
+    }
+
+    public function getRideWithDriver(int $id)
+    {
+        try {
+            return self::with('driver')->findOrFail($id);
+        } catch (\Exception $e) {
+            throw RepositoryException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
+        }
     }
 }

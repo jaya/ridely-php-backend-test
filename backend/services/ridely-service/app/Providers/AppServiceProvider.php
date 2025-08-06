@@ -3,18 +3,22 @@
 namespace App\Providers;
 
 use App\Models\PricingRule;
+use App\Models\Ride;
 use App\Repositories\V1\DriverRepository;
 use App\Services\Facades\DriverManagerFacade;
 use App\Services\Facades\RideManagerFacade;
 use App\Services\Interfaces\Driver\CreateDriverServiceInterface;
 use App\Services\Interfaces\Driver\ReadDriverServiceInterface;
 use App\Services\Interfaces\Location\LocationServiceInterface;
+use App\Services\Interfaces\Ride\RideServiceInterface;
 use App\Services\V1\Driver\CreateDriverService as CreateDriverServiceV1;
 use App\Services\V1\Driver\ReadDriverService;
 use App\Services\V1\Location\LocationService;
+use App\Services\V1\Ride\RideService;
 use App\Services\V2\Driver\CreateDriverServiceServiceInterface as CreateDriverServiceV2;
 use App\Validators\DriverValidator;
 use App\Validators\LocationValidator;
+use App\Validators\RideValidator;
 use Illuminate\Support\ServiceProvider;
 use L5Swagger\L5SwaggerServiceProvider;
 
@@ -75,8 +79,17 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->bind(RideServiceInterface::class, RideService::class);
+        $this->app->bind(RideService::class, function ($app) {
+           return new RideService(
+               $app->make(Ride::class),
+               $app->make(RideValidator::class),
+           );
+        });
+
         $this->app->singleton(RideManagerFacade::class, function ($app) {
             return new RideManagerFacade(
+                $app->make(RideService::class),
                 $app->make(LocationServiceInterface::class)
             );
         });

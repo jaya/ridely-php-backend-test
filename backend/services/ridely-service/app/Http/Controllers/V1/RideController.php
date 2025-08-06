@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Converters\DriverConverter;
+use App\Converters\RideConverter;
 use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ApplicationException;
+use App\Exceptions\RepositoryException;
 use App\Exceptions\RideException;
 use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
@@ -43,24 +44,19 @@ class RideController extends Controller
      *     )
      * )
      */
-    public function show(string $id)
+    public function show(string $id, RideManagerFacade $facade): JsonResponse
     {
-        $ride = Ride::with('driver')->findOrFail($id);
+        try {
+            $ride = $facade->getRide($id);
+            return ResponseHelper::success(($ride) ? RideConverter::convertFromModelToResponse($ride): null);
+        } catch (RepositoryException | ServiceException | RideException $e) {
+            return ResponseHelper::error($e);
+        } catch (ValidationException $e) {
+            return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
+        } catch (\Throwable $e) {
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
+        }
 
-        return response()->json([
-            'id' => $ride->id,
-            'status' => $ride->status,
-            'pick_up' => $ride->pick_up,
-            'drop_off' => $ride->drop_off,
-            'driver' => $ride->driver ? [
-                'name' => $ride->driver->name,
-                'car' => [
-                    'license_plate' => $ride->driver->car_license_plate,
-                    'model' => $ride->driver->car_model,
-                    'color' => $ride->driver->car_color
-                ]
-            ] : null
-        ]);
     }
 
     /**
@@ -411,15 +407,18 @@ class RideController extends Controller
             $rideData = $facade->estimateRide($estimateRideData);
             return ResponseHelper::success($rideData, Response::HTTP_OK);
 
-        } catch (ServiceException $e) {
-            return ResponseHelper::error($e);
-        } catch (RideException $e) {
+        } catch (ServiceException | RideException $e) {
             return ResponseHelper::error($e);
         } catch (ValidationException $e) {
             return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), [], $e));
         } catch (\Throwable $e) {
-            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::UNABLE_TO_ESTIMATE_RIDE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
+            return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
         }
 
+    }
+
+    public function getRidePrice(Request $request, RideManagerFacade $facade)
+    {
+        return ResponseHelper::success([], Response::HTTP_OK);
     }
 }

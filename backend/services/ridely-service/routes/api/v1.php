@@ -19,7 +19,8 @@ Route::prefix('rides')->group(function () {
 
     Route::get('/{id}', [RideController::class, 'show']);
     Route::delete('/{id}', [RideController::class, 'destroy']);
-    Route::post('/estimate-ride', [RideController::class, 'estimateRide']);
+    Route::post('/{id}/estimate-ride', [RideController::class, 'estimateRide']);
+    Route::get('/{id}/estimate-ride', [RideController::class, 'getRidePrice']);
     Route::post('/request-driver', [RideController::class, 'requestDriver']);
     Route::post('/cancel-ride', [RideController::class, 'cancelRide']);
     Route::post('/accept-ride', [RideController::class, 'acceptRide']);

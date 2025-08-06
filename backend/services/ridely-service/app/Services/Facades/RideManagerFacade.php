@@ -5,13 +5,16 @@ namespace App\Services\Facades;
 use App\Exceptions\RideException;
 use App\Http\Criteria\EstimateRideCriteria;
 use App\Services\Interfaces\Location\LocationServiceInterface;
+use App\Services\Interfaces\Ride\RideServiceInterface;
 
 class RideManagerFacade
 {
     protected LocationServiceInterface $locationService;
+    private RideServiceInterface $rideService;
 
-    public function __construct(LocationServiceInterface $searchLocationService)
+    public function __construct(RideServiceInterface $rideService, LocationServiceInterface $searchLocationService)
     {
+        $this->rideService = $rideService;
         $this->locationService = $searchLocationService;
     }
 
@@ -46,5 +49,10 @@ class RideManagerFacade
     private function getCoordinatesFromAddress(string $address, $wait = false)
     {
         return $this->locationService->execute($address, $wait);
+    }
+
+    public function getRide(string $id)
+    {
+        return $this->rideService->getRide((int)$id);
     }
 }

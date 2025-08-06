@@ -4,7 +4,10 @@ namespace Tests\Unit\Http\Controllers;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Http\Middleware\ValidateKeycloakJwt;
+use App\Models\Driver;
+use App\Models\Ride;
 use App\Services\JWTKeysService;
+use Database\Seeders\DriverSeeder;
 use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -27,7 +30,104 @@ class RideControllerTest extends UnitTestCase
 
         $this->locationServiceUrl = env('LOCATION_SERVICE_URL', 'https://nominatim.openstreetmap.org/search');
 
+        $this->seed(DriverSeeder::class);
         $this->seed(PricingRulesSeeder::class);
+    }
+
+    public function testShowWithoutDriverSuccess()
+    {
+        $this->mockTokenValidation();
+        $token = TokenHelper::getFakeToken();
+
+        $ride = Ride::create([
+            'passenger_name' => 'Jane Smith',
+            'passenger_email' => 'jane@example.com',
+            'pick_up' => '123 Main St',
+            'drop_off' => '456 Park Ave',
+            'status' => Ride::STATUS_REQUESTED
+        ]);
+
+
+        $response = $this->withHeader('Authorization', "Bearer $token")
+            ->get("/api/v1/rides/{$ride->id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'label',
+            'code',
+            'message',
+            'data' => [
+                'id',
+                'status',
+                'pick_up',
+                'drop_off',
+            ],
+        ]);
+
+        $dataObject = $response->json();
+        $data = $dataObject['data'];
+
+        $this->assertResponse($data);
+    }
+
+    public function testShowWithDriverSuccess()
+    {
+        $this->mockTokenValidation();
+        $token = TokenHelper::getFakeToken();
+
+        $driver = Driver::create([
+            'name' => 'John Doe',
+            'car_license_plate' => 'ABC123',
+            'car_model' => 'Toyota Corolla',
+            'car_color' => 'Blue',
+            'available' => true
+        ]);
+        //TODO usar helper
+
+        $ride = Ride::create([
+            'passenger_name' => 'Jane Smith',
+            'passenger_email' => 'jane@example.com',
+            'pick_up' => '123 Main St',
+            'drop_off' => '456 Park Ave',
+            'status' => Ride::STATUS_REQUESTED
+        ]);
+
+        $ride->accept($driver);
+
+        $rideId = $ride->id;
+
+
+        $response = $this->withHeader('Authorization', "Bearer $token")
+            ->get("/api/v1/rides/{$rideId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'success',
+            'label',
+            'code',
+            'message',
+            'data' => [
+                'id',
+                'status',
+                'pick_up',
+                'drop_off',
+                'driver' => [
+                    'name',
+                    'car' => [
+                        'license_plate',
+                        'model',
+                        'color',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dataObject = $response->json();
+        $data = $dataObject['data'];
+
+        $this->assertResponse($data);
+
     }
 
     /**
@@ -39,18 +139,21 @@ class RideControllerTest extends UnitTestCase
     */
     public function testEstimateRideSuccess() {
 
-
         // Mock the external calls
         $this->mockCalls();
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
+
         $data = [
             "pick_up" => LocationHelper::$pickUp,
             "drop_off" => LocationHelper::$dropOff,
         ];
 
+        $ride = Ride::factory()->create();
+        $rideId = $ride->id;
+
         $response = $this->withHeader('Authorization', "Bearer $token")
-        ->postJson("/api/v1/rides/estimate-ride", $data);
+        ->postJson("/api/v1/rides/$rideId/estimate-ride", $data);
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -84,8 +187,11 @@ class RideControllerTest extends UnitTestCase
             "drop_off" => "",
         ];
 
+        $ride = Ride::factory()->create();
+        $rideId = $ride->id;
+
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/v1/rides/estimate-ride", $data);
+            ->postJson("/api/v1/rides/${rideId}/estimate-ride", $data);
 
         $response->assertStatus(400);
         $response->assertJsonStructure([
@@ -113,8 +219,11 @@ class RideControllerTest extends UnitTestCase
             "drop_off" => "invalid",
         ];
 
+        $ride = Ride::factory()->create();
+        $rideId = $ride->id;
+
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/v1/rides/estimate-ride", $data);
+            ->postJson("/api/v1/rides/{$rideId}/estimate-ride", $data);
 
         $response->assertStatus(400);
         $response->assertJsonStructure([
@@ -154,18 +263,6 @@ class RideControllerTest extends UnitTestCase
     {
         LocationHelper::mockCall($this->locationServiceUrl, LocationHelper::$pickUp, LocationHelper::getDatasourceDataForPickUpSuccessResponse());
         LocationHelper::mockCall($this->locationServiceUrl, LocationHelper::$dropOff, LocationHelper::getDatasourceDataForDropOffSuccessResponse());
-//        $q = rawurlencode(LocationHelper::$pickUp);
-//        $url = "$this->locationServiceUrl?format=jsonv2&q=$q*";
-//        Http::fake([
-//            $url => Http::response(LocationHelper::getDatasourceDataForPickUpSuccessResponse())
-//
-//        ]);
-//        $q = rawurlencode(LocationHelper::$dropOff);
-//        $url = "$this->locationServiceUrl?format=jsonv2&q=$q*";
-//        Http::fake([
-//            $url => Http::response(LocationHelper::getDatasourceDataForDropOffSuccessResponse())
-//        ]);
-
     }
 
     private function mockFailCalls()
@@ -173,9 +270,35 @@ class RideControllerTest extends UnitTestCase
         LocationHelper::mockCall($this->locationServiceUrl, "invalid", []);
     }
 
+    /**
+     * @param mixed $data
+     * @return void
+     */
+    public function assertResponse(mixed $data): void
+    {
+        $this->assertIsInt($data['id']);
+        $this->assertIsString($data['status']);
+        $this->assertIsString($data['pick_up']);
+        $this->assertIsString($data['drop_off']);
 
+        // Verifica driver se existir
+        if (isset($data['driver'])) {
+            if(!is_null($data['driver'])) {
+                $this->assertIsArray($data['driver']);
+                $this->assertArrayHasKey('name', $data['driver']);
+                $this->assertIsString($data['driver']['name']);
 
+                $this->assertArrayHasKey('car', $data['driver']);
+                $this->assertIsArray($data['driver']['car']);
+                $this->assertIsString($data['driver']['car']['license_plate']);
+                $this->assertIsString($data['driver']['car']['model']);
+                $this->assertIsString($data['driver']['car']['color']);
+            } else {
+                $this->assertNull($data['driver']);
+            }
+        }
 
+    }
 
 
 }

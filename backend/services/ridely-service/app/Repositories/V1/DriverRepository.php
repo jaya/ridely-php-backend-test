@@ -13,6 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+// TODO Migrar tudo para a model
 class DriverRepository
 {
     /**

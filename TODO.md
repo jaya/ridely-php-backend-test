@@ -12,6 +12,7 @@
           - [x] Componente
           - [x] Deployment
           - [ ] Sequence
+      - [ ] Atualizar diagramas após a restruturação do projeto. 
       - Documentos
         - Serviços
     - Geral
@@ -23,17 +24,17 @@
     - [x] Skaffold
 - Infraestrutura
   - IAC (Terraform)
-    - [ ] EKS
-    - [ ] Codepipeline
-    - [ ] Criar VPC, subnets e security groups (Validar Necessidade)
-    - [ ] Configurar IAM Roles para EKS, RDS, etc.
-    - [ ] Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)
+    - [ ] ~~EKS~~
+    - [ ] ~~Codepipeline~~
+    - [ ] ~~Criar VPC, subnets e security groups (Validar Necessidade)~~
+    - [ ] ~~Configurar IAM Roles para EKS, RDS, etc.~~
+    - [ ] ~~Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)~~
   - Configurações com Ansible
-    - [ ] EKS
-    - [ ] Codepipeline
-    - [ ] Criar VPC, subnets e security groups (Validar Necessidade)
-    - [ ] Configurar IAM Roles para EKS, RDS, etc.
-    - [ ] Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)
+    - [ ] ~~EKS~~
+    - [ ] ~~Codepipeline~~
+    - [ ] ~~Criar VPC, subnets e security groups (Validar Necessidade)~~
+    - [ ] ~~Configurar IAM Roles para EKS, RDS, etc.~~
+    - [ ] ~~Criar bancos gerenciados RDS (MySQL) e ElastiCache (Redis)~~
   - Healm e Kubernetes configuration
     - Databases
       - [x] Redis chart
@@ -42,8 +43,8 @@
       - [x] Auth Service (KeyCloak)
       - [x] Ridely Service
       - [x] Ridely Service Nginx
-      - [ ] Ridely Pricing service (Node.js)
-      - [ ] RabbitMQ
+      - [ ] ~~Ridely Pricing service (Node.js)~~
+      - [ ] ~~RabbitMQ~~
     - Api Gateway
       - [ ] Kong
       - [ ] Configurar `Ingress` com Kong
@@ -52,7 +53,11 @@
       - [ ] Configurar PVCs, se necessário
       - [ ] Separar ambientes (local, homologação, produção) com arquivos `values.yaml` 
 - Serviços
-  - Ridely Pricing service (Node.js)
+  - ~~Location Service(Nomination)~~ 
+  - ~~Ridely Pricing service (Node.js)~~
+    - [x] Integrar o mesmo junto ao Ridely Service
+  - ~~RabbitMQ~~
+    - [x] Usar Redis para fila
   - Ridely Service (PHP + Laravel)
     - Docs
       - [x] Coleção do Postman
@@ -115,15 +120,21 @@
   - [ ] Escrever testes de integração (API + mensageria)
   - [ ] Escrever testes de integração (API + Auth)
   - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
+    - [ ] Artillery
+      - [ ] Ridely Service
+        - [x] Localhost
+          - [x] estimate-ride
+          - [x] list-drivers
+        - [ ] Cluster Kubernetes
   - [ ] Testar escalabilidade dos serviços com HPA
   - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)
 - Observabilidade e Monitoramento
-  - [ ] Deploy do Prometheus e Grafana via Helm
-  - [ ] Deploy do Loki para logs + Fluent Bit
-  - [ ] Deploy do Jaeger para tracing distribuído
-  - [ ] Instrumentar Laravel e Node.js com OpenTelemetry
-  - [ ] Criar dashboards no Grafana para métricas e logs
-  - [ ] Criar alertas com Prometheus e Grafana
+  - [ ] ~~Deploy do Prometheus e Grafana via Helm~~
+  - [ ] ~~Deploy do Loki para logs + Fluent Bit~~
+  - [ ] ~~Deploy do Jaeger para tracing distribuído~~
+  - [ ] ~~Instrumentar Laravel e Node.js com OpenTelemetry~~
+  - [ ] ~~Criar dashboards no Grafana para métricas e logs~~
+  - [ ] ~~Criar alertas com Prometheus e Grafana~~
 - Segurança
   - [ ] Configurar HTTPS no Ingress do Kong
   - [ ] Validar autenticação JWT/OIDC com Keycloak
