@@ -9,10 +9,10 @@ build:
       context: backend/services/ridely-service
       docker:
         dockerfile: ./docker/php/Dockerfile
-      sync:
-        manual:
-          - src: '**/*.php'
-            dest: /var/www
+#      sync:
+#        manual:
+#          - src: '**/*.php'
+#            dest: /var/www
     - &ridely-service-nginx-artifact
       image: ridely-service-nginx
       context: backend/services/ridely-service/docker/nginx/
