@@ -1,18 +1,25 @@
 const axios = require("axios");
 require("dotenv").config();
 
-let cachedToken = null;
-let tokenExpiresAt = null;
+let cachedTokens = [];
 
 module.exports = {
     authenticate: (context, events, done) => {
         const now = Date.now();
+        const username = context.vars.username || process.env.KEYCLOAK_USERNAME;
+        const password = context.vars.password || process.env.KEYCLOAK_PASSWORD;
 
         // Se temos token e ele ainda é válido, reutilize
-        if (cachedToken && tokenExpiresAt && now < tokenExpiresAt) {
-            // console.log('Usando token cacheado');
-            context.vars.token = cachedToken;
-            return done();
+        if (cachedTokens[username]) {
+            let tokenData = cachedTokens[username];
+            let cachedToken = tokenData.token;
+            let tokenExpiresAt = tokenData.expiresAt;
+            if (tokenExpiresAt && now < tokenExpiresAt) {
+                // console.log('Usando token cacheado para o usuario: ', username);
+                context.vars.token = cachedToken;
+                return done();
+            }
+
         }
 
         const url = `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`;
@@ -20,8 +27,8 @@ module.exports = {
         // console.log(`
         //     client_id: ${process.env.KEYCLOAK_CLIENT_ID},
         //     client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
-        //     username: ${process.env.KEYCLOAK_USERNAME},
-        //     password: process.env.KEYCLOAK_PASSWORD
+        //     username: ${username},
+        //     password: ${password}
         // `);
 
         axios.post(url,
@@ -29,8 +36,8 @@ module.exports = {
                 grant_type: "password",
                 client_id: process.env.KEYCLOAK_CLIENT_ID,
                 client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
-                username: process.env.KEYCLOAK_USERNAME,
-                password: process.env.KEYCLOAK_PASSWORD
+                username: username,
+                password: password
             }),
             {
                 headers: {
@@ -45,9 +52,11 @@ module.exports = {
             tokenExpiresAt = now + expiresIn * 1000 - 5000; // expira 5s antes para segurança
 
             context.vars.token = cachedToken;
+            cachedTokens[username] = { token: cachedToken, expiresAt: tokenExpiresAt };
             done();
         }).catch((err) => {
             console.error("Erro na autenticação:", err.response?.data || err.message);
+            console.error("User and password:", username, password)
             done();
         });
     }

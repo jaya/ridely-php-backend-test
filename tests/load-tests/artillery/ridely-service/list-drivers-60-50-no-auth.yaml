@@ -1,8 +1,8 @@
 config:
   target: "http://localhost:8000"
   phases:
-    - duration: 30   # duração do teste em segundos
-      arrivalRate: 10  # 10 usuários por segundo
+    - duration: 60   # duração do teste em segundos
+      arrivalRate: 50  # 50 usuários por segundo
   processor: "./functions.js"
   payload:
     path: "./users.csv"
@@ -18,9 +18,9 @@ config:
 scenarios:
   - name: List Drivers (Authenticated)
     flow:
-      - function: "authenticate"
+#      - function: "authenticate"
       - get:
           url: "/api/v1/drivers"
           headers:
             Custom-User: "{{ username }}"
-            Authorization: "Bearer {{ token }}"
+#            Authorization: "Bearer {{ token }}"

@@ -5,7 +5,7 @@ config:
       arrivalRate: 5
   processor: "./functions.js"
   http:
-    requestTimeout: 30
+    requestTimeout: 10000 # 10000
     headers:
       Content-Type: application/json
 

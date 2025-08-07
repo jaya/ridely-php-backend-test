@@ -4,8 +4,14 @@ config:
     - duration: 60   # duração do teste em segundos
       arrivalRate: 10  # 10 usuários por segundo
   processor: "./functions.js"
+  payload:
+    path: "./users.csv"
+    fields:
+      - username
+      - password
+    order: sequence # ou "random" se preferir
   http:
-    requestTimeout: 60 # 10000
+    requestTimeout: 10000 # 10000
     headers:
       Content-Type: application/json
 
@@ -16,4 +22,5 @@ scenarios:
       - get:
           url: "/api/v1/drivers"
           headers:
+            Custom-User: "{{ username }}"
             Authorization: "Bearer {{ token }}"
