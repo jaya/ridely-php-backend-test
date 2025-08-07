@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ridely-service.fullname" . }}-nginx
+spec:
+  replicas: {{ .Values.nginx.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "ridely-service.name" . }}-nginx
+  template:
+    metadata:
+      labels:
+        app: {{ include "ridely-service.name" . }}-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
+          imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/app.conf
+              subPath: app.conf
+          resources:
+            requests:
+              cpu: {{ .Values.nginx.resources.requests.cpu }}
+              memory: {{ .Values.nginx.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.nginx.resources.limits.cpu }}
+              memory: {{ .Values.nginx.resources.limits.memory }}
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ include "ridely-service.fullname" . }}-nginx-conf

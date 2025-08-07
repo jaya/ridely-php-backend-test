@@ -1,8 +1,28 @@
-replicaCount: 1
-
 hpa:
   minReplicas: 1
   maxReplicas: 4
+
+nginx:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+php:
+  enabled: true
+  replicas: 1
+  resources:
+    requests:
+      cpu: 300m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 384Mi
 
 images:
   nginx:
@@ -47,6 +67,6 @@ env:
   KEYCLOAK_CLIENT_ID: ridely-service
 
   LOCATION_SERVICE_URL: 'https://nominatim:openstreetmap:org/search'
-  REQUEST_LIMIT_PER_MINUTE: 1200
+  REQUEST_LIMIT_PER_MINUTE: 600
 
 

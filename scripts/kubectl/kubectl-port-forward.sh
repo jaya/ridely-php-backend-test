@@ -113,8 +113,8 @@ fi
 #fi
 
 # Forward Ridely service pod port if the pod is available
-if wait_for_service "ridely-service" "$PROJECT_NAMESPACE"; then
-  POD_NAME=$(kubectl get pods -n "$PROJECT_NAMESPACE" -l "app=ridely-service" -o jsonpath="{.items[0].metadata.name}")
+if wait_for_service "ridely-service-nginx" "$PROJECT_NAMESPACE"; then
+  POD_NAME=$(kubectl get pods -n "$PROJECT_NAMESPACE" -l "app=ridely-service-nginx" -o jsonpath="{.items[0].metadata.name}")
   echo "kubectl port-forward $POD_NAME 8000:80 -n $PROJECT_NAMESPACE"
   kubectl port-forward "$POD_NAME" 8000:80 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
   echo ""

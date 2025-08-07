@@ -501,6 +501,101 @@
       },
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin"
+        }
+      ]
+    },
+    {
+      "username": "anderson.contreira",
+      "email": "anderson.contreira@gmail.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user1",
+      "email": "load_test_user1@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha123"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user2",
+      "email": "load_test_user2@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha456"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user3",
+      "email": "load_test_user3@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha789"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user4",
+      "email": "load_test_user4@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha123"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user5",
+      "email": "load_test_user5@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha456"
+        }
+      ]
+    },
+    {
+      "username": "load_test_user6",
+      "email": "load_test_user6@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "senha789"
+        }
+      ]
     }
   ],
   "scopeMappings": [

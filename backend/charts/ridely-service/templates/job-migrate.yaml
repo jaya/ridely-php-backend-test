@@ -18,7 +18,8 @@ spec:
         - name: migrate
           image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
           imagePullPolicy: IfNotPresent
-          command: ["php", "artisan", "migrate", "--force"]
+          # command: ["php", "artisan", "migrate", "--force"]
+          command: ["/bin/sh", "-c", "./scripts/setup-db.sh"]
           env:
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}

@@ -22,6 +22,7 @@ fi
 ROOT_DIR=$(pwd)
 
 CHART=$1
+BUILD=$2
 if [ ! -z "$CHART" ]; then
   echo "Target chart: $CHART"
 
@@ -45,6 +46,19 @@ if [ ! -z "$CHART" ]; then
 
   else
     CHART_PATH="./backend/charts/$CHART"
+  fi
+
+  if [[ "$CHART" == "ridely-service" && "$BUILD" == true ]]; then
+    bash ./scripts/docker/docker-build-ridely-service-nginx.sh
+    bash ./scripts/docker/docker-build-ridely-service-php.sh
+
+    echo "Loading Docker images"
+
+    echo "./scripts/kind/kind-load-image.sh ridely-service-php:latest"
+    bash ./scripts/kind/kind-load-image.sh ridely-service-php:latest
+
+    echo "./scripts/kind/kind-load-image.sh ridely-service-nginx:latest"
+    bash ./scripts/kind/kind-load-image.sh ridely-service-nginx:latest
   fi
 
   helm install "$CHART" "$CHART_PATH/" -n "$PROJECT_NAMESPACE" --values "$CHART_PATH/values/values-dev.yaml" --set rollme=$(date +%s)
@@ -136,13 +150,8 @@ else
   echo "Generating certificate files..."
   bash ./scripts/nginx/nginx-gen-certs.sh ./backend/services/ridely-service/docker/nginx
 
-  echo "Building Docker images"
-
-  echo "./scripts/docker/create-tag.sh ridely-service-nginx latest ./backend/services/ridely-service/docker/nginx/Dockerfile ./backend/services/ridely-service/docker/nginx"
-  bash ./scripts/docker/create-tag.sh ridely-service-nginx latest ./backend/services/ridely-service/docker/nginx/Dockerfile ./backend/services/ridely-service/docker/nginx
-
-  echo "./scripts/docker/create-tag.sh ridely-service-php latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/"
-  bash ./scripts/docker/create-tag.sh ridely-service-php latest ./backend/services/ridely-service/docker/php/Dockerfile ./backend/services/ridely-service/
+  bash ./scripts/docker/docker-build-ridely-service-nginx.sh
+  bash ./scripts/docker/docker-build-ridely-service-php.sh
 
   echo "Loading Docker images"
 

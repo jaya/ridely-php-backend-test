@@ -1,38 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ridely-service.fullname" . }}
+  name: {{ include "ridely-service.fullname" . }}-php-fpm
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.php.replicas }}
   selector:
     matchLabels:
-      app: {{ include "ridely-service.name" . }}
+      app: {{ include "ridely-service.name" . }}-php-fpm
   template:
     metadata:
       labels:
-        app: {{ include "ridely-service.name" . }}
+        app: {{ include "ridely-service.name" . }}-php-fpm
     spec:
       # TODO revisar para que o PHP possa ter mais instancias quando necessário
       containers:
-        - name: nginx
-          image: "{{ .Values.images.nginx.repository }}:{{ .Values.images.nginx.tag }}"
-          imagePullPolicy: {{ .Values.images.nginx.pullPolicy }}
-          ports:
-            - containerPort: 80
-          volumeMounts:
-            - name: nginx-conf
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-            - name: nginx-conf
-              mountPath: /etc/nginx/conf.d/app.conf
-              subPath: app.conf
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 128Mi
         - name: laravel
           image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
           imagePullPolicy: {{ .Values.images.php.pullPolicy }}
@@ -60,15 +41,17 @@ spec:
             - containerPort: 9000
           # TODO migrar para values
           resources:
-            limits:
-              cpu: 200m
-              memory: 256Mi
             requests:
-              cpu: 200m
-              memory: 256Mi
-
-
+              cpu: {{ .Values.php.resources.requests.cpu }}
+              memory: {{ .Values.php.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.php.resources.limits.cpu }}
+              memory: {{ .Values.php.resources.limits.memory }}
+          volumeMounts:
+            - name: www-conf
+              mountPath: /usr/local/etc/php-fpm.d/www.conf
+              subPath: www.conf
       volumes:
-        - name: nginx-conf
+        - name: www-conf
           configMap:
-            name: {{ include "ridely-service.fullname" . }}-nginx-conf
+            name: {{ include "ridely-service.fullname" . }}-php-fpm-www-conf
