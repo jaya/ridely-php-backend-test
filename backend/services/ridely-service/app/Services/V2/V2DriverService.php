@@ -20,7 +20,7 @@ class V2DriverService extends AbstractService implements DriverServiceInterface
         protected DriverValidator $validator
     ) {}
 
-    public function create(CreateDriverCriteria $data): Driver
+    public function create(CreateDriverCriteria $criteria): Driver
     {
         throw ServiceException::notImplemented();
     }
@@ -30,12 +30,17 @@ class V2DriverService extends AbstractService implements DriverServiceInterface
         throw ServiceException::notImplemented();
     }
 
-    public function update()
+    public function update(): Driver
     {
         throw ServiceException::notImplemented();
     }
 
-    public function delete()
+    public function delete($id): bool
+    {
+        throw ServiceException::notImplemented();
+    }
+
+    public function softDelete($id): bool
     {
         throw ServiceException::notImplemented();
     }
