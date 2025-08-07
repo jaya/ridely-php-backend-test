@@ -23,8 +23,10 @@ Você deve implementar **uma feature funcional** do sistema de corrida de táxi.
 
 - 📍 **Cálculo de tempo e distância via API externa (Google Maps Directions API ou similar)**
 - 🚗 **Alocação do motorista mais próximo com base em coordenadas**
-- 💰 **Cálculo do preço estimado da corrida**
+- 💰 **Cálculo do preço estimado da corrida** 
 - ❌ **Implementação da política de cancelamento de corrida**
+
+> Nota: A feature selecionada foi o `Cálculo do preço estimado da corrida`.
 
 Sua feature deve conter:
 - Testes automatizados (unitários e/ou integrados)

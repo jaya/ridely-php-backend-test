@@ -104,7 +104,7 @@ O sistema Ridely utiliza aplicações móveis e painel administrativo, com micro
 
 A arquitetura adota:
 
-* **API Gateway Kong** para roteamento e controle de acesso;
+* ~~**API Gateway Kong** para roteamento e controle de acesso;~~
 * Microsserviço em **Laravel** com persistência em bancos MySQL, além de cache em Redis;
 * ~~Sidecars para coleta de logs com fluentd~~;
 * Comunicação assíncrona via Redis ~~**RabbitMQ**~~;
