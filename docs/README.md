@@ -22,4 +22,11 @@ As imagens serão geradas automaticamente na pasta correspondente.
 ./scripts/plantuml/plantuml-create-diagrams.sh
 ```
 > Nota: Você deve executar este comando na raiz do projeto.
- 
+
+### Gerar imagens de um único diagrama (especificando o arquivo)
+
+Para gerar uma imagem PNG de um diagrama específico, você pode usar o comando abaixo, substituindo o caminho do arquivo `.puml` conforme necessário:
+```
+java -jar ./docs/plantuml.jar -tpng ./docs/architecture/diagrams/uml/ridely-estimate-ride-async-sequence.puml 
+```
+> Nota: Você deve executar este comando na raiz do projeto.

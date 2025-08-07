@@ -11,15 +11,16 @@
         - Uml
           - [x] Componente
           - [x] Deployment
-          - [ ] Sequence
-      - [ ] Atualizar diagramas após a restruturação do projeto. 
-      - Documentos
-        - Serviços
+          - [x] Sequence
+      - [x] Atualizar diagramas após a restruturação do projeto. 
+    - Serviços
+      - [ ] Revisão de README.md
+      - [ ] Revisão do SETTINGS.md
     - Geral
         - [x] Criar README com visão geral do projeto
         - [ ] Documentar fluxo de autenticação e consumo de API
-        - [ ] Documentar eventos/mensageria e serviços envolvidos
-        - [ ] Documentar alertas e dashboards de observabilidade
+        - [ ] ~~Documentar eventos/mensageria e serviços envolvidos~~
+        - [ ] ~~Documentar alertas e dashboards de observabilidade~~
   - Execução
     - [x] Skaffold
 - Infraestrutura
@@ -41,42 +42,45 @@
       - [x] MYSQL chart
     - Services
       - [x] Auth Service (KeyCloak)
-      - [x] Ridely Service
-      - [x] Ridely Service Nginx
+      - [x] ridely-service
+      - [x] ridely-service Nginx
       - [ ] ~~Ridely Pricing service (Node.js)~~
       - [ ] ~~RabbitMQ~~
     - Api Gateway
-      - [ ] Kong
-      - [ ] Configurar `Ingress` com Kong
+      - [ ] ~~Kong~~
+      - [ ] ~~Configurar `Ingress` com Kong~~
     - Outros
-      - [ ] Configurar serviços com autoescalonamento (HPA)
-      - [ ] Configurar PVCs, se necessário
-      - [ ] Separar ambientes (local, homologação, produção) com arquivos `values.yaml` 
+      - [x] Configurar serviços com autoescalonamento (HPA)
+      - [x] Configurar PVCs, se necessário
+      - [x] Separar ambientes (local, homologação, produção) com arquivos `values.yaml`
+        - [x] values-dev.yaml (dev é o ambiente local, podendo ter variações como staging, production, etc.)
 - Serviços
   - ~~Location Service(Nomination)~~ 
   - ~~Ridely Pricing service (Node.js)~~
-    - [x] Integrar o mesmo junto ao Ridely Service
+    - [x] Integrar o mesmo junto ao ridely-service
   - ~~RabbitMQ~~
     - [x] Usar Redis para fila
-  - Ridely Service (PHP + Laravel)
+  - ridely-service (PHP + Laravel)
     - Docs
-      - [x] Coleção do Postman
+      - [x] Coleções do Postman
+        - [ ] ridely-service
+        - [ ] auth-service (Keycloak)
       - Api Docs
         - [x] Docs/Swagger (ridely-service)
-        - [x] Docs/Swagger (pricing-service)
-        - [ ] Docs/Swagger (keycloack)
+        - [x] ~~Docs/Swagger (pricing-service)~~
+        - [ ] ~~Docs/Swagger auth-service (Keycloak)~~
       - [ ] README.md
     - GitActions
-      - [ ] Templates
-      - [ ] Code review
-      - [ ] Guidelines
+      - [ ] ~~Templates~~
+      - [ ] ~~Code review~~
+      - [ ] ~~Guidelines~~
     - Tests 
       - [x] Unit tests
       - [x] Coverage
-      - [ ] Integration tests
+      - [ ] ~~Integration tests~~
     - Segurança
       - [ ] CORS
-      - [ ] UUID
+      - [ ] ~~UUID~~
       - [x] Auth implementação/integração
     - Logs
       - [x] Json
@@ -84,50 +88,74 @@
       - [x] HATEOS
     - Healthceheck inteligente
       - [x] Spatie\Health 
+      - [x] Configuração de pagina de status
 - Autenticação (Keycloak)
   - [x] Deploy do Keycloak com Helm
   - [x] Configurar banco de dados do Keycloak
-  - [ ] Criar realms, clients e roles no Keycloak
-  - [ ] Proteger rotas do ridely-service e pricing-service com Tokens JWT
-  - [ ] Validar tokens de autenticação nos serviços
+  - [x] Criar realms, clients e roles no Keycloak
+  - [x] Proteger rotas do ridely-service com Tokens JWT
+    - [x] Implementar flag para liberar testes sem autenticação
+  - [x] Validar tokens de autenticação nos serviços
+    - [x] Implementar middleware de autenticação no ridely-service
+      - [x] Validação simplificada pois a mais completa será feita pelo Kong
 - Autenticação (Kong)
-  - [ ] Configurar Kong com plugin OIDC
-  - [ ] Proteger rotas do ridely-service e pricing-service via Kong + OIDC
+  - [ ] ~~Configurar Kong com plugin OIDC~~
+  - [ ] ~~Proteger rotas do ridely-service via Kong + OIDC~~
 - Comunicação entre Serviços e Eventos
-  - [ ] Escolher entre RabbitMQ (local/dev) e AWS SQS (produção)
-  - [ ] Criar tópicos/filas (ex: corrida_solicitada, corrida_finalizada)
-  - [ ] Implementar produtores (publicadores) de eventos
-  - [ ] Implementar consumidores para os eventos
-  - [ ] Implementar tratamento de falhas e DLQ (Dead Letter Queue)
+  - [x] Escolher entre RabbitMQ ou AWS SQS
+    - [x] ~~Optar por RabbitMQ para mensageria~~
+    - [x] Optar por Redis para filas (sem tempo para implementar RabbitMQ)
+  - [ ] ~~RabbitMQ~~
+    - [ ] ~~Deploy do RabbitMQ com Helm~~
+    - [ ] ~~Configurar usuários, permissões e vhosts~~
+    - [ ] ~~Criar tópicos/filas (ex: corrida_solicitada, corrida_finalizada)~~
+    - [ ] ~~Implementar produtores (publicadores) de eventos~~
+    - [ ] ~~Implementar consumidores para os eventos~~
+    - [ ] ~~Implementar tratamento de falhas e DLQ (Dead Letter Queue)~~
 - Gerenciamento de Segredos
-  - [ ] Definir estratégia de segredos:
-    - [ ] Kubernetes Secrets com criptografia
-    - [ ] Sealed Secrets + SOPS (com GitOps)
-    - [ ] Versionar segredos de forma segura (Git + Kustomize ou Helm)
-    - [ ] Avaliar uso futuro de Secret Manager da AWS em produção
+  - [ ] ~~Definir estratégia de segredos:~~
+    - [ ] ~~Kubernetes Secrets com criptografia~~
+    - [ ] ~~Sealed Secrets + SOPS (com GitOps)~~
+    - [ ] ~~Versionar segredos de forma segura (Git + Kustomize ou Helm)~~
+    - [ ] ~~Avaliar uso futuro de Secret Manager da AWS em produção~~
 - CI/CD
-  - [ ] Criar pipelines com GitHub Actions (ou AWS CodePipeline)
-  - [ ] Automatizar:
-      - [ ] Build das imagens Docker
-      - [ ] Deploy via Helm por ambiente
-      - [ ] Rodar testes
-      - [ ] Scan de vulnerabilidades
-  - [ ] Adicionar versionamento de imagem/tag automático
+  - [ ] ~~Criar pipelines com GitHub Actions (ou AWS CodePipeline)~~
+  - ~~Automatizar:~~
+      - [ ] ~~Build das imagens Docker~~
+      - [ ] ~~Deploy via Helm por ambiente~~
+      - [ ] ~~Rodar testes~~
+      - [ ] ~~Scan de vulnerabilidades~~
+  - [ ] ~~Adicionar versionamento de imagem/tag automático~~
 - Testes e Validações
-  - [ ] Escrever testes unitários dos serviços
-    - [ ] ridely-service (WIP)
-    - [ ] pricing-service
-  - [ ] Escrever testes de integração (API + mensageria)
-  - [ ] Escrever testes de integração (API + Auth)
-  - [ ] Realizar testes de carga com ferramentas como k6 ou Artillery
-    - [ ] Artillery
-      - [ ] Ridely Service
-        - [x] Localhost
-          - [x] estimate-ride
-          - [x] list-drivers
-        - [ ] Cluster Kubernetes
-  - [ ] Testar escalabilidade dos serviços com HPA
-  - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)
+  - [ ] Testes de unidade
+    - [x] Escrever testes unitários dos serviços
+      - [x] ridely-service
+      - [ ] ~~pricing-service~~
+  - [ ] Testes de integração
+    - [ ] Escrever testes de integração (ridely-service)
+      - [ ] ~~Estimativa de corrida~~
+      - [ ] ~~Listagem de motoristas~~
+      - [ ] ~~Alocação do motorista mais próximo~~
+    - [ ] ~~Escrever testes de integração (API + mensageria)~~
+    - [ ] ~~Escrever testes de integração (API + Auth)~~
+  - [ ] Testes de contrato
+    - [ ] ~~Implementar testes de contrato com Pact~~
+      - [ ] ~~Criar contratos para o ridely-service~~
+  - [ ] Testes de performance
+    - [ ] ~~Definir cenários de teste de carga~~
+      - [ ] ~~Estimativa de corrida~~
+      - [ ] ~~Listagem de motoristas~~
+      - [ ] ~~Alocação do motorista mais próximo~~
+      - [ ] ~~Cálculo do preço estimado da corrida~~
+  - [x] Testes de carga
+    - [x] Implementar testes de carga com k6 ou Artillery
+      - [x] Artillery
+        - [x] ridely-service
+          - [x] Localhost
+            - [x] estimate-ride
+            - [x] list-drivers
+    - [ ] ~~Testar escalabilidade dos serviços com HPA~~
+    - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)
 - Observabilidade e Monitoramento
   - [ ] ~~Deploy do Prometheus e Grafana via Helm~~
   - [ ] ~~Deploy do Loki para logs + Fluent Bit~~
@@ -136,9 +164,9 @@
   - [ ] ~~Criar dashboards no Grafana para métricas e logs~~
   - [ ] ~~Criar alertas com Prometheus e Grafana~~
 - Segurança
-  - [ ] Configurar HTTPS no Ingress do Kong
-  - [ ] Validar autenticação JWT/OIDC com Keycloak
-  - [ ] Criar RBAC para os serviços e usuários no cluster
-  - [ ] Adotar Network Policies para limitar tráfego
-  - [ ] Aplicar PodSecurityPolicies ou PodSecurityStandards (PSA)
-  - [ ] Validar segurança nas imagens Docker (ex: Trivy, Grype)
+  - [ ] ~~Configurar HTTPS no Ingress do Kong~~
+  - [x] Validar autenticação JWT/OIDC com Keycloak
+  - [ ] ~~Criar RBAC para os serviços e usuários no cluster~~
+  - [ ] ~~Adotar Network Policies para limitar tráfego~~
+  - [ ] ~~Aplicar PodSecurityPolicies ou PodSecurityStandards (PSA)~~
+  - [ ] ~~Validar segurança nas imagens Docker (ex: Trivy, Grype)~~

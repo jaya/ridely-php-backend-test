@@ -1,5 +1,6 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+title Visão de Implantação do Projeto Ridely - ECS e Kong
 
 '-----------------------------------------
 ' People
@@ -30,17 +31,17 @@ Node(ecsCluster, "ECS Cluster", "Amazon ECS") {
         Container(ridelyService, "Ridely Service", "PHP/Laravel Container", "Ride management and event publishing")
     }
 
-    Node(pricingTask, "Pricing Task", "Fargate Task or EC2") {
-        Container(pricingService, "Pricing Service", "Node.js Container", "Calculates dynamic ride pricing")
-    }
+'    Node(pricingTask, "Pricing Task", "Fargate Task or EC2") {
+'        Container(pricingService, "Pricing Service", "Node.js Container", "Calculates dynamic ride pricing")
+'    }
 
     Node(authTask, "Auth Task", "Fargate Task or EC2") {
         Container(authService, "Auth Service", "Keycloak", "Handles authentication and tokens")
     }
 
-    Node(brokerTask, "Broker Task", "Fargate Task or EC2") {
-        Container(rabbitmq, "RabbitMQ", "Message Broker", "Publishes and subscribes to async events")
-    }
+'    Node(brokerTask, "Broker Task", "Fargate Task or EC2") {
+'        Container(rabbitmq, "RabbitMQ", "Message Broker", "Publishes and subscribes to async events")
+'    }
 
     Node(obsTask, "Observability Stack", "Fargate Task or EC2") {
         Container(prometheus, "Prometheus", "Metrics collection")
@@ -56,7 +57,7 @@ Node(ecsCluster, "ECS Cluster", "Amazon ECS") {
 Node(databases, "Managed DBs", "Amazon RDS / ElastiCache") {
     ContainerDb(mysql, "Ridely DB", "MySQL", "Stores ride/user data")
     ContainerDb(postgres, "Keycloak DB", "PostgreSQL", "Stores auth data")
-    ContainerDb(redis, "Pricing Cache", "Redis", "Stores temporary pricing results")
+    ContainerDb(redis, "Ridely Cache DB", "Redis", "TTL cache for data and pricing")
 }
 
 '-----------------------------------------
@@ -66,17 +67,17 @@ Rel(user, ridelyMobile, "Uses")
 Rel(ridelyMobile, kongProxy, "Sends HTTPS requests")
 
 Rel(kongProxy, ridelyService, "Routes /rides")
-Rel(kongProxy, pricingService, "Routes /pricing")
+'Rel(kongProxy, pricingService, "Routes /pricing")
 Rel(kongProxy, authService, "Routes /auth")
 
 Rel(ridelyService, mysql, "Reads/Writes")
 Rel(ridelyService, redis, "Reads")
-Rel(ridelyService, rabbitmq, "Publishes events")
+'Rel(ridelyService, rabbitmq, "Publishes events")
 Rel(ridelyService, authService, "Validates tokens")
 
-Rel(pricingService, redis, "Reads/Writes cache")
-Rel(pricingService, rabbitmq, "Publishes events")
-Rel(pricingService, authService, "Validates tokens")
+'Rel(pricingService, redis, "Reads/Writes cache")
+'Rel(pricingService, rabbitmq, "Publishes events")
+'Rel(pricingService, authService, "Validates tokens")
 
 Rel(authService, postgres, "Reads/Writes user data")
 

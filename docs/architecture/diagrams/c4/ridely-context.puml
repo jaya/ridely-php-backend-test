@@ -1,5 +1,6 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title Visão de Contexto do Projeto Ridely
 
 '-----------------------------------------
 ' Personas
@@ -13,12 +14,13 @@ Person(admin, "Administrator", "People that administrates the system")
 System(ridelyMobile, "Ridely Mobile","Mobile Application")
 System(ridelyService, "Ridely Service", "System that provides taxi services")
 System(authService, "Auth Service","Handles authentication and authorization")
-System(PricingService, "Pricing Service","Calculates dynamic ride pricing")
+'System(pricingService, "Pricing Service","Calculates dynamic ride pricing")
 '-----------------------------------------
 ' Sistemas Externos
 '-----------------------------------------
 'System_Ext(payment, "Payment Gateway", "Handles ride payments (e.g. Stripe, PayPal)")
-System_Ext(rabbitmq, "RabbitMQ", "Asynchronous messaging between services")
+'System_Ext(rabbitmq, "RabbitMQ", "Asynchronous messaging between services")
+System_Ext(locationService, "Location Service", "Provides geolocation data for rides")
 System_Ext(prometheus, "Prometheus", "Scrapes and stores metrics")
 System_Ext(grafana, "Grafana", "Visualizes metrics and dashboards")
 System_Ext(jaeger, "Jaeger", "Distributed tracing for request flow")
@@ -31,11 +33,13 @@ Rel(user, ridelyMobile, "Uses the mobile app")
 Rel(ridelyMobile, ridelyService, "Request taxi services")
 Rel(admin, ridelyService, "Uses the admin panel")
 
-Rel_R(ridelyService, PricingService, "Requests fare estimates")
-Rel_R(ridelyService, authService, "Validates user tokens and API key")
-Rel_R(PricingService, authService, "Validates user tokens and API key")
+'Rel_R(ridelyService, pricingService, "Requests fare estimates")
 
-Rel(ridelyService, rabbitmq, "Publishes and consumes ride events")
+Rel_R(ridelyService, authService, "Validates user tokens and API key")
+'Rel_R(pricingService, authService, "Validates user tokens and API key")
+
+'Rel(ridelyService, rabbitmq, "Publishes and consumes ride events")
+Rel(ridelyService, locationService, "Fetches geolocation data for rides")
 
 Rel(ridelyService, prometheus, "Exposes metrics")
 Rel(grafana, prometheus, "Reads metrics for dashboards")

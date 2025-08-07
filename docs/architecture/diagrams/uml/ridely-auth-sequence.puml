@@ -1,0 +1,27 @@
+@startuml
+actor User
+participant "Swagger UI / App" as Client
+participant "Laravel API" as API
+participant "Keycloak" as Keycloak
+
+== Fluxo de Login ==
+
+User -> Client: Inicia login
+Client -> Keycloak: Redireciona para autenticação (Authorization Code Flow)
+User -> Keycloak: Informa credenciais
+Keycloak -> Client: Retorna access_token (JWT)
+
+== Requisição à API ==
+
+Client -> API: Requisição com Authorization: Bearer <token>
+API -> API: Decodifica JWT localmente
+API -> API: Valida assinatura com JWKS cacheado
+API -> API: Verifica campo iss (issuer)
+API --> Client: Resposta autorizada
+
+== Requisição sem autenticação (negada) ==
+
+User -> API: Requisição sem token
+API -> User: 401 Unauthorized
+
+@enduml

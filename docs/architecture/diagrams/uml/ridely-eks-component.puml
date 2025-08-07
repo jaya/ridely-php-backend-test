@@ -1,5 +1,6 @@
 @startuml
-' Solução baseada em EKS e AWS com Kong e observabilidade
+' Solução baseada em AWS EKS e Kong e observabilidade
+title Componentes do Projeto Ridely - AWS EKS e Kong
 
 [ridely-mobile] <<mobile>>
 
@@ -10,21 +11,21 @@ package "EKS Cluster" {
     }
     package "ridely-namespace" {
         [ridely-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
-        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+'        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
 
         [auth-service] <<Pod>> <<Keycloak>>
         [ridely-service] <<Pod>> <<PHP/Laravel>>
-        [pricing-service] <<Pod>> <<Node.js/Express>>
-        [rabbitmq-service] <<Pod>> <<RabbitMQ>>
+'        [pricing-service] <<Pod>> <<Node.js/Express>>
+'        [rabbitmq-service] <<Pod>> <<RabbitMQ>>
     }
 }
 
-note left of "pricing-service"
-    Autoscaling Policy
-    Min pods: 1
-    Max pods: 3
-    CPU Utilization target: 60%
-end note
+'note left of "pricing-service"
+'    Autoscaling Policy
+'    Min pods: 1
+'    Max pods: 3
+'    CPU Utilization target: 60%
+'end note
 
 note bottom of "auth-service"
     Autoscaling Policy
@@ -52,8 +53,8 @@ package RDS {
 
 package ElastiCache {
     rectangle "Redis" {
-        [ridely-cache-database] <<cache>>
-        [pricing-cache-database] <<cache>>
+        [ridely-cache-database-master] <<cache>>
+        [ridely-cache-database-replica] <<cache>>
     }
 }
 
@@ -70,35 +71,35 @@ package Observability {
 
 ' Kong ingress routing to backend services
 [kong-proxy] --> [ridely-service-nginx]
-[kong-proxy] --> [pricing-service-nginx]
+'[kong-proxy] --> [pricing-service-nginx]
 [kong-proxy] --> [auth-service]
 
 ' Nginx proxies forwarding to services
 [ridely-service-nginx] --> [ridely-service]
-[pricing-service-nginx] --> [pricing-service]
+'[pricing-service-nginx] --> [pricing-service]
 
 ' Services access databases and cache
 [auth-service] ..> [auth-service-database] : Reads/Writes auth data
 [ridely-service] ..> [ridely-database] : Reads/Writes ride and user data
 [ridely-service] ..> [auth-service] : Token validation
-[ridely-service] ..> [ridely-cache-database] : Reads/Writes cache
+[ridely-service] ..> [ridely-cache-database-master] : Reads/Writes cache
 [ridely-database] ..> [ridely-database-replica] : Replication
 
-[pricing-service] ..> [auth-service] : Token validation
-[pricing-service] ..> [pricing-cache-database] : Reads/Writes pricing cache
+'[pricing-service] ..> [auth-service] : Token validation
+'[pricing-service] ..> [ridely-cache-database-master] : Reads/Writes pricing cache
 
 ' Messaging with RabbitMQ
-[pricing-service] ..> [rabbitmq-service] : Publishes/Consumes events
-[ridely-service] ..> [rabbitmq-service] : Publishes/Consumes events
+'[pricing-service] ..> [rabbitmq-service] : Publishes/Consumes events
+'[ridely-service] ..> [rabbitmq-service] : Publishes/Consumes events
 
 ' Observability integrations
 [ridely-service] --> [prometheus]
 [ridely-service] --> [loki]
 [ridely-service] --> [jaeger]
 
-[pricing-service] --> [prometheus]
-[pricing-service] --> [loki]
-[pricing-service] --> [jaeger]
+'[pricing-service] --> [prometheus]
+'[pricing-service] --> [loki]
+'[pricing-service] --> [jaeger]
 
 [grafana] --> [prometheus]
 [grafana] --> [loki]

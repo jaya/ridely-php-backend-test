@@ -1,0 +1,53 @@
+@startuml
+actor Cliente
+participant "RidelyService" as RidelyService
+participant "EstimateRideController" as Controller
+participant "RideService"
+participant "Redis Queue" as RedisQueue
+participant "Job Processor" as JobProcessor
+
+participant "LocationService"
+participant "OpenStreetMap (Nominatim)" as Nominatim
+participant "Database"
+
+Cliente -> RidelyService : POST /api/v1/rides/{id}/estimate-ride\n(pick_up, drop_off)
+RidelyService -> Controller : estimateRide()
+Controller -> RideService : Append "Aracaju, SE" if needed
+RideService -> RedisQueue : enqueue({hash, pick_up, drop_off})
+'RideService -> Database : save estimate request data
+'Database -> RideService : return (hash, status)
+RideService -> Controller : return (hash, status)
+Controller -> RidelyService : return hash + status: "processing"
+RidelyService --> Cliente : 202 Accepted
+
+== Async Job ==
+
+JobProcessor -> RedisQueue : consume nessage
+JobProcessor -> LocationService : getCoordinates(pick_up)
+LocationService -> LocationService : check cache
+alt Not in cache
+    LocationService -> Nominatim : GET /search?q=pick_up
+    Nominatim --> LocationService : lat/lon
+    LocationService -> LocationService : store in cache
+end
+JobProcessor -> LocationService : getCoordinates(drop_off)
+LocationService -> LocationService : check cache
+alt Not in cache
+    LocationService -> Nominatim : GET /search?q=drop_off
+    Nominatim --> LocationService : lat/lon
+    LocationService -> LocationService : store in cache
+end
+JobProcessor -> JobProcessor : calculateDistance()
+JobProcessor -> JobProcessor : calculateDuration()
+JobProcessor -> JobProcessor : calculatePrice()
+JobProcessor -> Database : save estimate data (hash, result)
+
+== Polling ==
+
+Cliente -> RidelyService : GET /api/v1/rides/{id}/estimate-ride?hash=XYZ
+RidelyService -> Controller : getEstimate(hash)
+Controller -> Database : find by hash
+Database --> Controller : result
+Controller --> RidelyService : price or processing status
+RidelyService --> Cliente : response
+@enduml

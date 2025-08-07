@@ -1,0 +1,36 @@
+@startuml
+title Componentes do Projeto Ridely - Kubernetes
+
+package "Serviços da Aplicação" {
+  [Ridely Service] as ridely_service
+  [Migração DB] as migrate_job <<Job>>
+}
+
+package "Autenticação" {
+  [Keycloak] as keycloak
+  [PostgreSQL (Auth)] as auth_db
+}
+
+package "Banco de Dados" {
+  [MySQL/PostgreSQL (App)] as app_db
+}
+
+package "Cache Redis" {
+  [Redis Master] as redis_master
+  [Redis Replica 1] as redis_replica1
+  [Redis Replica 2] as redis_replica2
+  [Redis Replica 3] as redis_replica3
+}
+
+' Relações
+ridely_service --> keycloak : Autenticação via
+keycloak --> auth_db : Persiste dados em
+ridely_service --> app_db : Usa como banco de dados
+ridely_service --> redis_master : Usa para cache e filas
+redis_master --> redis_replica1 : Replica para
+redis_master --> redis_replica2
+redis_master --> redis_replica3
+
+migrate_job --> app_db : Executa migração
+
+@enduml

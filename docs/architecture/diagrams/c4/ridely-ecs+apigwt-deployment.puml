@@ -1,5 +1,6 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+title Visão de Implantação do Projeto Ridely - ECS e Api Gateway
 
 '-----------------------------------------
 ' People
@@ -30,17 +31,17 @@ Node(ecsCluster, "ECS Cluster", "Amazon ECS") {
         Container(ridelyService, "Ridely Service", "PHP/Laravel", "Ride management and event publishing")
     }
 
-    Node(pricingTask, "Pricing Task", "Fargate Task or EC2") {
-        Container(pricingService, "Pricing Service", "Node.js", "Estimates pricing")
-    }
+'    Node(pricingTask, "Pricing Task", "Fargate Task or EC2") {
+'        Container(pricingService, "Pricing Service", "Node.js", "Estimates pricing")
+'    }
 
     Node(authTask, "Auth Task", "Fargate Task or EC2") {
         Container(authService, "Keycloak", "Identity Provider", "Handles OAuth2 authentication")
     }
 
-    Node(brokerTask, "Broker Task", "Fargate Task or EC2") {
-        Container(rabbitmq, "RabbitMQ", "Broker", "Handles events")
-    }
+'    Node(brokerTask, "Broker Task", "Fargate Task or EC2") {
+'        Container(rabbitmq, "RabbitMQ", "Broker", "Handles events")
+'    }
 
     Node(obsTask, "Observability Stack", "Fargate Task or EC2") {
         Container(prometheus, "Prometheus", "Collects metrics")
@@ -56,7 +57,7 @@ Node(ecsCluster, "ECS Cluster", "Amazon ECS") {
 Node(databases, "Managed DBs", "Amazon RDS / ElastiCache") {
     ContainerDb(mysql, "Ridely DB", "MySQL", "Stores core ride data")
     ContainerDb(postgres, "Keycloak DB", "PostgreSQL", "Auth DB")
-    ContainerDb(redis, "Pricing Cache", "Redis", "TTL cache for pricing")
+    ContainerDb(redis, "Ridely Cache DB", "Redis", "TTL cache for data and pricing")
 }
 
 '-----------------------------------------
@@ -68,16 +69,16 @@ Rel(ridelyMobile, apiGatewayComponent, "HTTPS Request")
 Rel(apiGatewayComponent, albComponent, "Forward request")
 
 Rel(albComponent, ridelyService, "Routes to ECS service")
-Rel(albComponent, pricingService, "Routes to ECS service")
+'Rel(albComponent, pricingService, "Routes to ECS service")
 Rel(albComponent, authService, "Routes to ECS service")
 
 Rel(ridelyService, mysql, "Reads/Writes")
-Rel(ridelyService, rabbitmq, "Publishes")
+'Rel(ridelyService, rabbitmq, "Publishes")
 Rel(ridelyService, authService, "Validates tokens")
 Rel(ridelyService, redis, "Reads cache")
 
-Rel(pricingService, redis, "Reads/Writes")
-Rel(pricingService, rabbitmq, "Publishes pricing events")
+'Rel(pricingService, redis, "Reads/Writes")
+'Rel(pricingService, rabbitmq, "Publishes pricing events")
 
 Rel(authService, postgres, "Reads/Writes")
 

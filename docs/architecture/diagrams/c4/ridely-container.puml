@@ -1,5 +1,6 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Visão de Containers do Projeto Ridely
 
 '-----------------------------------------
 ' Pessoa externa
@@ -28,28 +29,34 @@ System_Boundary(authContext, "Auth Service") {
     ContainerDb(postgres, "Auth Service Database", "Postgres", "Stores authentication and identity data")
 }
 
-System_Boundary(pricingContext, "Pricing Service") {
-    Container(pricingService, "Pricing Service", "Node.js", "Calculates dynamic ride pricing")
-    ContainerDb(pricingDatabase, "Pricing Database", "Redis", "Stores temporary pricing calculations and estimations with automatic expiration (TTL)")
-}
+'System_Boundary(pricingContext, "Pricing Service") {
+'    Container(pricingService, "Pricing Service", "Node.js", "Calculates dynamic ride pricing")
+'    ContainerDb(pricingDatabase, "Pricing Database", "Redis", "Stores temporary pricing calculations and estimations with automatic expiration (TTL)")
+'}
 
 System(ridelyMobile, "Ridely Mobile", "Mobile Application")
 
 '-----------------------------------------
 ' Sistemas externos
 '-----------------------------------------
-System_Boundary(messageBrokerContext, "Message Broker") {
-    System_Ext(rabbitmq, "RabbitMQ", "Asynchronous messaging between services")
+'System_Boundary(messageBrokerContext, "Message Broker") {
+    'System_Ext(rabbitmq, "RabbitMQ", "Asynchronous messaging between services")
 
-    ContainerQueue(rideRequested, "ride.requested", "RabbitMQ Topic", "Published when a user requests a ride")
-    ContainerQueue(rideAccepted, "ride.accepted", "RabbitMQ Topic", "Published when a driver accepts a ride")
-    ContainerQueue(rideCanceled, "ride.canceled", "RabbitMQ Topic", "Published when a user or driver cancels a ride")
-    ContainerQueue(rideCompleted, "ride.completed", "RabbitMQ Topic", "Published when a ride is completed successfully")
-    ContainerQueue(driverStatusChanged, "driver.status.changed", "RabbitMQ Topic", "Published when a driver's availability/status changes")
+    'ContainerQueue(rideRequested, "ride.requested", "RabbitMQ Topic", "Published when a user requests a ride")
+    'ContainerQueue(rideAccepted, "ride.accepted", "RabbitMQ Topic", "Published when a driver accepts a ride")
+    'ContainerQueue(rideCanceled, "ride.canceled", "RabbitMQ Topic", "Published when a user or driver cancels a ride")
+    'ContainerQueue(rideCompleted, "ride.completed", "RabbitMQ Topic", "Published when a ride is completed successfully")
+    'ContainerQueue(driverStatusChanged, "driver.status.changed", "RabbitMQ Topic", "Published when a driver's availability/status changes")
 
-    ContainerQueue(pricingCalculated, "pricing.calculated", "RabbitMQ Topic", "Published when pricing estimation is calculated")
-    ContainerQueue(pricingFailed, "pricing.failed", "RabbitMQ Topic", "Published when pricing estimation fails")
+    'ContainerQueue(pricingCalculated, "pricing.calculated", "RabbitMQ Topic", "Published when pricing estimation is calculated")
+    'ContainerQueue(pricingFailed, "pricing.failed", "RabbitMQ Topic", "Published when pricing estimation fails")
+'}
 
+System_Boundary(messageQueueContext, "Message Queue (Redis)") {
+    ContainerDb(redisQueue, "Redis Streams/Lists", "Redis", "Implements lightweight pub/sub and queueing")
+
+    ContainerQueue(pricingCalculated, "pricing.calculated", "Redis Stream/List", "Published when pricing estimation is calculated")
+    ContainerQueue(pricingFailed, "pricing.failed", "Redis Stream/List", "Published when pricing estimation fails")
 }
 
 System_Boundary(observabilityContext, "Observability Stack") {
@@ -59,6 +66,8 @@ System_Boundary(observabilityContext, "Observability Stack") {
     System_Ext(loki, "Loki", "Centralized logging for services")
 }
 
+System_Ext(locationService, "Location Service", "Provides geolocation data for rides")
+
 '-----------------------------------------
 ' Relacionamentos
 '-----------------------------------------
@@ -67,42 +76,44 @@ Rel(ridelyMobile, kongProxy, "Sends HTTPS requests")
 
 Rel(kongProxy, authService, "Routes /auth requests")
 Rel(kongProxy, ridelyService, "Routes /rides requests")
-Rel(kongProxy, pricingService, "Routes /pricing requests")
+'Rel(kongProxy, pricingService, "Routes /pricing requests")
 Rel_L(kongIngress, kongProxy, "Configures routes and plugins")
 
 Rel_D(authService, postgres, "Reads/Writes authentication data")
 Rel_D(ridelyService, ridelyDatabase, "Reads/Writes ride and user data")
 Rel_D(ridelyService, redisCache, "Reads/Writes cache")
+Rel(ridelyService, locationService, "Fetches geolocation data for rides")
 
-Rel_U(ridelyService, rideRequested, "Publishes", "AMQP")
-Rel_U(ridelyService, rideAccepted, "Publishes", "AMQP")
-Rel_U(ridelyService, rideCanceled, "Publishes", "AMQP")
-Rel_U(ridelyService, rideCompleted, "Publishes", "AMQP")
-Rel_U(ridelyService, driverStatusChanged, "Publishes", "AMQP")
+'Rel_U(ridelyService, rideRequested, "Publishes", "AMQP")
+'Rel_U(ridelyService, rideAccepted, "Publishes", "AMQP")
+'Rel_U(ridelyService, rideCanceled, "Publishes", "AMQP")
+'Rel_U(ridelyService, rideCompleted, "Publishes", "AMQP")
+'Rel_U(ridelyService, driverStatusChanged, "Publishes", "AMQP")
+
+Rel_U(ridelyService, pricingCalculated, "Publishes", "Async Queue")
+Rel_U(ridelyService, pricingFailed, "Publishes", "Async Queue")
 
 
-' TODO to be reviewed
 'Rel_R(ridelyService, pricingService, "Requests fare estimates")
 Rel_R(ridelyService, authService, "Validates tokens and API keys")
-Rel_R(pricingService, authService, "Validates tokens and API keys")
+'Rel_R(pricingService, authService, "Validates tokens and API keys")
 
-Rel_D(pricingService, pricingDatabase, "Reads/Writes pricing cache")
-' TODO to be reviewed
-Rel_U(pricingService, rideRequested, "Consumes", "AMQP")
+'Rel_D(pricingService, pricingDatabase, "Reads/Writes pricing cache")
+'Rel_U(pricingService, rideRequested, "Consumes", "AMQP")
 'Rel_U(pricingService, rideAccepted, "Consumes", "AMQP")
 'Rel_U(pricingService, driverStatusChanged, "Consumes", "AMQP")
 
-Rel_U(pricingService, pricingCalculated, "Publishes", "AMQP")
-Rel_U(pricingService, pricingFailed, "Publishes", "AMQP")
+'Rel_U(pricingService, pricingCalculated, "Publishes", "AMQP")
+'Rel_U(pricingService, pricingFailed, "Publishes", "AMQP")
 
 ' Observability
 Rel(ridelyService, prometheus, "Exposes metrics")
 Rel(ridelyService, loki, "Sends logs")
 Rel(ridelyService, jaeger, "Sends traces")
 
-Rel(pricingService, prometheus, "Exposes metrics")
-Rel(pricingService, loki, "Sends logs")
-Rel(pricingService, jaeger, "Sends traces")
+'Rel(pricingService, prometheus, "Exposes metrics")
+'Rel(pricingService, loki, "Sends logs")
+'Rel(pricingService, jaeger, "Sends traces")
 
 Rel(grafana, prometheus, "Queries metrics")
 Rel(grafana, loki, "Queries logs")

@@ -1,5 +1,6 @@
 @startuml
 ' Diagrama de Componentes atualizado com API Gateway separado e arquitetura Kubernetes
+title Componentes do Projeto Ridely - AWS ECS e API Gateway
 
 [ridely-mobile] <<mobile>>
 
@@ -7,18 +8,18 @@ component "API Gateway" {
     component "ridely-api-gateway" {
         [Api Authorizer] ..> [auth-service API]: use
         [Api Authorizer] ..> [ridely-service API]: use
-        [Api Authorizer] ..> [pricing-service API]: use
+'        [Api Authorizer] ..> [pricing-service API]: use
     }
 }
 
 component Kubernetes {
     component "ridely-cluster" {
         [ridely-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
-        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
+'        [pricing-service-nginx] <<Pod>> <<Nginx Reverse Proxy>>
         [auth-service] <<Pod>> <<Keycloak>>
         [ridely-service] <<Pod>> <<PHP/Laravel>>
-        [pricing-service] <<Pod>> <<Node.js/Express>>
-        [rabbitmq-service] <<Pod>> <<RabbitMQ>>
+'        [pricing-service] <<Pod>> <<Node.js/Express>>
+'        [rabbitmq-service] <<Pod>> <<RabbitMQ>>
     }
 }
 
@@ -34,20 +35,21 @@ component Databases {
 
 component Cache {
     rectangle "Redis" {
-        [ridely-cache-database] <<cache>>
-        [pricing-cache-database] <<cache>>
+        [ridely-cache-database-master] <<cache>>
+        [ridely-cache-database-replicas] <<cache>>
+        '[pricing-cache-database-master] <<cache>>
     }
 }
 
 ' ------------------------------------------
 ' Autoscaling Policies (Notas)
 ' ------------------------------------------
-note left of "pricing-service"
-    Autoscaling Policy
-    Min pods: 1
-    Max pods: 3
-    CPU Utilization target: 60%
-end note
+'note left of "pricing-service"
+'    Autoscaling Policy
+'    Min pods: 1
+'    Max pods: 3
+'    CPU Utilization target: 60%
+'end note
 
 note right of "auth-service"
     Autoscaling Policy
@@ -70,26 +72,26 @@ end note
 
 ' API gateway records
 [ridely-service API] --> [ridely-service-nginx]
-[pricing-service API] --> [pricing-service-nginx]
+'[pricing-service API] --> [pricing-service-nginx]
 [auth-service API] --> [auth-service]
 
 ' Nginx reverse proxies
 [ridely-service-nginx] --> [ridely-service]
-[pricing-service-nginx] --> [pricing-service]
+'[pricing-service-nginx] --> [pricing-service]
 
 ' Services accessing databases and caches
 [auth-service] ..> [auth-service-database] : Reads/Writes auth data
 
-[ridely-service] ..> [ridely-database] : Reads/Writes ride data
-[ridely-service] ..> [ridely-cache-database] : Reads/Writes cache
+[ridely-service] .left.> [ridely-database] : Reads/Writes ride data
+[ridely-service] ..> [ridely-cache-database-master] : Reads/Writes cache
 [ridely-service] ..> [auth-service] : Token validation
 
-[pricing-service] ..> [pricing-cache-database] : Reads/Writes pricing cache
-[pricing-service] ..> [auth-service] : Token validation
+'[pricing-service] ..> [pricing-cache-database-master] : Reads/Writes pricing cache
+'[pricing-service] ..> [auth-service] : Token validation
 
 ' Services publishing/consuming events
-[pricing-service] ..> [rabbitmq-service] : Uses messaging
-[ridely-service] ..> [rabbitmq-service] : Uses messaging
+'[pricing-service] ..> [rabbitmq-service] : Uses messaging
+'[ridely-service] ..> [rabbitmq-service] : Uses messaging
 
 ' Database replication
 [ridely-database] ..> [ridely-database-replica] : Replication

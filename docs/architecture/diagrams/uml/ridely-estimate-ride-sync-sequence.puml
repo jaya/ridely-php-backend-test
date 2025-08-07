@@ -1,0 +1,30 @@
+@startuml
+actor Cliente
+participant "Ridely Service" as RidelyService
+participant "EstimateRideController" as Controller
+participant "LocationService" as LocationService
+participant "OpenStreetMap (Nominatim)" as Nominatim
+
+Cliente -> RidelyService : POST /api/v1/rides/{id}/estimate-ride\n(pick_up, drop_off)
+RidelyService -> Controller : estimateRide()
+Controller -> Controller : Append "Aracaju, SE" if needed
+Controller -> LocationService : getCoordinates(pick_up)
+LocationService -> LocationService : check cache
+alt Not in cache
+    LocationService -> Nominatim : GET /search?q=pick_up
+    Nominatim --> LocationService : lat/lon
+    LocationService -> LocationService : store in cache
+end
+Controller -> LocationService : getCoordinates(drop_off)
+LocationService -> LocationService : check cache
+alt Not in cache
+    LocationService -> Nominatim : GET /search?q=drop_off
+    Nominatim --> LocationService : lat/lon
+    LocationService -> LocationService : store in cache
+end
+Controller -> Controller : calculateDistance()
+Controller -> Controller : calculateDuration()\n(velocity avg 45/30 kmh)
+Controller -> Controller : calculatePrice()\n(base + km-based)
+Controller --> RidelyService : estimated price
+RidelyService --> Cliente : response
+@enduml

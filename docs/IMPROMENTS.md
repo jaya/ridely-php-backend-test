@@ -21,10 +21,11 @@
   - Aplicar cache em endpoints que fazem muitas consultas ao banco de dados
 - Segurança
   - Implementar UUID no banco de dados e API
+  - Circuit Breaker
+  - Implementar Circuit Breaker para evitar sobrecarga em serviços externos
 - Testes
   - Implementar testes de integração
   - Implementar mais testes de carga
   - Implementar testes de contrato (Pact)
 - Logs
   - Revisar logs, tratar erros e exceções que não devem ser expostas
-  - 
