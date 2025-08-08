@@ -11,6 +11,9 @@ use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
 use App\Services\V1\EstimateRideService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class RideManagerFacade
@@ -52,10 +55,10 @@ class RideManagerFacade
         return $this->rideService->create($criteria);
     }
 
-    public function find(string $id)
+    public function find(string $id): array|Builder|Collection|Model
     {
-        $ride = $this->rideService->find((int)$id);
-        $ride->load('estimate'); // Load the estimate relationship
+        $ride = $this->rideService->find($id);
+        $ride->load('estimate');
         return $ride;
     }
 

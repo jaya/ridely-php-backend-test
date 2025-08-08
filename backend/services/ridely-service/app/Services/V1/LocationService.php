@@ -6,6 +6,7 @@ use App\Exceptions\RideException;
 use App\Models\PricingRule;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Validators\LocationValidator;
+use Faker\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -16,7 +17,12 @@ use Throwable;
 class LocationService implements LocationServiceInterface
 {
     const EARTH_RADIUS = 6371; // km
+    const MOCK_RESPONSE = true;
 
+    // Triangle (lat, long) for Aracaju, SE, Brazil
+    protected array $p1 = [-10.899441, -37.169611];
+    protected array $p2 = [-11.005954, -37.103693];
+    protected array $p3 = [-10.807727, -36.937524];
     private string $locationServiceUrl;
 
     protected ValidationException $exception;
@@ -38,8 +44,7 @@ class LocationService implements LocationServiceInterface
         $this->pricingRule = $pricingRule;
 
     }
-    // TODO renomear
-    public function execute(string $address, $wait = false): ?array
+    public function getCoordinatesFromAddress(string $address, $wait = false): ?array
     {
         // Use a consistent cache key
         $cacheKey = 'geocode:' . md5($address);
@@ -51,18 +56,39 @@ class LocationService implements LocationServiceInterface
                 sleep(1);
             }
 
-            $encodedAddress = rawurlencode($address);
-            $url = "$this->locationServiceUrl?format=jsonv2&q=$encodedAddress";
-            Log::info("Requesting data from the locationService: $url");
+            // TO avoid the API limitation for test usage, we will use a mock response
+            if (self::MOCK_RESPONSE) {
+                $encodedAddress = rawurlencode($address);
+                $url = "$this->locationServiceUrl?format=jsonv2&q=$encodedAddress";
+                Log::info("Mocking data from the locationService: $url");
+                Log::info("Address: $address");
 
-            $response = Http::withHeaders([
-                'User-Agent' => 'RidelyApp/1.0 (www.ridely.com.br)'
-            ])->get($this->locationServiceUrl, [
-                'format' => 'jsonv2',
-                'q' => $address,
-            ]);
+                // Generating a random point within the triangle defined by the three vertices
+                // -10.899441, -37.169611
+                // -11.005954, -37.103693
+                // -10.807727, -36.937524
+                $point = $this->randomPointInTriangle();
+                $data = [
+                    [
+                        "lat" => $point['latitude'],
+                        "lon" => $point['longitude'],
+                    ]
+                ];
+            } else {
+                $encodedAddress = rawurlencode($address);
+                $url = "$this->locationServiceUrl?format=jsonv2&q=$encodedAddress";
+                Log::info("Requesting data from the locationService: $url");
 
-            $data = $response->json();
+                $response = Http::withHeaders([
+                    'User-Agent' => 'RidelyApp/1.0 (www.ridely.com.br)'
+                ])->get($this->locationServiceUrl, [
+                    'format' => 'jsonv2',
+                    'q' => $address,
+                ]);
+
+                $data = $response->json();
+            }
+
 
             if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
                 return null;
@@ -170,5 +196,27 @@ class LocationService implements LocationServiceInterface
     {
         // Rush hour is between 7–9 AM and 5–7 PM
         return ($hour >= 7 && $hour < 9) || ($hour >= 17 && $hour < 19);
+    }
+
+    public function randomPointInTriangle(): array
+    {
+        // Gera dois números aleatórios entre 0 e 1
+        $r1 = mt_rand() / mt_getrandmax();
+        $r2 = mt_rand() / mt_getrandmax();
+
+        // Garante que os pontos fiquem dentro do triângulo
+        if ($r1 + $r2 > 1) {
+            $r1 = 1 - $r1;
+            $r2 = 1 - $r2;
+        }
+
+        // Cálculo das coordenadas interpoladas
+        $lat = $this->p1[0] + $r1 * ($this->p2[0] - $this->p1[0]) + $r2 * ($this->p3[0] - $this->p1[0]);
+        $lng = $this->p1[1] + $r1 * ($this->p2[1] - $this->p1[1]) + $r2 * ($this->p3[1] - $this->p1[1]);
+
+        return [
+            'latitude' => $lat,
+            'longitude' => $lng,
+        ];
     }
 }

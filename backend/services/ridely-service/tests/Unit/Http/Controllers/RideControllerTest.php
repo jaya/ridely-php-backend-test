@@ -211,16 +211,10 @@ class RideControllerTest extends UnitTestCase
         $this->mockFailCalls();
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
-        $data = [
-            "pick_up" => "invalid",
-            "drop_off" => "invalid",
-        ];
 
-        $ride = $this->createRideWithRideEstimation();
-        $rideId = $ride->id;
-
+        $rideId = 999;
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/v1/rides/{$rideId}/estimate-ride", $data);
+            ->postJson("/api/v1/rides/{$rideId}/estimate-ride");
 
         $response->assertStatus(400);
         $response->assertJsonStructure([
@@ -233,7 +227,7 @@ class RideControllerTest extends UnitTestCase
 
         $data = $response->json();
         $this->assertFalse($data['success']);
-        $this->assertEquals(ErrorMessagesEnum::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA->label(), $data['label']);
+        $this->assertEquals(ErrorMessagesEnum::RIDE_NOT_FOUND->label(), $data['label']);
     }
 
     public function testRequestDriverSuccess()

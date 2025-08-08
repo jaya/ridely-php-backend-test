@@ -6,12 +6,10 @@ use App\Enums\RideEstimateStatusEnum;
 use App\Exceptions\RideException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\EstimateRideCriteria;
-use App\Models\Ride;
 use App\Models\RideEstimate;
 use App\Services\AbstractService;
 use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
-use App\Services\Interfaces\RideServiceInterface;
 use App\Validators\EstimateRideValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -85,7 +83,7 @@ class EstimateRideService extends AbstractService implements EstimateRideService
 
     private function getCoordinatesFromAddress(string $address, $wait = false)
     {
-        return $this->locationService->execute($address, $wait);
+        return $this->locationService->getCoordinatesFromAddress($address, $wait);
     }
 
     public function updateStatus($id, RideEstimateStatusEnum $estimateStatusEnum): bool

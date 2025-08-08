@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Converters\RideEstimateConverter;
 use App\Converters\RideConverter;
+use App\Converters\RideEstimateConverter;
 use App\Enums\RideStatusEnum;
 use App\Exceptions\ApplicationException;
-use App\Exceptions\RideException;
 use App\Http\Controllers\Controller;
-use App\Http\Criteria\EstimateRideCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
