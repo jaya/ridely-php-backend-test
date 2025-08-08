@@ -18,22 +18,22 @@ php:
   replicas: 1
   resources:
     requests:
-      cpu: 300m
-      memory: 256Mi
+      cpu: 200m
+      memory: 128Mi
     limits:
-      cpu: 500m
-      memory: 384Mi
+      cpu: 200m
+      memory: 256Mi
 
 tasks:
   rideEstimates:
     enabled: true
-    replicas: 1
+    replicas: 4
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
       limits:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
 
 images:
