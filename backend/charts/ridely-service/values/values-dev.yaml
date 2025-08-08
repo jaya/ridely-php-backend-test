@@ -24,6 +24,18 @@ php:
       cpu: 500m
       memory: 384Mi
 
+tasks:
+  rideEstimates:
+    enabled: true
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 100Mi
+
 images:
   nginx:
     repository: ridely-service-nginx
@@ -60,13 +72,14 @@ env:
   REDIS_PASSWORD: redis-pass
   REDIS_PORT: 6379
   REDIS_DB: 0
+  REDIS_PREFIX: ''
 
   KEYCLOAK_HEALTH_CHECK_URL: http://auth-service-keycloak:80/realms/master
   KEYCLOAK_ISSUER: http://auth-service-keycloak/realms/spa-customers
   KEYCLOAK_REALM_URL: http://auth-service-keycloak:80/realms/spa-customers
   KEYCLOAK_CLIENT_ID: ridely-service
 
-  LOCATION_SERVICE_URL: 'https://nominatim:openstreetmap:org/search'
+  LOCATION_SERVICE_URL: 'https://nominatim.openstreetmap.org/search'
   REQUEST_LIMIT_PER_MINUTE: 600
 
 

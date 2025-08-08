@@ -29,10 +29,10 @@ class EstimateRideService extends AbstractService implements EstimateRideService
     }
     public function estimateRide(EstimateRideCriteria $criteria, string $id = null)
     {
-        Log::debug('Estimating ride with criteria: ' . json_encode($criteria->toArray()));
+        Log::info('Estimating ride with criteria: ' . json_encode($criteria->toArray()));
 
         if ($this->validator->validate($criteria, $id)) {
-            Log::debug("Searching for ride with ID: $id");
+            Log::debug("Searching for estimateRide with ID: $id");
             $estimate = $this->find($id);
 
             if (!$estimate) {
@@ -41,7 +41,7 @@ class EstimateRideService extends AbstractService implements EstimateRideService
 
 
             $estimate->processing();
-            Log::info("Ride estimate processing estimate ID: {$estimate->id}, status changed to PROCESSING");
+            Log::info("Status changed to PROCESSING");
 
             $origin = $this->getCoordinatesFromAddress($criteria->getPickUp());
             $destination = $this->getCoordinatesFromAddress($criteria->getDropOff(), true);
@@ -58,10 +58,11 @@ class EstimateRideService extends AbstractService implements EstimateRideService
             $durationMin = $this->locationService->calculateDurationTime($distanceKm);
 
             $price = $this->locationService->calculatePrice($distanceKm);
+            $rideId = $estimate->ride_id;
 
-            Log::debug(sprintf(
+            Log::info(sprintf(
                 "Estimated ride %d: distance %s km, duration %s min, price %s",
-                $id, round($distanceKm, 1), $durationMin, $price
+                $rideId, round($distanceKm, 1), $durationMin, $price
             ));
 
             $estimate->ready($distanceKm, $durationMin, $price);

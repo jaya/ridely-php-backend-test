@@ -19,3 +19,14 @@ Execute o seguinte comando:
     ./scripts/init.sh
 ```
 > Nota: este comando dever ser executado na pasta do serviço.
+ 
+
+## Executar o serviço
+```bash
+    php artisan serve
+```
+
+## Executar o worker para processar as filas
+```bash
+    php artisan queue:process-ride-estimates
+```

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ridely-service.name" . }}-process-ride-estimates-worker
+spec:
+  replicas: {{ .Values.tasks.rideEstimates.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "ridely-service.name" . }}-process-ride-estimates-worker
+  template:
+    metadata:
+      labels:
+        app: {{ include "ridely-service.name" . }}-process-ride-estimates-worker
+    spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: [ 'sh', '-c', 'until nc -zv {{ .Values.env.DB_HOST }} {{ .Values.env.DB_PORT }}; do echo "Waiting for DB..."; sleep 2; done' ]
+        - name: wait-for-cache-db
+          image: busybox
+          command: [ 'sh', '-c', 'until nc -zv {{ .Values.env.REDIS_HOST }} {{ .Values.env.REDIS_PORT }}; do echo "Waiting for Redis..."; sleep 2; done' ]
+      containers:
+        - name: laravel
+          image: "{{ .Values.images.php.repository }}:{{ .Values.images.php.tag }}"
+          imagePullPolicy: {{ .Values.images.php.pullPolicy }}
+          command: ["php", "artisan", "queue:process-ride-estimates"]
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: database-password
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: app-key
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ridely-service.fullname" . }}-secret
+                  key: keycloak-client-secret
+          resources:
+            requests:
+              cpu: {{ .Values.tasks.rideEstimates.resources.requests.cpu }}
+              memory: {{ .Values.tasks.rideEstimates.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.tasks.rideEstimates.resources.limits.cpu }}
+              memory: {{ .Values.tasks.rideEstimates.resources.limits.memory }}
+      restartPolicy: Always

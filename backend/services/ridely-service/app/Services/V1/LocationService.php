@@ -51,7 +51,7 @@ class LocationService implements LocationServiceInterface
                 sleep(1);
             }
 
-            $encodedAddress = rawurldecode($address);
+            $encodedAddress = rawurlencode($address);
             $url = "$this->locationServiceUrl?format=jsonv2&q=$encodedAddress";
             Log::info("Requesting data from the locationService: $url");
 

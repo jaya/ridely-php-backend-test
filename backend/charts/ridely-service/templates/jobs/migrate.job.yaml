@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "ridely-service.fullname" . }}-migrate
+  name: {{ include "ridely-service.name" . }}-migrate-job
   annotations:
     #"helm.sh/resource-policy": keep
     "helm.sh/hook": post-install,post-upgrade

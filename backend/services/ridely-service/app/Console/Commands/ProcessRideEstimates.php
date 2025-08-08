@@ -17,7 +17,7 @@ class ProcessRideEstimates extends Command
      *
      * @var string
      */
-    protected $signature = 'app:process-ride-estimates';
+    protected $signature = 'queue:process-ride-estimates';
 
     /**
      * The console command description.
@@ -40,29 +40,22 @@ class ProcessRideEstimates extends Command
         try {
             $redis->xgroup('CREATE', $streamName, 'estimate_group', '$', 'MKSTREAM');
         } catch (\Exception $e) {
-            // Grupo já existe, ignorar
             Log::warning($e->getMessage());
         }
-
-        Log::info('...');
 
         /**
          * @var EstimateRideServiceInterface $estimateRideService
          */
         $estimateRideService = app(EstimateRideServiceInterface::class);
 
-        Log::info('...');
-
         while (true) {
-//            Log::info('While loop happening');
 
             $entries = $redis->xreadgroup('estimate_group', 'consumer-1', [
                 $streamName => '>'
             ], 1, 5000);
 
-            Log::info('Received entries from Redis stream', ['entries' => $entries]);
-
             if (!empty($entries)) {
+                Log::info('Received entries from Redis stream', ['entries' => $entries]);
                 foreach ($entries[$streamName] ?? [] as $id => $data) {
                     Log::info('Found entry in Redis stream', ['id' => $id, 'data' => $data]);
 
@@ -74,7 +67,6 @@ class ProcessRideEstimates extends Command
                     $estimateId = $data['estimate_id'];
 
                     Log::info("Processing estimate for ride ID: $rideId, estimate ID: $estimateId");
-
 
                     $estimateRideService->checkDatabase();
 
@@ -90,7 +82,8 @@ class ProcessRideEstimates extends Command
                 }
             }
 
-            sleep(1); // evitar busy loop
+            // avoid busy loop
+            sleep(1);
         }
 
     }
