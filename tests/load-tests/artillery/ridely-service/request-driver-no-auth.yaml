@@ -16,9 +16,9 @@ config:
       Content-Type: application/json
 
 scenarios:
-  - name: Estimate Ride (Authenticated)
+  - name: Request driver (Non Authenticated)
     flow:
-      - function: "authenticate"
+#      - function: "authenticate"
       - function: "requestDriverDataGenerator"
       - post:
           url: "/api/v1/rides/request-driver"
@@ -29,8 +29,9 @@ scenarios:
           capture:
             - json: "$.data.id"
               as: "ride_id"
-      - post:
-          url: "/api/v1/rides/{{ ride_id }}/estimate-ride"
+      - get:
+          url: "/api/v1/rides/{{ ride_id }}"
           headers:
             Custom-User: "{{ username }}"
             Authorization: "Bearer {{ token }}"
+

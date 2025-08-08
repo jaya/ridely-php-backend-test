@@ -1,3 +1,4 @@
+const {faker} = require('@faker-js/faker');
 const axios = require("axios");
 require("dotenv").config();
 
@@ -52,12 +53,31 @@ module.exports = {
             tokenExpiresAt = now + expiresIn * 1000 - 5000; // expira 5s antes para segurança
 
             context.vars.token = cachedToken;
-            cachedTokens[username] = { token: cachedToken, expiresAt: tokenExpiresAt };
+            cachedTokens[username] = {token: cachedToken, expiresAt: tokenExpiresAt};
             done();
         }).catch((err) => {
             console.error("Erro na autenticação:", err.response?.data || err.message);
             console.error("User and password:", username, password)
             done();
         });
+    },
+    requestDriverDataGenerator: (context, events, done) => {
+        // Gera dados dinâmicos para a corrida
+        const data = {
+            passenger: {
+                name: faker.person.fullName(),
+                email: faker.internet.email(),
+            },
+            pick_up: faker.location.streetAddress(),
+            drop_off: faker.location.streetAddress(),
+        };
+
+        // console.log('data', data);
+        // Armazena os dados no contexto do Artillery
+        // O Artillery irá usar isso como a variável `ride_data`
+        context.vars.ride_data = data;
+
+        // Chama o próximo passo no cenário
+        return done();
     }
 };

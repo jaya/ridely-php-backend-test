@@ -1,14 +1,19 @@
 {
   "dependencies": {
+    "@faker-js/faker": "^9.9.0",
     "artillery": "^2.0.23",
     "dotenv": "^17.2.1"
   },
   "scripts": {
     "test:ridely-service:list-drivers": "artillery run ./artillery/ridely-service/list-drivers.yaml",
+    "test:ridely-service:list-drivers-no-auth": "artillery run ./artillery/ridely-service/list-drivers-no-auth.yaml",
     "test:ridely-service:list-drivers-60-10": "artillery run ./artillery/ridely-service/list-drivers-60-10.yaml",
     "test:ridely-service:list-drivers-60-10-no-auth": "artillery run ./artillery/ridely-service/list-drivers-60-10-no-auth.yaml",
     "test:ridely-service:list-drivers-60-50": "artillery run ./artillery/ridely-service/list-drivers-60-50.yaml",
     "test:ridely-service:list-drivers-60-50-no-auth": "artillery run ./artillery/ridely-service/list-drivers-60-50-no-auth.yaml",
-    "test:ridely-service:estimate-ride": "artillery run ./artillery/ridely-service/estimate-ride.yaml"
+    "test:ridely-service:estimate-ride": "artillery run ./artillery/ridely-service/estimate-ride.yaml",
+    "test:ridely-service:estimate-ride-no-auth": "artillery run ./artillery/ridely-service/estimate-ride-no-auth.yaml",
+    "test:ridely-service:request-driver": "artillery run ./artillery/ridely-service/request-driver.yaml",
+    "test:ridely-service:request-driver-no-auth": "artillery run ./artillery/ridely-service/request-driver-no-auth.yaml"
   }
 }

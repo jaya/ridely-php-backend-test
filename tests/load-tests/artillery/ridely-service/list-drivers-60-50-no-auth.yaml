@@ -16,7 +16,7 @@ config:
       Content-Type: application/json
 
 scenarios:
-  - name: List Drivers (Authenticated)
+  - name: List Drivers (Non Authenticated)
     flow:
 #      - function: "authenticate"
       - get:
