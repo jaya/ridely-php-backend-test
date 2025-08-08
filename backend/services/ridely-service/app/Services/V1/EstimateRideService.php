@@ -2,6 +2,7 @@
 
 namespace App\Services\V1;
 
+use App\Enums\RideEstimateStatusEnum;
 use App\Exceptions\RideException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\EstimateRideCriteria;
@@ -27,18 +28,26 @@ class EstimateRideService extends AbstractService implements EstimateRideService
         $this->validator = $validator;
         $this->locationService = $locationService;
     }
-    public function estimateRide(EstimateRideCriteria $criteria, string $id = null)
+
+    /**
+     * It keeps the criteria to simplify the lecture in the Redis queue, just ids will not be easy to read
+     * @param $id
+     * @param EstimateRideCriteria $criteria
+     * @return RideEstimate
+     * @throws RideException
+     * @throws ServiceException
+     */
+    public function estimateRide($id, EstimateRideCriteria $criteria): RideEstimate
     {
         Log::info('Estimating ride with criteria: ' . json_encode($criteria->toArray()));
 
-        if ($this->validator->validate($criteria, $id)) {
+        if ($this->validator->validate($id, $criteria)) {
             Log::debug("Searching for estimateRide with ID: $id");
             $estimate = $this->find($id);
 
             if (!$estimate) {
                 throw RideException::estimateNotFound();
             }
-
 
             $estimate->processing();
             Log::info("Status changed to PROCESSING");
@@ -67,11 +76,7 @@ class EstimateRideService extends AbstractService implements EstimateRideService
 
             $estimate->ready($distanceKm, $durationMin, $price);
 
-            return [
-                'distance_km' => round($distanceKm, 1),
-                'duration_min' => $durationMin,
-                'price_estimate' => $price,
-            ];
+            return $estimate;
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), $criteria->toArray(), $this->exception);
@@ -83,14 +88,21 @@ class EstimateRideService extends AbstractService implements EstimateRideService
         return $this->locationService->execute($address, $wait);
     }
 
-    public function updateEstimateRide(mixed $estimateId, \App\Enums\RideEstimateStatusEnum $estimateStatusEnum)
+    public function updateStatus($id, RideEstimateStatusEnum $estimateStatusEnum): bool
     {
-        $estimate = $this->find($estimateId);
+        $estimate = $this->find($id);
         $estimate->updateStatus($estimateStatusEnum);
+        return ($estimate->status == $estimateStatusEnum);
     }
 
     public function find($id): RideEstimate
     {
-        return RideEstimate::findOrFail($id);
+        if ($this->validator->validateId($id)) {
+            return RideEstimate::findOrFail($id);
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+
     }
 }

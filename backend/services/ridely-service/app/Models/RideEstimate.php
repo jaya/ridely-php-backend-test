@@ -16,6 +16,15 @@ class RideEstimate extends Model
         'price_estimate',
     ];
 
+    public static array $fields = [
+        'id',
+        'distance_km',
+        'duration_min',
+        'price_estimate',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $casts = ['status' => RideEstimateStatusEnum::class];
 
     public function ride()

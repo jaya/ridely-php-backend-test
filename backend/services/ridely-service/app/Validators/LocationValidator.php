@@ -6,9 +6,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class LocationValidator
+class LocationValidator extends AbstractValidator
 {
-    protected ValidationException $exception;
+
+    public function setValidFields()
+    {
+        $this->validFields = [];
+    }
 
     public function validate(string $address = null): bool
     {
@@ -33,8 +37,4 @@ class LocationValidator
         ];
     }
 
-    public function getException(): ValidationException
-    {
-        return $this->exception;
-    }
 }

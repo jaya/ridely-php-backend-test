@@ -21,11 +21,13 @@ use Illuminate\Validation\ValidationException;
 class DriverService extends AbstractService implements DriverServiceInterface
 {
     protected ValidationException $exception;
+    protected DriverValidator $validator;
 
     public function __construct(
-        protected DriverValidator $validator
+        DriverValidator $validator
     )
     {
+        $this->validator = $validator;
     }
 
     public function create(CreateDriverCriteria $criteria): Driver

@@ -18,6 +18,17 @@ class PricingRule extends Model
         'is_flag_2',
     ];
 
+    public static array $fields = [
+        'id',
+        'name',
+        'base_fare',
+        'price_per_km',
+        'is_rush_hour',
+        'is_flag_2',
+        'created_at',
+        'updated_at'
+    ];
+
     public function filterRuleBasedOnTime($isRushHour, $isFlag2)
     {
 

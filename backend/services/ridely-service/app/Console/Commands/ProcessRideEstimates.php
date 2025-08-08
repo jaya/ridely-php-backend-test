@@ -71,11 +71,11 @@ class ProcessRideEstimates extends Command
                     $estimateRideService->checkDatabase();
 
                     try {
-                        $estimateRideService->estimateRide($criteria, $estimateId);
+                        $estimateRideService->estimateRide($estimateId, $criteria);
                         $redis->xack(RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value, 'estimate_group', [$id]);
                     } catch (ServerException $e) {
                         Log::error("Error processing estimate for ride ID: $rideId, estimate ID: $estimateId. Error: " . $e->getMessage());
-                        $estimateRideService->updateEstimateRide($estimateId, RideEstimateStatusEnum::FAILED);
+                        $estimateRideService->updateStatus($estimateId, RideEstimateStatusEnum::FAILED);
                     }
 
 

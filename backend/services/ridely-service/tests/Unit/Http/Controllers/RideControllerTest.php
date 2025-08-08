@@ -12,6 +12,8 @@ use App\Models\RideEstimate;
 use App\Services\JWTKeysService;
 use Database\Seeders\DriverSeeder;
 use Database\Seeders\PricingRulesSeeder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Tests\Helpers\LocationHelper;
@@ -138,26 +140,22 @@ class RideControllerTest extends UnitTestCase
      * 27 min
      * @link https://www.google.com/maps/dir/Av.+Gen.+Eucl%C3%ADdes+Figueiredo,+65+-+Dom+Luciano,+Aracaju+-+SE,+49070-523/Av.+Gov.+Paulo+Barreto+de+Menezes,+25+-+Farol%C3%A2ndia,+Aracaju+-+SE/@-10.9043079,-37.1047231,13z/data=!3m1!4b1!4m14!4m13!1m5!1m1!1s0x7054cd3611c4121:0x6bc9edf5b93a523!2m2!1d-37.0773645!2d-10.8773348!1m5!1m1!1s0x71ab386c59b8259:0x25d93ef731a4380!2m2!1d-37.0435827!2d-10.9254996!3e0?entry=ttu&g_ep=EgoyMDI1MDczMC4wIKXMDSoASAFQAw%3D%3D
      * @return void
-    */
-    public function testEstimateRideSuccess() {
+     */
+    public function testEstimateRideSuccess()
+    {
 
         // Mock the external calls
         $this->mockCalls();
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        $data = [
-            "pick_up" => LocationHelper::$pickUp,
-            "drop_off" => LocationHelper::$dropOff,
-        ];
-
         $ride = $this->createRideWithRideEstimation();
         $rideId = $ride->id;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-        ->postJson("/api/v1/rides/$rideId/estimate-ride", $data);
+            ->postJson("/api/v1/rides/$rideId/estimate-ride");
 
-        $response->assertStatus(200);
+        $response->assertStatus(201);
         $response->assertJsonStructure([
             'success',
             'label',
@@ -178,22 +176,18 @@ class RideControllerTest extends UnitTestCase
         $this->assertIsNumeric($data['price_estimate']);
     }
 
-    public function testEstimateRideFailWithEmptyParams() {
+    public function testEstimateRideFailWithInvalidRideId()
+    {
 
         // Mock the external calls
         $this->mockCalls();
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
-        $data = [
-            "pick_up" => "",
-            "drop_off" => "",
-        ];
 
-        $ride = $this->createRideWithRideEstimation();
-        $rideId = $ride->id;
+        $rideId = 999;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/v1/rides/${rideId}/estimate-ride", $data);
+            ->postJson("/api/v1/rides/${rideId}/estimate-ride");
 
         $response->assertStatus(400);
         $response->assertJsonStructure([
@@ -206,10 +200,11 @@ class RideControllerTest extends UnitTestCase
 
         $data = $response->json();
         $this->assertFalse($data['success']);
-        $this->assertEquals(ErrorMessagesEnum::INVALID_REQUEST_PARAM->label(), $data['label']);
+        $this->assertEquals(ErrorMessagesEnum::RIDE_NOT_FOUND->label(), $data['label']);
     }
 
-    public function testEstimateRideFailWithInvalidParams() {
+    public function testEstimateRideFailWithInvalidParams()
+    {
 
 
         // Mock the external calls
@@ -262,26 +257,33 @@ class RideControllerTest extends UnitTestCase
             ->post("/api/v1/rides/request-driver", $data);
 
         $response->assertStatus(201);
-//        $response->assertJsonStructure([
-//            'success',
-//            'label',
-//            'code',
-//            'message',
-//            'data' => [
-//                'id',
-//                'status',
-//                'pick_up',
-//                'drop_off',
-//                'driver' => [
-//                    'name',
-//                    'car' => [
-//                        'license_plate',
-//                        'model',
-//                        'color',
-//                    ],
-//                ],
-//            ],
-//        ]);
+        $response->assertJsonStructure([
+            'success',
+            'label',
+            'code',
+            'message',
+            'data' => [
+                'id',
+                'status',
+                'pick_up',
+                'drop_off',
+                'driver' => [
+                    'name',
+                    'car' => [
+                        'license_plate',
+                        'model',
+                        'color',
+                    ],
+                    'available',
+                ],
+                'estimate' => [
+                    'status',
+                    'distance_km',
+                    'duration_min',
+                    'price_estimate',
+                ],
+            ],
+        ]);
 //
 //        $dataObject = $response->json();
 //        $data = $dataObject['data'];
@@ -333,7 +335,7 @@ class RideControllerTest extends UnitTestCase
 
         // Verifica driver se existir
         if (isset($data['driver'])) {
-            if(!is_null($data['driver'])) {
+            if (!is_null($data['driver'])) {
                 $this->assertIsArray($data['driver']);
                 $this->assertArrayHasKey('name', $data['driver']);
                 $this->assertIsString($data['driver']['name']);
@@ -351,11 +353,14 @@ class RideControllerTest extends UnitTestCase
     }
 
     /**
-     * @return Ride|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     * @return Ride|Collection|Model
      */
-    public function createRideWithRideEstimation(): Ride|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+    public function createRideWithRideEstimation(): Ride|Collection|Model
     {
-        $ride = Ride::factory()->create();
+        $ride = Ride::factory()->create([
+            "pick_up" => LocationHelper::$pickUp,
+            "drop_off" => LocationHelper::$dropOff,
+        ]);
         $estimate = RideEstimate::create([
             'ride_id' => $ride->id,
             'status' => RideEstimateStatusEnum::PENDING,

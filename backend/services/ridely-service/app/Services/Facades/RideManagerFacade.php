@@ -6,6 +6,7 @@ use App\Exceptions\RideException;
 use App\Http\Criteria\EstimateRideCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Models\Ride;
+use App\Models\RideEstimate;
 use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
@@ -26,11 +27,22 @@ class RideManagerFacade
     }
 
     /**
-     * @throws RideException
+     * @param string|null $id Ride ID
      */
-    public function estimateRide(EstimateRideCriteria $criteria, string $id = null): array
+    public function estimateRide(string $id = null): RideEstimate
     {
-        return $this->estimateRideService->estimateRide($criteria, $id);
+        $ride = $this->find($id);
+        if (!$ride) {
+            RideException::notFound();
+        }
+        $estimateId = $ride->estimate->id;
+        $criteria = new EstimateRideCriteria(
+            [
+                "pick_up" => $ride->pick_up,
+                "drop_off" => $ride->drop_off
+            ]
+        );
+        return $this->estimateRideService->estimateRide($estimateId, $criteria);
 
     }
 
@@ -45,5 +57,10 @@ class RideManagerFacade
         $ride = $this->rideService->find((int)$id);
         $ride->load('estimate'); // Load the estimate relationship
         return $ride;
+    }
+
+    public function findEstimateRideByRideId($id)
+    {
+        return $this->estimateRideService->find($id);
     }
 }

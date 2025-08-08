@@ -26,7 +26,9 @@ Route::prefix('rides')->group(function () {
     Route::post('/{id}/refuse-ride', [RideController::class, 'refuseRide']);
     Route::post('/{id}/finish-ride', [RideController::class, 'finishRide']);
 
+    // Forces the estimate ride to be processed immediately
     Route::post('/{id}/estimate-ride', [RideController::class, 'estimateRide']);
-    Route::get('/{id}/estimate-ride', [RideController::class, 'getRidePrice']);
+    // Get the ride estimate
+    Route::get('/{id}/estimate-ride', [RideController::class, 'getRideEstimate']);
 
 });

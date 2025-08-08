@@ -17,6 +17,9 @@ use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
 use App\Validators\RideValidator;
 use Couchbase\QueryException;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\ValidationException;
@@ -37,16 +40,13 @@ class RideService extends AbstractService implements RideServiceInterface
     }
 
     /**
-     * @throws ServiceException
+     * @throws ServiceException|RideException
      */
-    public function find(int $id)
+    public function find($id): Builder|array|Collection|Model
     {
-        //TODO I can add a cache here
-//        Cache::remember()
-        Log::debug("Validating ride Id");
         if ($this->validator->validateId($id)) {
             Log::debug("Searching for the ride with ID: $id");
-            return $this->ride->getRideWithDriver($id);
+            return $this->ride->find($id);
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);

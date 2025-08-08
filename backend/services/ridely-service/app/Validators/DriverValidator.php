@@ -11,20 +11,20 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-class DriverValidator implements ValidatorInterface
+class DriverValidator extends AbstractValidator
 {
-    protected array $validFields = [];
+
 
     protected ValidationException $exception;
 
-    public function __construct()
+    public function setValidFields()
     {
         $this->validFields = Driver::$fields;
     }
 
     public function validateCreate(CreateDriverCriteria $criteria): bool
     {
-        return $this->commonValidator($criteria->toArray(), $criteria->rules());
+        return $this->commonValidator($criteria->toArray(), $criteria->rules(), ErrorMessagesEnum::INVALID_DRIVER_DATA->message());
     }
 
     public function validateRead(ListCriteria $criteria): bool
@@ -46,20 +46,13 @@ class DriverValidator implements ValidatorInterface
 
     public function validateUpdate($data): bool
     {
-        $rules = array_merge($this->rules(), [
-            // Note: this will make the validator check the db
-            //'id' => 'required|numeric|exists:drivers,id',
-            'id' => 'required|numeric',
-        ]);
-        return $this->commonValidator($data, $rules);
+        $rules = array_merge($this->rules(), $this->idRules());
+        return $this->commonValidator($data, $rules, ErrorMessagesEnum::INVALID_DRIVER_DATA->message());
     }
 
     public function validateDelete($id): bool
     {
-        $rules = [
-            'id' => 'required|numeric',
-        ];
-        return $this->commonValidator(['id' => $id], $rules);
+        return $this->commonValidator(['id' => $id], $this->idRules(), ErrorMessagesEnum::INVALID_DRIVER_DATA->message());
     }
 
     public function getException(): ValidationException
@@ -73,31 +66,8 @@ class DriverValidator implements ValidatorInterface
      * @param $rules
      * @return bool
      */
-    public function commonValidator($data, $rules): bool
-    {
-        if (empty($rules)) {
-            $rules = $this->rules();
-        }
-
-        $result = true;
-
-        if (empty($data)) {
-            $this->exception = ValidationException::withMessages([ErrorMessagesEnum::INVALID_DRIVER_DATA->message()]);
-            $result = false;
-        } else {
-            $validator = Validator::make($data, $rules);
-
-            if ($validator->fails()) {
-                $this->exception = new ValidationException($validator);
-                $result = false;
-            }
-        }
-
-        return $result;
-    }
 
     /**
-     * TODO remover
      * @return string[]
      */
     public function rules(): array
@@ -112,12 +82,5 @@ class DriverValidator implements ValidatorInterface
         ];
     }
 
-    /**
-     * @param ListCriteria $criteria
-     * @return array|\Illuminate\Validation\Rules\In[][]|\string[][]
-     */
-    public function appendDatabaseFields(ListCriteria $criteria): array
-    {
-        return $criteria->rules($this->validFields);
-    }
+
 }

@@ -21,6 +21,18 @@ class Ride extends Model
         'drop_off',
     ];
 
+    public static array $fields = [
+        'id',
+        'passenger_name',
+        'passenger_email',
+        'driver_id',
+        'status',
+        'pick_up',
+        'drop_off',
+        'created_at',
+        'updated_at'
+    ];
+
     protected $casts = [
         'price' => 'decimal:2',
         'status' => RideStatusEnum::class
@@ -110,11 +122,12 @@ class Ride extends Model
         $this->save();
     }
 
-    public function getRideWithDriver(int $id)
+    public function find(int $id)
     {
         try {
-            return self::with('driver')->findOrFail($id);
+            return self::with(['driver', 'estimate'])->findOrFail($id);
         } catch (\Exception $e) {
+            Log::error($e->getMessage());
             throw RideException::notFound();
         }
     }

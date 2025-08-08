@@ -610,32 +610,25 @@
                 }
             }
         },
-        "/api/v1/rides/cancel": {
+        "/api/v1/rides/{id}/cancel-ride": {
             "post": {
                 "tags": [
                     "Rides"
                 ],
                 "summary": "Cancelar corrida",
-                "operationId": "f0b2a58f95283b96bf6b570afa0009f8",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "operationId": "829561f3084b0f3b75ebea25a22949e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "Corrida cancelada",
@@ -664,7 +657,7 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID do driver",
+                        "description": "ID da corrida",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -710,32 +703,25 @@
                 }
             }
         },
-        "/api/v1/rides/refuse": {
+        "/api/v1/rides/{id}/refuse-ride": {
             "post": {
                 "tags": [
                     "Rides"
                 ],
                 "summary": "Recusar corrida",
-                "operationId": "2c2f4225b8b9d69cb6e476bfdf465318",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "operationId": "2c1f57ac1f8254b1da3b152edac456cd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "Corrida recusada",
@@ -774,38 +760,25 @@
                 }
             }
         },
-        "/api/v1/rides/finish": {
+        "/api/v1/rides/{id}/finish-ride": {
             "post": {
                 "tags": [
                     "Rides"
                 ],
                 "summary": "Finalizar corrida",
-                "operationId": "437aa54038d63c9673f1eea4d12eb8fa",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id",
-                                    "price"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 25
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "operationId": "994c72711abd10e7043b6813c85443b7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "Corrida finalizada",
@@ -845,81 +818,14 @@
                 }
             }
         },
-        "/api/v1/drivers/{driverId}/open-rides": {
+        "/api/v1/rides/{id}/estimate-ride": {
             "get": {
                 "tags": [
                     "Rides"
                 ],
-                "summary": "Listar corridas abertas para motorista",
-                "operationId": "29adaafeccc75b914e9d80fbee4f911e",
-                "parameters": [
-                    {
-                        "name": "driverId",
-                        "in": "path",
-                        "description": "ID do motorista",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Lista de corridas abertas",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RideSimple"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Motorista indisponível",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Driver is not available"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Nenhuma corrida aberta",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No rides waiting to be accepted"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/rides/{id}/estimate-ride": {
-            "post": {
-                "tags": [
-                    "Rides"
-                ],
-                "summary": "Estimar corrida",
+                "summary": "Consultar uma estimativa de corrida",
                 "description": "Retorna a estimativa de distância, duração e preço de uma corrida.",
-                "operationId": "estimateRide",
+                "operationId": "getRideEstimate",
                 "parameters": [
                     {
                         "name": "id",
@@ -932,33 +838,9 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "pick_up",
-                                    "drop_off"
-                                ],
-                                "properties": {
-                                    "pick_up": {
-                                        "type": "string",
-                                        "example": "Avenida Beira Mar, 25"
-                                    },
-                                    "drop_off": {
-                                        "type": "string",
-                                        "example": "Avenida Euclides Figueiredo, 65"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
-                        "description": "Estimativa gerada com sucesso",
+                        "description": "A estimativa consultada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -973,7 +855,7 @@
                                         },
                                         "code": {
                                             "type": "integer",
-                                            "example": 200
+                                            "example": 0
                                         },
                                         "message": {
                                             "type": "string",
@@ -1006,7 +888,7 @@
                         }
                     },
                     "400": {
-                        "description": "Erro de validação ou endereço inválido",
+                        "description": "Erro de validação ou corrida não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1021,11 +903,129 @@
                                         },
                                         "code": {
                                             "type": "integer",
-                                            "example": 400
+                                            "example": 61
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Invalid Request Parameter: The drop off field is required"
+                                            "example": "Ride not found"
+                                        },
+                                        "params": {
+                                            "description": "Parametros da requisição",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "id"
+                                            }
+                                        },
+                                        "detail": {
+                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Rides"
+                ],
+                "summary": "Estimar corrida manualmente",
+                "description": "Retorna a estimativa de distância, duração e preço de uma corrida.",
+                "operationId": "estimateRide",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Estimativa gerada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 0
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "distance_km": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 12.5
+                                                },
+                                                "duration_min": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 18.3
+                                                },
+                                                "price_estimate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 23.75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "common.error.invalid_request_param"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 61
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ride not found"
                                         },
                                         "params": {
                                             "description": "Parametros da requisição",

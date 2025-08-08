@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Converters\RideEstimateConverter;
 use App\Converters\RideConverter;
 use App\Enums\RideStatusEnum;
 use App\Exceptions\ApplicationException;
@@ -148,15 +149,15 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/v1/rides/cancel",
+     *     path="/api/v1/rides/{id}/cancel-ride",
      *     summary="Cancelar corrida",
      *     tags={"Rides"},
-     *     @OA\RequestBody(
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"id"},
-     *             @OA\Property(property="id", type="integer", example=1)
-     *         )
+     *         description="ID da corrida",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -169,9 +170,10 @@ class RideController extends Controller
      *     )
      * )
      */
-    public function cancelRide(Request $request): JsonResponse
+    public function cancelRide($id): JsonResponse
     {
-        $ride = Ride::findOrFail($request->id);
+        Log::debug("Cancel ride request received with ID: " . $id);
+        $ride = Ride::findOrFail($id);
         $ride->cancel();
 
         return response()->json([
@@ -191,7 +193,7 @@ class RideController extends Controller
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID do driver",
+     *         description="ID da corrida",
      *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
@@ -212,7 +214,7 @@ class RideController extends Controller
      *     )
      * )
      */
-    public function acceptRide($id, Request $request): JsonResponse
+    public function acceptRide($id): JsonResponse
     {
         //$id = $request->id;
         $ride = Ride::findOrFail($id);
@@ -233,15 +235,15 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/v1/rides/refuse",
+     *     path="/api/v1/rides/{id}/refuse-ride",
      *     summary="Recusar corrida",
      *     tags={"Rides"},
-     *     @OA\RequestBody(
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"id"},
-     *             @OA\Property(property="id", type="integer", example=1)
-     *         )
+     *         description="ID da corrida",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -261,9 +263,9 @@ class RideController extends Controller
      *     )
      * )
      */
-    public function refuseRide(Request $request): JsonResponse
+    public function refuseRide($id): JsonResponse
     {
-        $ride = Ride::findOrFail($request->id);
+        $ride = Ride::findOrFail($id);
         $ride->refuse();
 
         return response()->json([
@@ -280,16 +282,15 @@ class RideController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/v1/rides/finish",
+     *     path="/api/v1/rides/{id}/finish-ride",
      *     summary="Finalizar corrida",
      *     tags={"Rides"},
-     *     @OA\RequestBody(
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"id", "price"},
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="price", type="number", format="float", example=25.00)
-     *         )
+     *         description="ID da corrida",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -328,42 +329,11 @@ class RideController extends Controller
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/drivers/{driverId}/open-rides",
-     *     summary="Listar corridas abertas para motorista",
-     *     tags={"Rides"},
-     *     @OA\Parameter(
-     *         name="driverId",
-     *         in="path",
-     *         required=true,
-     *         description="ID do motorista",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista de corridas abertas",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/RideSimple")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Motorista indisponível",
-     *         @OA\JsonContent(@OA\Property(property="message", type="string", example="Driver is not available"))
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Nenhuma corrida aberta",
-     *         @OA\JsonContent(@OA\Property(property="message", type="string", example="No rides waiting to be accepted"))
-     *     )
-     * )
-     */
     public function getOpenRides($driverId): JsonResponse
     {
+        // TODO preciso revisar, parece duplicado de alguma forma
         $driver = Driver::findOrFail($driverId);
-        
+
         if (!$driver->available) {
             return response()->json([
                 'message' => 'Driver is not available',
@@ -395,7 +365,7 @@ class RideController extends Controller
     /**
      * @OA\Post(
      *     path="/api/v1/rides/{id}/estimate-ride",
-     *     summary="Estimar corrida",
+     *     summary="Estimar corrida manualmente",
      *     description="Retorna a estimativa de distância, duração e preço de uma corrida.",
      *     operationId="estimateRide",
      *     tags={"Rides"},
@@ -409,22 +379,13 @@ class RideController extends Controller
      *         @OA\Schema(type="number", example="1")
      *     ),
      *
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"pick_up", "drop_off"},
-     *             @OA\Property(property="pick_up", type="string", example="Avenida Beira Mar, 25"),
-     *             @OA\Property(property="drop_off", type="string", example="Avenida Euclides Figueiredo, 65"),
-     *         )
-     *     ),
-     *
      *     @OA\Response(
-     *         response=200,
+     *         response=201,
      *         description="Estimativa gerada com sucesso",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="label", type="string", example="success"),
-     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(property="code", type="integer", example=0),
      *             @OA\Property(property="message", type="string", example="Success"),
      *             @OA\Property(
      *                 property="data",
@@ -438,12 +399,12 @@ class RideController extends Controller
      *
      *     @OA\Response(
      *         response=400,
-     *         description="Erro de validação ou endereço inválido",
+     *         description="Erro de validação ou corrida não encontrada",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="label", type="string", example="common.error.invalid_request_param"),
-     *             @OA\Property(property="code", type="integer", example=400),
-     *             @OA\Property(property="message", type="string", example="Invalid Request Parameter: The drop off field is required"),
+     *             @OA\Property(property="code", type="integer", example=61),
+     *             @OA\Property(property="message", type="string", example="Ride not found"),
      *             @OA\Property(
      *               property="params",
      *               type="array",
@@ -459,24 +420,16 @@ class RideController extends Controller
      *         )
      *     )
      * )
+     *
+     *
      */
     public function estimateRide($id, Request $request, RideManagerFacade $facade): JsonResponse
     {
-        // TODO I need to review this method
         Log::debug("Estimate ride for ride ID: $id with data: " . json_encode($request->all()));
-        $criteria = new EstimateRideCriteria($request->all());
         try {
 
-            $request->validate($criteria->rules());
-
-            $ride = $facade->find($id);
-            if (!$ride) {
-                RideException::notFound();
-            }
-
-            $estimateId = $ride->estimate->id;
-            $rideData = $facade->estimateRide($criteria, $estimateId);
-            return ResponseHelper::success($rideData, Response::HTTP_OK);
+            $estimate = $facade->estimateRide($id);
+            return ResponseHelper::success(RideEstimateConverter::convertFromModelToResponse($estimate), Response::HTTP_CREATED);
 
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
@@ -484,8 +437,77 @@ class RideController extends Controller
 
     }
 
-    public function getRidePrice(Request $request, RideManagerFacade $facade)
+    /**
+     * @OA\Get(
+     *     path="/api/v1/rides/{id}/estimate-ride",
+     *     summary="Consultar uma estimativa de corrida",
+     *     description="Retorna a estimativa de distância, duração e preço de uma corrida.",
+     *     operationId="getRideEstimate",
+     *     tags={"Rides"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID da corrida",
+     *         @OA\Schema(type="number", example="1")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="A estimativa consultada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="label", type="string", example="success"),
+     *             @OA\Property(property="code", type="integer", example=0),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="distance_km", type="number", format="float", example=12.5),
+     *                 @OA\Property(property="duration_min", type="number", format="float", example=18.3),
+     *                 @OA\Property(property="price_estimate", type="number", format="float", example=23.75)
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação ou corrida não encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="label", type="string", example="common.error.invalid_request_param"),
+     *             @OA\Property(property="code", type="integer", example=61),
+     *             @OA\Property(property="message", type="string", example="Ride not found"),
+     *             @OA\Property(
+     *               property="params",
+     *               type="array",
+     *               description="Parametros da requisição",
+     *               @OA\Items(type="string", example="id")
+     *            ),
+     *             @OA\Property(
+     *               property="detail",
+     *               type="array",
+     *               description="Stack trace (visível apenas em ambiente de desenvolvimento)",
+     *               @OA\Items(type="object")
+     *            )
+     *         )
+     *     )
+     * )
+     *
+     *
+     */
+    public function getRideEstimate($id, Request $request, RideManagerFacade $facade)
     {
-        return ResponseHelper::success([], Response::HTTP_OK);
+        Log::debug("Estimate ride for ride ID: $id with data: " . json_encode($request->all()));
+        try {
+
+            $estimate = $facade->findEstimateRideByRideId($id);
+            return ResponseHelper::success(RideEstimateConverter::convertFromModelToResponse($estimate), Response::HTTP_OK);
+
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
     }
 }

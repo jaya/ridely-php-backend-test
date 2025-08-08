@@ -6,23 +6,6 @@ use App\Models\Ride;
 
 class RideConverter
 {
-    public static function convertFromArrayToModel(array $data)
-    {
-        $ride = new Ride();
-        $ride->id = $data['id'] ?? null;
-        $ride->status = $data['status'] ?? null;
-        $ride->pick_up = $data['pick_up'] ?? null;
-        $ride->drop_off = $data['drop_off'] ?? null;
-        $ride->passenger_name = $data['passenger_name'] ?? null;
-        $ride->passenger_email = $data['passenger_email'] ?? null;
-
-//        if ($data['driver']) {
-//
-//        }
-
-        return $ride;
-    }
-
     public static function convertFromArrayToResponse(array $ride): array
     {
         $response =  [
@@ -53,12 +36,4 @@ class RideConverter
         return self::convertFromArrayToResponse($ride->toArray());
     }
 
-    public static function convertListFromArrayToResponse(array $items):array
-    {
-        $result = [];
-        foreach ($items as $item) {
-            $result[] = self::convertFromArrayToResponse($item);
-        }
-        return $result;
-    }
 }

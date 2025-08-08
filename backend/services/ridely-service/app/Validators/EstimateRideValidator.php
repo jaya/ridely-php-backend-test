@@ -3,22 +3,21 @@
 namespace App\Validators;
 
 use App\Http\Criteria\EstimateRideCriteria;
+use App\Models\RideEstimate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class EstimateRideValidator
+class EstimateRideValidator extends AbstractValidator
 {
-    protected ValidationException $exception;
 
-    public function rules(): array
+    public function setValidFields()
     {
-        return [
-            'id' => 'required|string',
-        ];
+        $this->validFields = RideEstimate::$fields;
     }
 
-    public function validate(EstimateRideCriteria $criteria, ?string $id)
+
+    public function validate($id, EstimateRideCriteria $criteria)
     {
         $result = true;
 
@@ -26,7 +25,7 @@ class EstimateRideValidator
             'id' => $id,
         ], $criteria->toArray());
 
-        $rules = array_merge($criteria->rules(), $this->rules());
+        $rules = array_merge($criteria->rules(), $this->idRules());
         $validator = Validator::make($data, $rules);
 
         if ($validator->fails()) {
@@ -38,8 +37,9 @@ class EstimateRideValidator
         return $result;
     }
 
-    public function getException(): ValidationException
+
+    protected function rules()
     {
-        return $this->exception;
+        return [];
     }
 }
