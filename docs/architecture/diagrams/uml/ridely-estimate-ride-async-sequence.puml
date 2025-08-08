@@ -1,53 +1,49 @@
 @startuml
 actor Cliente
 participant "RidelyService" as RidelyService
-participant "EstimateRideController" as Controller
+participant "RideController" as Controller
 participant "RideService"
 participant "Redis Queue" as RedisQueue
-participant "Job Processor" as JobProcessor
+participant "ProcessRideEstimates" as ProcessRideEstimates
 
 participant "LocationService"
 participant "OpenStreetMap (Nominatim)" as Nominatim
 participant "Database"
 
-Cliente -> RidelyService : POST /api/v1/rides/{id}/estimate-ride\n(pick_up, drop_off)
-RidelyService -> Controller : estimateRide()
-Controller -> RideService : Append "Aracaju, SE" if needed
-RideService -> RedisQueue : enqueue({hash, pick_up, drop_off})
-'RideService -> Database : save estimate request data
-'Database -> RideService : return (hash, status)
-RideService -> Controller : return (hash, status)
-Controller -> RidelyService : return hash + status: "processing"
-RidelyService --> Cliente : 202 Accepted
+Cliente -> RidelyService : POST /api/v1/rides/request-driver\n(passenger, pick_up, drop_off)
+RidelyService -> Controller : requestDriver()
+Controller -> Controller : Append "Aracaju, SE" if needed (EstimateRideCriteria)
+Controller -> RideService : create()
+RideService -> RideService : create Ride
+RideService -> RideService : create Estimate with status "PENDING"
+
+RideService -> RedisQueue : publishToEstimateRideQueue({ride_id, estimate_id, pick_up, drop_off, timestamp})
+RideService -> Controller : return (Ride, RideEstimate)
+Controller -> RidelyService : return Ride, RideEstimate->status: "processing"
+RidelyService --> Cliente : 201 Created
 
 == Async Job ==
 
-JobProcessor -> RedisQueue : consume nessage
-JobProcessor -> LocationService : getCoordinates(pick_up)
+ProcessRideEstimates -> RedisQueue : consume message
+ProcessRideEstimates -> LocationService : getCoordinates(pick_up)
 LocationService -> LocationService : check cache
 alt Not in cache
     LocationService -> Nominatim : GET /search?q=pick_up
     Nominatim --> LocationService : lat/lon
     LocationService -> LocationService : store in cache
 end
-JobProcessor -> LocationService : getCoordinates(drop_off)
+
+ProcessRideEstimates -> LocationService : getCoordinates(drop_off)
 LocationService -> LocationService : check cache
 alt Not in cache
     LocationService -> Nominatim : GET /search?q=drop_off
     Nominatim --> LocationService : lat/lon
     LocationService -> LocationService : store in cache
 end
-JobProcessor -> JobProcessor : calculateDistance()
-JobProcessor -> JobProcessor : calculateDuration()
-JobProcessor -> JobProcessor : calculatePrice()
-JobProcessor -> Database : save estimate data (hash, result)
+ProcessRideEstimates -> ProcessRideEstimates : calculateDistance()
+ProcessRideEstimates -> ProcessRideEstimates : calculateDuration()
+ProcessRideEstimates -> ProcessRideEstimates : calculatePrice()
+ProcessRideEstimates -> Database : save RideEstimate data (result)
 
-== Polling ==
 
-Cliente -> RidelyService : GET /api/v1/rides/{id}/estimate-ride?hash=XYZ
-RidelyService -> Controller : getEstimate(hash)
-Controller -> Database : find by hash
-Database --> Controller : result
-Controller --> RidelyService : price or processing status
-RidelyService --> Cliente : response
 @enduml

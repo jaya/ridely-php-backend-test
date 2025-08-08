@@ -28,8 +28,6 @@ Também foi considerado extrair o cálculo da estimativa para um serviço separa
 - Ter um plano claro de evolução ajuda a mitigar riscos de acoplamento excessivo.
 
 ### Próximos Passos
-- Caso o tempo permita, implementar o mecanismo de fila com Redis como passo inicial.
-- Caso contrário, manter o modelo síncrono atual com estrutura preparada para migração.
 - Monitorar o comportamento do sistema com uso real e reavaliar a necessidade de desacoplamento.
 - Revisitar a possibilidade de introduzir um `pricing-service` no futuro com base no crescimento da aplicação e nas necessidades de escalabilidade.
 

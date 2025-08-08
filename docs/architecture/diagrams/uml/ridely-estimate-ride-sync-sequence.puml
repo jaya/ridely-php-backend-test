@@ -1,30 +1,52 @@
 @startuml
 actor Cliente
 participant "Ridely Service" as RidelyService
-participant "EstimateRideController" as Controller
+participant "RideController" as Controller
+participant "RideManager" as RideManager
+participant "EstimateRideService" as EstimateRideService
 participant "LocationService" as LocationService
 participant "OpenStreetMap (Nominatim)" as Nominatim
 
-Cliente -> RidelyService : POST /api/v1/rides/{id}/estimate-ride\n(pick_up, drop_off)
-RidelyService -> Controller : estimateRide()
-Controller -> Controller : Append "Aracaju, SE" if needed
-Controller -> LocationService : getCoordinates(pick_up)
+== Estimating manually ==
+Cliente -> RidelyService : POST /api/v1/rides/{id}/estimate-ride
+RidelyService -> Controller : estimateRide(id)
+Controller -> RideManager : estimateRide(id)
+RideManager -> RideManager : find EstimateRide, create criteria
+RideManager -> EstimateRideService: estimateRide(estimateId, criteria);
+EstimateRideService -> LocationService : getCoordinates(pick_up)
 LocationService -> LocationService : check cache
 alt Not in cache
     LocationService -> Nominatim : GET /search?q=pick_up
     Nominatim --> LocationService : lat/lon
     LocationService -> LocationService : store in cache
 end
-Controller -> LocationService : getCoordinates(drop_off)
+EstimateRideService -> LocationService : getCoordinates(drop_off)
 LocationService -> LocationService : check cache
 alt Not in cache
     LocationService -> Nominatim : GET /search?q=drop_off
     Nominatim --> LocationService : lat/lon
     LocationService -> LocationService : store in cache
 end
-Controller -> Controller : calculateDistance()
-Controller -> Controller : calculateDuration()\n(velocity avg 45/30 kmh)
-Controller -> Controller : calculatePrice()\n(base + km-based)
-Controller --> RidelyService : estimated price
+EstimateRideService -> EstimateRideService : calculateDistance()
+EstimateRideService -> EstimateRideService : calculateDuration()\n(velocity avg 45/30 kmh)
+EstimateRideService -> EstimateRideService : calculatePrice()\n(base + km-based)
+EstimateRideService -> EstimateRideService : change status to "READY"
+EstimateRideService -> "RideManager" : return (RideEstimate)
+RideManager -> "Controller" : return (RideEstimate)
+Controller --> RidelyService : return (RideEstimate)
+RidelyService --> Cliente : response
+== Consulting ==
+
+Cliente -> RidelyService : GET /api/v1/rides/{id}/estimate-ride
+RidelyService -> Controller : getRideEstimate(ride_id)
+Controller -> "RideManager" : findEstimateRideByRideId(ride_id)
+RideManager -> EstimateRideService : find(ride_id)
+EstimateRideService -> Database : find by id
+Database -> EstimateRideService : return RideEstimate
+EstimateRideService -> RideManager : return RideEstimate
+RideManager --> Controller : return RideEstimate
+Controller --> RidelyService : return RideEstimate
 RidelyService --> Cliente : response
 @enduml
+
+

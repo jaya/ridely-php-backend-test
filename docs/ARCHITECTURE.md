@@ -273,14 +273,51 @@ Embora atualmente o controle de autenticação e autorização seja feito direta
 
 ### Fluxo de Cálculo de Preço Estimado
 
-#### Fluxo Síncrono (Atual)
 
-Atualmente, o cálculo do preço estimado é realizado de forma síncrona, diretamente no endpoint:
+#### Fluxo Assíncrono (Padrão)
+
+Para atender requisitos de escalabilidade e resiliência, uma futura melhoria propõe a transformação do processo em **assíncrono**.
+
+Nesse modelo, ao realizar a requisição de estimativa, o cliente recebe imediatamente uma resposta com:
+
+- Os dados da corrida
+- A estimativa com o status `"PENDING"` 
+
+Os dados da solicitação são então enfileirados em uma **fila Redis**.
+
+Um **job worker assíncrono** consome a fila e executa os mesmos passos do fluxo síncrono:
+
+- Obtenção das coordenadas (com cache)
+- Cálculo da distância
+- Estimativa de tempo
+- Cálculo do valor da corrida
+
+Ao final, os dados são **persistidos em banco de dados**.
+
+O cliente pode consultar o resultado por meio do endpoint:
+
+```
+  GET /api/v1/rides/{id}/estimate-ride
+```
+
+Ou no endpoint da propria corrida:
+```
+  GET /api/v1/rides/{id}
+```
+  
+
+##### Diagramas
+![ridely-estimate-ride-async-sequence.png](architecture/diagrams/uml/ridely-estimate-ride-async-sequence.png)
+
+
+#### Fluxo Síncrono (Fallback manual)
+
+O cálculo do preço estimado é realizado de forma síncrona, diretamente no endpoint:
 ```
   POST /api/v1/rides/{id}/estimate-ride
 ```
 
-O cliente envia os endereços de origem (`pick_up`) e destino (`drop_off`). Caso os nomes das ruas não incluam a cidade e o estado, o sistema os complementa automaticamente com “Aracaju, SE”.
+O cliente faz a requisição para o endpoint. Caso os nomes das ruas não incluam a cidade e o estado, o sistema os complementa automaticamente com “Aracaju, SE”.
 
 Para cada endereço, o sistema verifica se já existe uma entrada cacheada (via hash MD5). Se não houver, uma requisição é enviada ao serviço externo **Nominatim (OpenStreetMap)** para obtenção das coordenadas geográficas (latitude e longitude).
 
@@ -294,37 +331,10 @@ O preço é então calculado com base em regras tarifárias:
 - Horários de rush possuem tarifa base + preço por km
 - Após as **17h** ou antes das **7h**, aplica-se a **bandeira 2**, com valores diferenciados
 
-O resultado do cálculo é retornado diretamente ao cliente, sem persistência no banco de dados.
+O resultado do cálculo é retornado ao cliente, os dados são persistidos no banco de dados.
 
 ##### Diagramas
 ![ridely-estimate-ride-sync-sequence.png](architecture/diagrams/uml/ridely-estimate-ride-sync-sequence.png)
-
-#### Fluxo Assíncrono (Melhoria futura)
-
-Para atender requisitos de escalabilidade e resiliência, uma futura melhoria propõe a transformação do processo em **assíncrono**.
-
-Nesse modelo, ao realizar a requisição de estimativa, o cliente recebe imediatamente uma resposta com:
-
-- Um `hash` de rastreamento
-- Status: `"processing"`
-
-Os dados da solicitação são então enfileirados em uma **fila Redis**.
-
-Um **job worker assíncrono** consome a fila e executa os mesmos passos do fluxo síncrono:
-
-- Obtenção das coordenadas (com cache)
-- Cálculo da distância
-- Estimativa de tempo
-- Cálculo do valor da corrida
-
-Ao final, os dados são **persistidos em banco de dados**, indexados pelo `hash`.
-
-O cliente pode consultar o resultado por meio do endpoint:
-
-##### Diagramas
-![ridely-estimate-ride-async-sequence.png](architecture/diagrams/uml/ridely-estimate-ride-async-sequence.png)
-
-
 
 
 
