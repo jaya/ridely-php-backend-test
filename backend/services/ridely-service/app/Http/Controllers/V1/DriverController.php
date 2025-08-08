@@ -87,18 +87,16 @@ class DriverController extends Controller
      * )
      * // TODO revisar os exemplos dos erros, pois estão todos com a mesma mensagem, qualquer coisa criar outros schemas ou ver como passar os valores para o schema
      */
-    public function index(Request $request, DriverManagerFacade $facade)
+    public function listDrivers(Request $request, DriverManagerFacade $facade)
     {
         try {
 
-            $user = $request->attributes->get('user') ?? null;
-            $userStr = json_encode($user);
-            Log::debug("Request user: $userStr");
 
             $criteria = new ListCriteria($request->all());
             Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
-            $request->validate($criteria->rules());
+            // The request will be validated inside the facade/service
+//            $request->validate($criteria->rules());
 
             $paginator = $facade->list($criteria);
             $metadata = new HateosMetadata($paginator);
@@ -137,7 +135,8 @@ class DriverController extends Controller
         try {
 
             $criteria = new CreateDriverCriteria($request->all());
-            $request->validate($criteria->rules());
+            // The request will be validated inside the facade/service
+            // $request->validate($criteria->rules());
 
             $driver = $facade->create($criteria);
             return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);

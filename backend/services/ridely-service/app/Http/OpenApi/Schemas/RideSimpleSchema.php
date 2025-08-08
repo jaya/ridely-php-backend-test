@@ -10,8 +10,10 @@ namespace App\Http\OpenApi\Schemas;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="status", type="string", example="requested"),
  *     @OA\Property(property="pick_up", type="string", example="Rua X, 200"),
- *     @OA\Property(property="drop_off", type="string", example="Av. Brasil, 1000")
+ *     @OA\Property(property="drop_off", type="string", example="Av. Brasil, 1000"),
+ *     @OA\Property(property="_links", ref="#/components/schemas/RideLinks")
  * )
+ *
  */
 class RideSimpleSchema
 {

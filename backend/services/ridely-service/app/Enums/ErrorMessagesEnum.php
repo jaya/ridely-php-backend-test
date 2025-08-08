@@ -56,6 +56,8 @@ enum ErrorMessagesEnum: int
 
     case RIDE_ESTIMATE_NOT_FOUND = 69;
 
+    case UNABLE_LIST_RIDES = 70;
+
     public function label(): string
     {
         return match ($this) {
@@ -88,6 +90,7 @@ enum ErrorMessagesEnum: int
             self::INVALID_RIDE_DATA => 'common.error.invalid_ride_data',
             self::UNABLE_TO_CREATE_RIDE => 'common.error.unable_to_create_ride',
             self::RIDE_ESTIMATE_NOT_FOUND => 'common.error.ride_estimate_not_found',
+            self::UNABLE_LIST_RIDES => 'common.error.unable_list_rides',
 
 
         };
@@ -114,7 +117,7 @@ enum ErrorMessagesEnum: int
             self::UNABLE_TO_DELETE_DRIVER => 'Unable to delete driver.',
             self::DRIVER_NOT_FOUND => 'Driver not found.',
             self::UNABLE_TO_LIST_DRIVERS => 'Unable to list drivers.',
-            self::INVALID_DRIVER_DATA => 'Invalid Driver Data.',
+            self::INVALID_DRIVER_DATA => 'Invalid driver data.',
 
             self::RIDE_NOT_FOUND => 'Ride not found.',
             self::RIDE_INVALID_STATE => 'Ride invalid state: %s',
@@ -122,9 +125,10 @@ enum ErrorMessagesEnum: int
             self::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA => 'Unable to locate address data.',
             self::RIDE_PRICING_RULE_NOT_FOUND => 'Pricing rule not found.',
             self::UNABLE_TO_ESTIMATE_RIDE => 'Unable to estimate ride.',
-            self::INVALID_RIDE_DATA => 'Invalid Ride Data.',
+            self::INVALID_RIDE_DATA => 'Invalid ride data.',
             self::UNABLE_TO_CREATE_RIDE => 'Unable to create ride.',
             self::RIDE_ESTIMATE_NOT_FOUND => 'Ride estimate not found.',
+            self::UNABLE_LIST_RIDES => 'Unable to list rides.',
         };
 
         if ($args) {

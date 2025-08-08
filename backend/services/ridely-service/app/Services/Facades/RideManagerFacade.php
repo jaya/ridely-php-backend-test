@@ -4,7 +4,9 @@ namespace App\Services\Facades;
 
 use App\Exceptions\RideException;
 use App\Http\Criteria\EstimateRideCriteria;
+use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
+use App\Http\Hateos\HateosHelper;
 use App\Models\Ride;
 use App\Models\RideEstimate;
 use App\Services\Interfaces\EstimateRideServiceInterface;
@@ -14,6 +16,7 @@ use App\Services\V1\EstimateRideService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class RideManagerFacade
@@ -70,5 +73,48 @@ class RideManagerFacade
     public function acceptRide($id)
     {
         return $this->rideService->acceptRide($id);
+    }
+
+    public function cancelRide($id)
+    {
+        return $this->rideService->cancelRide($id);
+    }
+
+    public function listRidesWithoutDriver(ListCriteria $criteria): LengthAwarePaginator
+    {
+        $paginator = $this->rideService->listRidesWithoutDriver($criteria);
+        if (is_array($paginator->items())) {
+            $data = $paginator->items();
+            $path = $paginator->path();
+
+            $modifiedItems = HateosHelper::addHateosLinksToItems($data, $path);
+            return new LengthAwarePaginator(
+                $modifiedItems,
+                $paginator->total(),
+                $paginator->perPage(),
+                $paginator->currentPage(),
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
+        }
+
+        return $paginator;
+    }
+
+    public function delete(string $id)
+    {
+        return $this->rideService->delete($id);
+    }
+
+    public function refuseRide($id)
+    {
+        return $this->rideService->refuseRide($id);
+    }
+
+    public function finishRide($id)
+    {
+        return $this->rideService->finishRide($id);
     }
 }

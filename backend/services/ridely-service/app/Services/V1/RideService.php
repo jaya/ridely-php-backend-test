@@ -5,9 +5,12 @@ namespace App\Services\V1;
 use App\Enums\ErrorMessagesEnum;
 use App\Enums\RedisStreamsEnum;
 use App\Enums\RideEstimateStatusEnum;
+use App\Enums\RideStatusEnum;
+use App\Exceptions\DriverException;
 use App\Exceptions\RideException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\EstimateRideCriteria;
+use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Models\Driver;
 use App\Models\Ride;
@@ -21,6 +24,9 @@ use Couchbase\QueryException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\ValidationException;
@@ -49,7 +55,7 @@ class RideService extends AbstractService implements RideServiceInterface
     {
         if ($this->validator->validateId($id)) {
             Log::debug("Searching for the ride with ID: $id");
-            return $this->ride->find($id);
+            return $this->ride->find($id, true);
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
@@ -60,6 +66,7 @@ class RideService extends AbstractService implements RideServiceInterface
     public function create(CreateRideCriteria $criteria)
     {
         if ($this->validator->validateCreate($criteria)) {
+            Log::info("Validation passed for ride creation.");
 
             $this->checkDatabase();
 
@@ -72,6 +79,19 @@ class RideService extends AbstractService implements RideServiceInterface
             $fields = $criteria->toArray();
 
             try {
+
+                if (!$driver->id) {
+                    throw ServiceException::queryException(ErrorMessagesEnum::INVALID_DRIVER_DATA, []);
+                }
+                Log::debug("==================================================");
+                Log::debug("Transaction started for ride creation");
+                Log::debug("==================================================");
+                DB::beginTransaction();
+
+                Log::debug("Creating ride on the database");
+                /**
+                 * @var Ride $ride
+                 */
                 $ride = Ride::create([
                     'passenger_name' => $fields['passenger']['name'],
                     'passenger_email' => $fields['passenger']['email'],
@@ -80,24 +100,37 @@ class RideService extends AbstractService implements RideServiceInterface
                     'driver_id' => $driver->id
                 ]);
 
-                $estimate = RideEstimate::create([
+                Log::debug("Creating ride-estimate on the database");
+                $ride->estimate()->create([
                     'ride_id' => $ride->id,
                     'status' => RideEstimateStatusEnum::PENDING,
                 ]);
 
-                $ride->estimate()->save($estimate);
+                // TODO isso quem sabe pode ser migrado para um job para rodar em background
+                Log::debug("Requesting a ride");
+                $ride->request(true);
 
+                $ride->driver = $driver;
+                //$ride->load(['driver', 'estimate']);
+
+                DB::commit();
+                Log::debug("==================================================");
+                Log::debug("Transaction end - commit");
+                Log::debug("==================================================");
 
             } catch (QueryException $e) {
+                Log::debug("==================================================");
+                Log::debug("Transaction end - rollback");
+                Log::debug("==================================================");
+                DB::rollBack();
+
                 Log::error($e->getMessage());
                 throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_RIDE, [], $e);
             }
 
-            $ride->request();
-
+            Log::debug("Loading ride relationships");
             // associate the driver and estimate to the ride
-            $ride->load(['driver', 'estimate']);
-
+//            $ride->load(['driver', 'estimate']);
 
             $this->publishToEstimateRideQueue($ride);
 
@@ -137,15 +170,130 @@ class RideService extends AbstractService implements RideServiceInterface
 
             $this->checkDatabase();
 
+            // TODO incluir transaction
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id);
+            $ride = $this->ride->find($id, true);
 
-            Log::debug("Searching for the driver with ID: $ride->driver_id");
-            $driver = Driver::findOrFail($ride->driver_id);
+            try {
+                $driver = $this->findDriverOrFail($ride);
+            } catch (DriverException $e) {
+                Log::error($e->getMessage());
+                throw RideException::rideWithoutDriver();
+            }
+
 
             $ride->accept($driver);
             $this->rideCacheService->removeDriverFromCache($driver->id);
 
+            return $ride;
+
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+    }
+
+    public function cancelRide($id)
+    {
+
+        if ($this->validator->validateId($id)) {
+
+            $this->checkDatabase();
+
+            Log::debug("Searching for the ride with ID: $id");
+            $ride = $this->ride->find($id);
+
+            $driver = $this->findDriverOrFail($ride);
+
+            $ride->cancel();
+            $this->rideCacheService->addDriverToCache($driver);
+
+            return $ride;
+
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+    }
+
+    /**
+     * @param Ride $ride
+     * @return mixed
+     * @throws DriverException
+     */
+    public function findDriverOrFail(Ride $ride)
+    {
+        Log::debug("Searching for the driver with ID: $ride->driver_id");
+        try {
+            $driver = Driver::findOrFail($ride->driver_id);
+        } catch (ModelNotFoundException $e) {
+            Log::error($e->getMessage());
+            throw DriverException::notFound(['driverId' => $ride->driver_id]);
+        }
+        return $driver;
+    }
+
+    public function listRidesWithoutDriver(ListCriteria $criteria): LengthAwarePaginator
+    {
+        if ($this->validator->validateRead($criteria)) {
+
+            $this->checkDatabase();
+
+            try {
+
+                Log::debug("Listing rides without driver");
+                return $this->ride->withoutDriver($criteria);
+
+            } catch (QueryException $e) {
+                Log::error($e->getMessage());
+                throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_LIST_RIDES, ["criteria" => $criteria->toArray()], $e);
+            }
+        } else {
+            $this->exception = $this->validator->getException();
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), $criteria->toArray(), $this->exception);
+        }
+    }
+
+    public function delete($id)
+    {
+        if ($this->validator->validateId($id)) {
+            Log::debug("Searching for the ride with ID: $id");
+            $ride = $this->ride->find($id);
+            $ride->delete();
+            return true;
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+    }
+
+    public function refuseRide($id)
+    {
+        if ($this->validator->validateId($id)) {
+
+            $this->checkDatabase();
+
+            Log::debug("Searching for the ride with ID: $id");
+            $ride = $this->ride->find($id);
+            $ride->refuse();
+            return $ride;
+
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+    }
+
+    public function finishRide($id)
+    {
+        if ($this->validator->validateId($id)) {
+
+            $this->checkDatabase();
+
+            Log::debug("Searching for the ride with ID: $id");
+            $ride = $this->ride->find($id);
+            $ride->finish();
             return $ride;
 
         } else {

@@ -135,7 +135,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
 
     }
 
-    public function find(int $id): Driver
+    public function find($id): Driver
     {
         throw ServiceException::notImplemented();
 

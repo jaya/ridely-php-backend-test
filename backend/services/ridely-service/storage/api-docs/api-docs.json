@@ -191,7 +191,7 @@
                     "Driver"
                 ],
                 "summary": "Lista os motoristas com filtros opcionais",
-                "operationId": "d7e939814aa58b3a941ed13b4b77955e",
+                "operationId": "7f3fc5cabb720d907c416cbf56c91826",
                 "parameters": [
                     {
                         "name": "page",
@@ -456,17 +456,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Detalhes da corrida",
+                        "description": "Corrida encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RideFull"
+                                    "$ref": "#/components/schemas/RideShowSuccess"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Corrida não encontrada"
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -492,7 +509,24 @@
                         "description": "Corrida removida"
                     },
                     "404": {
-                        "description": "Corrida não encontrada"
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -538,28 +572,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "label": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 0
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Success"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/RideFull"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/RideResponseSuccess"
                                 }
                             }
                         }
@@ -569,40 +582,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "label": {
-                                            "type": "string",
-                                            "example": "common.error.ride_drivers_available"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 63
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "We do not have drivers available"
-                                        },
-                                        "params": {
-                                            "description": "Parametros da requisição",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "id"
-                                            }
-                                        },
-                                        "detail": {
-                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ErrorResponseRideUnavailable"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -635,13 +635,40 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RideSimple"
+                                    "$ref": "#/components/schemas/RideCancelledResponseSuccess"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Corrida com status diferente de 'requested'",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideWithInvalidState"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Corrida não encontrada"
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -667,38 +694,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Corrida aceita",
+                        "description": "Corrida criada com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "accepted"
-                                        },
-                                        "drop_off": {
-                                            "type": "string",
-                                            "example": "Av. Brasil, 1000"
-                                        },
-                                        "pick_up": {
-                                            "type": "string",
-                                            "example": "Rua X, 200"
-                                        },
-                                        "passenger": {
-                                            "$ref": "#/components/schemas/Passenger"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/AcceptRequestSuccess"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Corrida ou motorista não encontrado"
+                        "description": "Corrida invalida,sem motorista ou não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -728,34 +751,30 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "refused"
-                                        },
-                                        "drop_off": {
-                                            "type": "string",
-                                            "example": "Av. Brasil, 1000"
-                                        },
-                                        "pick_up": {
-                                            "type": "string",
-                                            "example": "Rua X, 200"
-                                        },
-                                        "passenger": {
-                                            "$ref": "#/components/schemas/Passenger"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/RideRefusedSuccess"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Corrida não encontrada"
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -785,37 +804,162 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "finished"
-                                        },
-                                        "drop_off": {
-                                            "type": "string",
-                                            "example": "Av. Brasil, 1000"
-                                        },
-                                        "price": {
-                                            "type": "number",
-                                            "format": "float",
-                                            "example": 25
-                                        },
-                                        "passenger": {
-                                            "$ref": "#/components/schemas/Passenger"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/RideFinishedResponseSuccess"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Corrida com status diferente de 'accepted'",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideWithInvalidState"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Corrida não encontrada"
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
                     }
                 }
+            }
+        },
+        "/api/v1/rides/without-driver": {
+            "get": {
+                "tags": [
+                    "Rides"
+                ],
+                "summary": "Lista as corridas sem motorista",
+                "operationId": "ecadc34bb28d3f2726c6893c03aa4cff",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Referente a qual página dos itens da listagem deseja buscar",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Quantidade de resultados por página (máx: 100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Campo para ordenação (ex: name, created_at)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Direção da ordenação: asc ou desc",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "fields",
+                        "in": "query",
+                        "description": "Campos específicos a retornar (ex: name,available)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de motoristas retornada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RideListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação dos critérios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Outros erros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponível",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/rides/{id}/estimate-ride": {
@@ -887,45 +1031,22 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Erro de validação ou corrida não encontrada",
+                    "404": {
+                        "description": "Corrida não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "label": {
-                                            "type": "string",
-                                            "example": "common.error.invalid_request_param"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 61
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Ride not found"
-                                        },
-                                        "params": {
-                                            "description": "Parametros da requisição",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "id"
-                                            }
-                                        },
-                                        "detail": {
-                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -1005,45 +1126,22 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Erro de validação ou corrida não encontrada",
+                    "404": {
+                        "description": "Corrida não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "label": {
-                                            "type": "string",
-                                            "example": "common.error.invalid_request_param"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 61
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Ride not found"
-                                        },
-                                        "params": {
-                                            "description": "Parametros da requisição",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "example": "id"
-                                            }
-                                        },
-                                        "detail": {
-                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -1081,41 +1179,7 @@
                 },
                 "type": "object"
             },
-            "DriverListLink": {
-                "properties": {
-                    "href": {
-                        "type": "string",
-                        "example": "http://127.0.0.1:8000/api/v1/drivers?limit=2&fields=id&page=1"
-                    },
-                    "rel": {
-                        "type": "string",
-                        "example": "get"
-                    },
-                    "method": {
-                        "type": "string",
-                        "example": "GET"
-                    }
-                },
-                "type": "object"
-            },
-            "DriverLink": {
-                "properties": {
-                    "href": {
-                        "type": "string",
-                        "example": "http://127.0.0.1:8000/api/v1/drivers/1"
-                    },
-                    "rel": {
-                        "type": "string",
-                        "example": "get"
-                    },
-                    "method": {
-                        "type": "string",
-                        "example": "GET"
-                    }
-                },
-                "type": "object"
-            },
-            "DriverPaginationLinks": {
+            "DriverLinks": {
                 "properties": {
                     "self": {
                         "$ref": "#/components/schemas/DriverListLink"
@@ -1131,39 +1195,6 @@
                     },
                     "last": {
                         "$ref": "#/components/schemas/DriverListLink"
-                    }
-                },
-                "type": "object"
-            },
-            "DriverListResponse": {
-                "properties": {
-                    "success": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "label": {
-                        "type": "string",
-                        "example": "success"
-                    },
-                    "code": {
-                        "type": "integer",
-                        "example": 0
-                    },
-                    "message": {
-                        "type": "string",
-                        "example": "Success"
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Driver"
-                        }
-                    },
-                    "_meta": {
-                        "$ref": "#/components/schemas/PaginationMeta"
-                    },
-                    "_links": {
-                        "$ref": "#/components/schemas/DriverPaginationLinks"
                     }
                 },
                 "type": "object"
@@ -1227,34 +1258,6 @@
                     "available": {
                         "type": "boolean",
                         "example": true
-                    }
-                },
-                "type": "object"
-            },
-            "ErrorResponse": {
-                "properties": {
-                    "success": {
-                        "type": "boolean",
-                        "example": false
-                    },
-                    "label": {
-                        "type": "string",
-                        "example": "error"
-                    },
-                    "code": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "message": {
-                        "type": "string",
-                        "example": "Erro ao buscar motoristas."
-                    },
-                    "detail": {
-                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
-                        "type": "array",
-                        "items": {
-                            "type": "object"
-                        }
                     }
                 },
                 "type": "object"
@@ -1356,42 +1359,528 @@
                 },
                 "type": "object"
             },
-            "RideFull": {
-                "required": [
-                    "id",
-                    "status",
-                    "pick_up",
-                    "drop_off"
+            "AcceptRequestSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/RideFull"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverListLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers?limit=2&fields=id&page=1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers/1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverListResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Driver"
+                        }
+                    },
+                    "_meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/DriverLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseRideNotFound": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.ride_not_found"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 61
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Ride not found"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseRideUnavailable": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.ride_drivers_available"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 63
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "We do not have drivers available"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseRideWithInvalidState": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.ride_invalid_state"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 62
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Ride invalid state: Ride can only be cancelled in REQUESTED or ACCEPTED state"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "error"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Erro ao buscar motoristas."
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseServiceUnavailable": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.service_unavailable"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 21
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Service temporarily unavailable"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "RideCancelledResponseSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/RideSimple"
+                    }
+                },
+                "type": "object"
+            },
+            "RideFinishedResponseSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Ride"
+                    }
+                },
+                "type": "object"
+            },
+            "RideListResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Driver"
+                        }
+                    },
+                    "_meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/RideLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "RideRefusedSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Ride"
+                    }
+                },
+                "type": "object"
+            },
+            "RideResponseSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/RideFull"
+                    }
+                },
+                "type": "object"
+            },
+            "RideShowSuccess": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/RideFull"
+                    }
+                },
+                "type": "object"
+            },
+            "RideStatus": {
+                "description": "Status da corrida",
+                "type": "string",
+                "enum": [
+                    "REQUESTED",
+                    "ACCEPTED",
+                    "FINISHED",
+                    "CANCELLED",
+                    "REFUSED"
                 ],
+                "example": "REQUESTED"
+            },
+            "RideEstimate": {
+                "properties": {
+                    "distance_km": {
+                        "type": "number",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "duration_min": {
+                        "type": "number",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "price_estimate": {
+                        "type": "number",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/RideStatus"
+                    }
+                },
+                "type": "object"
+            },
+            "RideFull": {
                 "properties": {
                     "id": {
                         "type": "integer",
                         "example": 1
                     },
                     "status": {
-                        "type": "string",
-                        "enum": [
-                            "REQUESTED",
-                            "ACCEPTED",
-                            "FINISHED",
-                            "CANCELLED",
-                            "REFUSED"
-                        ],
-                        "example": "REQUESTED"
+                        "$ref": "#/components/schemas/RideStatus"
                     },
                     "pick_up": {
                         "type": "string",
-                        "example": "Rua X, 200"
+                        "example": "Avenida Beira Mar, 25"
                     },
                     "drop_off": {
                         "type": "string",
-                        "example": "Av. Brasil, 1000"
+                        "example": "Avenida Euclides Figueiredo, 65"
                     },
                     "driver": {
                         "$ref": "#/components/schemas/DriverShort"
                     },
                     "estimate": {
                         "$ref": "#/components/schemas/EstimateRideShort"
+                    },
+                    "passenger": {
+                        "$ref": "#/components/schemas/Passenger"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/RideLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "RideLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://localhost:8000/api/v1/rides/5386"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "RideLinks": {
+                "properties": {
+                    "self": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "cancel": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "accept": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "refuse": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "finish": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "estimate": {
+                        "$ref": "#/components/schemas/RideLink"
+                    },
+                    "getEstimate": {
+                        "$ref": "#/components/schemas/RideLink"
                     }
                 },
                 "type": "object"
@@ -1410,8 +1899,7 @@
                         "example": 10
                     },
                     "status": {
-                        "type": "string",
-                        "example": "waiting"
+                        "$ref": "#/components/schemas/RideStatus"
                     },
                     "drop_off": {
                         "type": "string",
@@ -1423,6 +1911,9 @@
                     },
                     "passenger": {
                         "$ref": "#/components/schemas/Passenger"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/RideLinks"
                     }
                 },
                 "type": "object"
@@ -1450,6 +1941,9 @@
                     "drop_off": {
                         "type": "string",
                         "example": "Av. Brasil, 1000"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/RideLinks"
                     }
                 },
                 "type": "object"

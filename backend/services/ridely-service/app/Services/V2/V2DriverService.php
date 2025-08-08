@@ -9,6 +9,9 @@ use App\Models\Driver;
 use App\Services\AbstractService;
 use App\Services\Interfaces\DriverServiceInterface;
 use App\Validators\DriverValidator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
@@ -41,6 +44,11 @@ class V2DriverService extends AbstractService implements DriverServiceInterface
     }
 
     public function softDelete($id): bool
+    {
+        throw ServiceException::notImplemented();
+    }
+
+    public function find($id): Builder|array|Collection|Model
     {
         throw ServiceException::notImplemented();
     }

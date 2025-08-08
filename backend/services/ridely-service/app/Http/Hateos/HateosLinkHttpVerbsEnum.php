@@ -6,10 +6,11 @@ enum HateosLinkHttpVerbsEnum
 {
     case DELETE;
     case UPDATE;
-
     case PATCH;
 
     case GET;
+
+    case POST;
 
     public function method(): string
     {
@@ -18,6 +19,7 @@ enum HateosLinkHttpVerbsEnum
             self::UPDATE => 'UPDATE',
             self::PATCH => 'PATCH',
             self::GET => 'GET',
+            self::POST => 'POST',
         };
     }
 
@@ -28,6 +30,7 @@ enum HateosLinkHttpVerbsEnum
             self::UPDATE => 'replace',
             self::PATCH => 'update',
             self::GET => 'get',
+            self::POST => 'create',
         };
     }
 }

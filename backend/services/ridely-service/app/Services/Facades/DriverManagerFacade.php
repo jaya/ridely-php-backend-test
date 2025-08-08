@@ -5,6 +5,7 @@ namespace App\Services\Facades;
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
+use App\Http\Hateos\HateosHelper;
 use App\Http\Hateos\HateosItemLinks;
 use App\Services\Interfaces\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,7 +26,7 @@ class DriverManagerFacade
 
         $data = $this->driverService->create($criteria);
         $path = request()->path();
-        $newData = $this->addHateosLinksToItems($data, $path);
+        $newData = HateosHelper::addHateosLinksToItems($data, $path);
         return $newData[0];
     }
 
@@ -56,7 +57,7 @@ class DriverManagerFacade
             $data = $paginator->items();
             $path = $paginator->path();
 
-            $modifiedItems = $this->addHateosLinksToItems($data, $path);
+            $modifiedItems = HateosHelper::addHateosLinksToItems($data, $path);
             return new LengthAwarePaginator(
                 $modifiedItems,
                 $paginator->total(),
@@ -73,35 +74,5 @@ class DriverManagerFacade
 
     }
 
-    /**
-     * @param $data
-     * @param $path
-     * @return array
-     */
-    public function addHateosLinksToItems($data, $path): array
-    {
-        if ($data instanceof Collection) {
-            $items = $data->toArray();
-        } else if (!is_array($data)) {
-            $items = [$data];
-        } else {
-            $items = $data;
-        }
 
-        $modifiedItems = [];
-        foreach ($items as $driver) {
-
-            if (is_object($driver)) {
-                $driver = $driver->toArray();
-            }
-
-            $self = sprintf("%s/%s", $path, $driver['id']);
-            $metadata = [
-                '_links' => new HateosItemLinks($self)
-            ];
-            $modifiedItems[] = array_merge($driver, $metadata);
-        }
-        return $modifiedItems;
-
-    }
 }

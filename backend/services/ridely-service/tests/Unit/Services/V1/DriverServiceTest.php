@@ -10,6 +10,7 @@ use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Services\DriverCacheService;
 use App\Services\V1\DriverService;
 use App\Validators\DriverValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,8 +37,9 @@ class DriverServiceTest extends UnitTestCase
         parent::setUp();
 
         $validator = new DriverValidator();
+        $driverCacheService = $this->createMock(DriverCacheService::class);
         $this->mock = $this->createMock(DriverService::class);
-        $this->service = new DriverService($validator);
+        $this->service = new DriverService($validator, $driverCacheService);
     }
 
     public function testCreateSuccess()

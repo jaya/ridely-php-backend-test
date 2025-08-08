@@ -48,6 +48,7 @@ abstract class AbstractValidator
     protected function commonValidator(array $data, array $rules, $errorMessage): bool
     {
         $result = true;
+        Log::debug("commonValidator data called");
 
         if (empty($data)) {
             $this->exception = ValidationException::withMessages([$errorMessage]);
@@ -71,6 +72,22 @@ abstract class AbstractValidator
         $validator = Validator::make([
             'id' => $id
         ], $this->rules());
+
+        if ($validator->fails()) {
+            $this->exception = new ValidationException($validator);
+            $result = false;
+            Log::debug(sprintf("Validation fails: %s", $this->exception->getMessage()));
+        }
+
+        return $result;
+    }
+
+    public function validateRead(ListCriteria $criteria): bool
+    {
+        $result = true;
+
+        $rules = $this->appendDatabaseFields($criteria);
+        $validator = Validator::make($criteria->toArray(), $rules);
 
         if ($validator->fails()) {
             $this->exception = new ValidationException($validator);

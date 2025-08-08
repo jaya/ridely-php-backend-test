@@ -17,7 +17,7 @@ class HealthCheckProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+
     }
 
     /**
@@ -25,18 +25,27 @@ class HealthCheckProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $keycloakUrl = config('keycloak.health_check_url');
-//        Log::debug("Keycloak url: $keycloakUrl");
+//        Log::debug("HealthCheckProvider::boot() called");
+        $inConsole = app()->runningInConsole();
+        $request = request();
 
-        // TODO adicionar o token
-        Health::checks([
-            UsedDiskSpaceCheck::new(),
-            DatabaseCheck::new()->name("Database")->connectionName(""),
-            RedisCheck::new()->name("Cache")->connectionName(""),
-            PingCheck::new()
-                ->name('Keycloak Auth Service')
-                ->url($keycloakUrl)
-                ->timeout(2),
-        ]);
+        if ($inConsole || $request && $request->is(['health', 'status'])) {
+            $keycloakUrl = config('keycloak.health_check_url');
+            // TODO adicionar o token
+
+//            Log::debug("Booting Health::checks()");
+
+            Health::checks([
+                UsedDiskSpaceCheck::new(),
+                DatabaseCheck::new()->name("Database")->connectionName(""),
+                RedisCheck::new()->name("Cache")->connectionName(""),
+                PingCheck::new()
+                    ->name('Keycloak Auth Service')
+                    ->url($keycloakUrl)
+                    ->timeout(2),
+            ]);
+        } else {
+//            Log::debug("Ignoring Health::checks() in non-console or non-health request context");
+        }
     }
 }

@@ -10,7 +10,7 @@ class RideException extends ApplicationException
 
     public static function notFound(): RideException
     {
-        return new self(ErrorMessagesEnum::RIDE_NOT_FOUND, Response::HTTP_BAD_REQUEST);
+        return new self(ErrorMessagesEnum::RIDE_NOT_FOUND, Response::HTTP_NOT_FOUND);
     }
 
     public static function invalidState($message): RideException
@@ -20,7 +20,7 @@ class RideException extends ApplicationException
 
     public static function noDriversAvailable(): RideException
     {
-        return new self(ErrorMessagesEnum::RIDE_NO_DRIVERS_AVAILABLE, Response::HTTP_BAD_REQUEST);
+        return new self(ErrorMessagesEnum::RIDE_NO_DRIVERS_AVAILABLE, Response::HTTP_NOT_ACCEPTABLE);
     }
 
     public static function unableToLocateAddressData(): RideException
@@ -38,4 +38,10 @@ class RideException extends ApplicationException
     {
         return new self(ErrorMessagesEnum::RIDE_ESTIMATE_NOT_FOUND, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-} 
+
+    public static function rideWithoutDriver()
+    {
+        return new self(ErrorMessagesEnum::INVALID_RIDE_DATA, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+}

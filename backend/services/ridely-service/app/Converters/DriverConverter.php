@@ -21,16 +21,18 @@ class DriverConverter
 
     public static function convertFromArrayToResponse(array $driver): array
     {
-        return [
-            'id' => $driver['id'],
-            'name' => $driver['name'],
+        $array = [
+            'id' => $driver['id'] ?? null,
+            'name' => $driver['name'] ?? null,
             'car' => [
-                'license_plate' => $driver['car_license_plate'],
-                'model' => $driver['car_model'],
-                'color' => $driver['car_color']
+                'license_plate' => $driver['car_license_plate'] ?? null,
+                'model' => $driver['car_model'] ?? null,
+                'color' => $driver['car_color'] ?? null,
             ],
-            'available' => $driver['available'],
+            'available' => $driver['available'] ?? null,
         ];
+
+        return $array;
     }
 
     public static function convertFromModelToResponse(Driver $driver): array

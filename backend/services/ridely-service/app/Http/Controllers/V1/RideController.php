@@ -4,13 +4,13 @@ namespace App\Http\Controllers\V1;
 
 use App\Converters\RideConverter;
 use App\Converters\RideEstimateConverter;
-use App\Enums\RideStatusEnum;
 use App\Exceptions\ApplicationException;
 use App\Http\Controllers\Controller;
+use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
+use App\Http\Hateos\HateosHelper;
+use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
-use App\Models\Driver;
-use App\Models\Ride;
 use App\Services\Facades\RideManagerFacade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,22 +32,30 @@ class RideController extends Controller
      *         @OA\Schema(type="string", example="1")
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Detalhes da corrida",
-     *         @OA\JsonContent(ref="#/components/schemas/RideFull")
-     *     ),
+     *          response=200,
+     *          description="Corrida encontrada",
+     *          @OA\JsonContent(ref="#/components/schemas/RideShowSuccess")
+     *      ),
      *     @OA\Response(
      *         response=404,
-     *         description="Corrida não encontrada"
-     *     )
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
-     * TODO revisar por causa do HATEOS
      */
     public function show(string $id, RideManagerFacade $facade): JsonResponse
     {
         try {
+            $path = str_replace("/${id}", "", request()->fullUrl());
             $ride = $facade->find($id);
-            return ResponseHelper::success(($ride) ? RideConverter::convertFromModelToResponse($ride): null);
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse);
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
         }
@@ -72,14 +80,19 @@ class RideController extends Controller
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Corrida não encontrada"
-     *     )
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
      */
-    public function destroy(string $id)
+    public function destroy(string $id, RideManagerFacade $facade)
     {
-        $ride = Ride::findOrFail($id);
-        $ride->delete();
+        $facade->delete($id);
         return response()->noContent();
     }
 
@@ -100,46 +113,42 @@ class RideController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Corrida criada com sucesso",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="label", type="string", example="success"),
-     *             @OA\Property(property="code", type="integer", example=0),
-     *             @OA\Property(property="message", type="string", example="Success"),
-     *             @OA\Property(property="data", ref="#/components/schemas/RideFull")
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/RideResponseSuccess")
      *     ),
      *     @OA\Response(
      *         response=400,
      *         description="Não há motoristas disponíveis",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="label", type="string", example="common.error.ride_drivers_available"),
-     *             @OA\Property(property="code", type="integer", example=63),
-     *             @OA\Property(property="message", type="string", example="We do not have drivers available"),
-     *             @OA\Property(
-     *               property="params",
-     *               type="array",
-     *               description="Parametros da requisição",
-     *               @OA\Items(type="string", example="id")
-     *            ),
-     *             @OA\Property(
-     *               property="detail",
-     *               type="array",
-     *               description="Stack trace (visível apenas em ambiente de desenvolvimento)",
-     *               @OA\Items(type="object")
-     *            )
-     *         )
-     *     )
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideUnavailable")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
+     * OK
      */
     public function requestDriver(Request $request, RideManagerFacade $facade): JsonResponse
     {
         try {
+            Log::info('Requesting a driver...');
             $criteria = new CreateRideCriteria($request->all());
-            $request->validate($criteria->rules());
 
+            // The request will be validated inside the facade/service
+            //$request->validate($criteria->rules());
+
+//            Log::info('Request validated successfully');
+
+            $path = str_replace("/request-driver", "", $request->fullUrl());
             $ride = $facade->create($criteria);
-            return ResponseHelper::success(RideConverter::convertFromArrayToResponse($ride->toArray()), Response::HTTP_CREATED);
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse, Response::HTTP_CREATED);
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
         }
@@ -160,26 +169,49 @@ class RideController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Corrida cancelada",
-     *         @OA\JsonContent(ref="#/components/schemas/RideSimple")
+     *         @OA\JsonContent(ref="#/components/schemas/RideCancelledResponseSuccess")
      *     ),
      *     @OA\Response(
+     *          response=400,
+     *          description="Corrida com status diferente de 'requested'",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideWithInvalidState")
+     *    ),
+     *     @OA\Response(
      *         response=404,
-     *         description="Corrida não encontrada"
-     *     )
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
+     * OK
      */
-    public function cancelRide($id): JsonResponse
+    public function cancelRide($id, RideManagerFacade $facade): JsonResponse
     {
-        Log::debug("Cancel ride request received with ID: " . $id);
-        $ride = Ride::findOrFail($id);
-        $ride->cancel();
 
-        return response()->json([
-            'id' => $ride->id,
-            'status' => $ride->status,
-            'drop_off' => $ride->drop_off,
-            'pick_up' => $ride->pick_up
-        ]);
+        try {
+
+            Log::debug("Cancel ride request received with ID: " . $id);
+
+
+            $path = str_replace("/${id}/cancel-ride", "", request()->fullUrl());
+            $ride = $facade->cancelRide($id);
+
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            // Removing data from response as it is not needed in this context
+            unset($rideResponse['driver']);
+            unset($rideResponse['passenger']);
+
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse);
+
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
+
     }
 
     /**
@@ -196,38 +228,31 @@ class RideController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Corrida aceita",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="status", type="string", example="accepted"),
-     *             @OA\Property(property="drop_off", type="string", example="Av. Brasil, 1000"),
-     *             @OA\Property(property="pick_up", type="string", example="Rua X, 200"),
-     *             @OA\Property(property="passenger", ref="#/components/schemas/Passenger")
-     *         )
+     *         description="Corrida criada com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/AcceptRequestSuccess")
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Corrida ou motorista não encontrado"
-     *     )
+     *         description="Corrida invalida,sem motorista ou não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
+     * OK
      */
     public function acceptRide($id, RideManagerFacade $facade): JsonResponse
     {
         try {
             $ride = $facade->acceptRide($id);
-            return ResponseHelper::success(RideConverter::convertFromModelToResponse($ride));
+            $path = str_replace("/{$id}/accept-ride", "", request()->fullUrl());
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse);
 
-//            return response()->json([
-//                'id' => $ride->id,
-//                'status' => $ride->status,
-//                'drop_off' => $ride->drop_off,
-//                'pick_up' => $ride->pick_up,
-//                'passenger' => [
-//                    'name' => $ride->passenger_name,
-//                    'email' => $ride->passenger_email
-//                ]
-//            ]);
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
         }
@@ -247,38 +272,43 @@ class RideController extends Controller
      *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
-     *         response=200,
-     *         description="Corrida recusada",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="status", type="string", example="refused"),
-     *             @OA\Property(property="drop_off", type="string", example="Av. Brasil, 1000"),
-     *             @OA\Property(property="pick_up", type="string", example="Rua X, 200"),
-     *             @OA\Property(property="passenger", ref="#/components/schemas/Passenger")
-     *         )
-     *     ),
+     *          response=200,
+     *          description="Corrida recusada",
+     *          @OA\JsonContent(ref="#/components/schemas/RideRefusedSuccess")
+     *      ),
      *     @OA\Response(
      *         response=404,
-     *         description="Corrida não encontrada"
-     *     )
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
      */
-    public function refuseRide($id): JsonResponse
+    public function refuseRide($id, RideManagerFacade $facade): JsonResponse
     {
-        $ride = Ride::findOrFail($id);
-        $ride->refuse();
+        try {
 
-        return response()->json([
-            'id' => $ride->id,
-            'status' => $ride->status,
-            'drop_off' => $ride->drop_off,
-            'pick_up' => $ride->pick_up,
-            'passenger' => [
-                'name' => $ride->passenger_name,
-                'email' => $ride->passenger_email
-            ]
-        ]);
+            Log::debug("Cancel ride request received with ID: " . $id);
+
+
+            $path = str_replace("/${id}/refuse-ride", "", request()->fullUrl());
+            $ride = $facade->refuseRide($id);
+
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            // Removing data from response as it is not needed in this context
+            unset($rideResponse['driver']);
+//            unset($rideResponse['passenger']);
+
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse);
+
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
     }
 
     /**
@@ -296,71 +326,129 @@ class RideController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Corrida finalizada",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="status", type="string", example="finished"),
-     *             @OA\Property(property="drop_off", type="string", example="Av. Brasil, 1000"),
-     *             @OA\Property(property="price", type="number", format="float", example=25.00),
-     *             @OA\Property(property="passenger", ref="#/components/schemas/Passenger")
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/RideFinishedResponseSuccess")
      *     ),
      *     @OA\Response(
+     *          response=400,
+     *          description="Corrida com status diferente de 'accepted'",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideWithInvalidState")
+     *    ),
+     *     @OA\Response(
      *         response=404,
-     *         description="Corrida não encontrada"
-     *     )
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
+     * )
      * )
      */
-    public function finishRide(Request $request): JsonResponse
+    public function finishRide($id, RideManagerFacade $facade): JsonResponse
     {
-        $ride = Ride::findOrFail($request->id);
-        $ride->finish();
-        $ride->price = $request->price;
-        $ride->save();
+        try {
 
-        return response()->json([
-            'id' => $ride->id,
-            'status' => $ride->status,
-            'drop_off' => $ride->drop_off,
-            'price' => $ride->price,
-            'passenger' => [
-                'name' => $ride->passenger_name,
-                'email' => $ride->passenger_email
-            ]
-        ]);
+            Log::debug("Finish ride request received with ID: " . $id);
+
+
+            $path = str_replace("/${id}/finish-ride", "", request()->fullUrl());
+            $ride = $facade->finishRide($id);
+
+            $rideResponse = RideConverter::convertFromArrayToResponse($ride->toArray());
+            // Removing data from response as it is not needed in this context
+            unset($rideResponse['driver']);
+//            unset($rideResponse['passenger']);
+
+            $rideResponse = HateosHelper::appendRideHateosLinks($rideResponse, $path, $ride->id);
+            return ResponseHelper::success($rideResponse);
+
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
     }
 
-    public function getOpenRides($driverId): JsonResponse
+    /**
+     * @OA\Get(
+     *     path="/api/v1/rides/without-driver",
+     *     summary="Lista as corridas sem motorista",
+     *     tags={"Rides"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Referente a qual página dos itens da listagem deseja buscar",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=0)
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Quantidade de resultados por página (máx: 100)",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
+     *     @OA\Parameter(
+     *         name="order_by",
+     *         in="query",
+     *         description="Campo para ordenação (ex: name, created_at)",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Direção da ordenação: asc ou desc",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"asc", "desc"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="fields",
+     *         in="query",
+     *         description="Campos específicos a retornar (ex: name,available)",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de motoristas retornada com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/RideListResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação dos critérios",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *          response=500,
+     *          description="Outros erros",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     *     @OA\Response(
+     *          response=503,
+     *          description="Serviço indisponível",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *     ),
+     * )
+     * // TODO revisar os exemplos dos erros, pois estão todos com a mesma mensagem, qualquer coisa criar outros schemas ou ver como passar os valores para o schema
+     */
+    public function listRidesWithoutDriver(Request $request, RideManagerFacade $facade): JsonResponse
     {
-        // TODO preciso revisar, parece duplicado de alguma forma
-        $driver = Driver::findOrFail($driverId);
-
-        if (!$driver->available) {
-            return response()->json([
-                'message' => 'Driver is not available',
-            ], 400);
+        try {
+            $criteria = new ListCriteria($request->all());
+            $paginator = $facade->listRidesWithoutDriver($criteria);
+            $metadata = new HateosMetadata($paginator);
+            return ResponseHelper::success(RideConverter::convertListFromArrayToResponse($paginator->items()), metadata: $metadata);
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
         }
 
-        $rides = Ride::where('status', RideStatusEnum::REQUESTED)
-            ->whereNull('driver_id')
-            ->get();
-
-        if ($rides->isEmpty()) {
-            return response()->json([
-                'message' => 'No rides waiting to be accepted',
-            ], 404);
-        }
-
-        return response()->json($rides->map(function ($ride) {
-            return [
-                'id' => $ride->id,
-                'passenger_name' => $ride->passenger_name,
-                'passenger_email' => $ride->passenger_email,
-                'pick_up' => $ride->pick_up,
-                'drop_off' => $ride->drop_off,
-                'status' => $ride->status,
-            ];
-        }));
     }
 
     /**
@@ -399,30 +487,17 @@ class RideController extends Controller
      *     ),
      *
      *     @OA\Response(
-     *         response=400,
-     *         description="Erro de validação ou corrida não encontrada",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="label", type="string", example="common.error.invalid_request_param"),
-     *             @OA\Property(property="code", type="integer", example=61),
-     *             @OA\Property(property="message", type="string", example="Ride not found"),
-     *             @OA\Property(
-     *               property="params",
-     *               type="array",
-     *               description="Parametros da requisição",
-     *               @OA\Items(type="string", example="id")
-     *            ),
-     *             @OA\Property(
-     *               property="detail",
-     *               type="array",
-     *               description="Stack trace (visível apenas em ambiente de desenvolvimento)",
-     *               @OA\Items(type="object")
-     *            )
-     *         )
-     *     )
+     *         response=404,
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
-     *
-     *
+     * OK
      */
     public function estimateRide($id, Request $request, RideManagerFacade $facade): JsonResponse
     {
@@ -475,30 +550,17 @@ class RideController extends Controller
      *     ),
      *
      *     @OA\Response(
-     *         response=400,
-     *         description="Erro de validação ou corrida não encontrada",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="label", type="string", example="common.error.invalid_request_param"),
-     *             @OA\Property(property="code", type="integer", example=61),
-     *             @OA\Property(property="message", type="string", example="Ride not found"),
-     *             @OA\Property(
-     *               property="params",
-     *               type="array",
-     *               description="Parametros da requisição",
-     *               @OA\Items(type="string", example="id")
-     *            ),
-     *             @OA\Property(
-     *               property="detail",
-     *               type="array",
-     *               description="Stack trace (visível apenas em ambiente de desenvolvimento)",
-     *               @OA\Items(type="object")
-     *            )
-     *         )
-     *     )
+     *         response=404,
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno do servidor",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
-     *
-     *
+     * OK
      */
     public function getRideEstimate($id, Request $request, RideManagerFacade $facade)
     {

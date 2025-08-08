@@ -10,6 +10,7 @@ use App\Models\Driver;
 use App\Models\Ride;
 use App\Models\RideEstimate;
 use App\Services\JWTKeysService;
+use App\Services\RideCacheService;
 use Database\Seeders\DriverSeeder;
 use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Database\Eloquent\Collection;
@@ -189,7 +190,7 @@ class RideControllerTest extends UnitTestCase
         $response = $this->withHeader('Authorization', "Bearer $token")
             ->postJson("/api/v1/rides/${rideId}/estimate-ride");
 
-        $response->assertStatus(400);
+        $response->assertStatus(404);
         $response->assertJsonStructure([
             'success',
             'label',
@@ -203,40 +204,16 @@ class RideControllerTest extends UnitTestCase
         $this->assertEquals(ErrorMessagesEnum::RIDE_NOT_FOUND->label(), $data['label']);
     }
 
-    public function testEstimateRideFailWithInvalidParams()
-    {
-
-
-        // Mock the external calls
-        $this->mockFailCalls();
-        $this->mockTokenValidation();
-        $token = TokenHelper::getFakeToken();
-
-        $rideId = 999;
-        $response = $this->withHeader('Authorization', "Bearer $token")
-            ->postJson("/api/v1/rides/{$rideId}/estimate-ride");
-
-        $response->assertStatus(400);
-        $response->assertJsonStructure([
-            'success',
-            'label',
-            'code',
-            'message',
-            'params'
-        ]);
-
-        $data = $response->json();
-        $this->assertFalse($data['success']);
-        $this->assertEquals(ErrorMessagesEnum::RIDE_NOT_FOUND->label(), $data['label']);
-    }
 
     public function testRequestDriverSuccess()
     {
 
+
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        Driver::factory()->count(5)->create();
+        $drivers = Driver::factory()->count(5)->create();
+        $fakeDriver = $drivers[0];
 
         $data = [
             'pick_up' => LocationHelper::$pickUp,
@@ -246,6 +223,16 @@ class RideControllerTest extends UnitTestCase
                 'email' => 'john.doe@example.com',
             ]
         ];
+        // Mock do serviço de cache
+        $rideCacheServiceMock = \Mockery::mock(RideCacheService::class);
+        $rideCacheServiceMock
+            ->shouldReceive('getNextAvailableDriver')
+            ->once()
+            ->andReturn($fakeDriver);
+
+        // Injeta o mock no container do Laravel
+        $this->app->instance(RideCacheService::class, $rideCacheServiceMock);
+
 
         $response = $this->withHeader('Authorization', "Bearer $token")
             ->post("/api/v1/rides/request-driver", $data);

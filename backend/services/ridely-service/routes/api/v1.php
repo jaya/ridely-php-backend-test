@@ -7,7 +7,7 @@ use App\Http\Controllers\V1\RideController;
 Route::prefix('drivers')->group(function () {
 
     Route::post('/', [DriverController::class, 'store']);
-    Route::get('/', [DriverController::class, 'index']);
+    Route::get('/', [DriverController::class, 'listDrivers']);
 //    Route::get('{id}', [DriverController::class, 'show']);
 //    Route::put('{id}', [DriverController::class, 'update']);
     Route::delete('{id}', [DriverController::class, 'destroy']);
@@ -17,6 +17,7 @@ Route::prefix('drivers')->group(function () {
 
 Route::prefix('rides')->group(function () {
 
+    Route::get('/without-driver', [RideController::class, 'listRidesWithoutDriver']);
     Route::post('/request-driver', [RideController::class, 'requestDriver']);
 
     Route::get('/{id}', [RideController::class, 'show']);

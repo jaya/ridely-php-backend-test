@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\OpenApi\Schemas;
+namespace App\Http\OpenApi\Schemas\Responses;
 
 /**
 * @OA\Schema(
@@ -18,15 +18,6 @@ namespace App\Http\OpenApi\Schemas;
 * )
 *
 *
-* @OA\Schema(
-*     schema="DriverPaginationLinks",
-*     type="object",
-*     @OA\Property(property="self", ref="#/components/schemas/DriverListLink"),
-*     @OA\Property(property="next", ref="#/components/schemas/DriverListLink"),
-*     @OA\Property(property="previous", ref="#/components/schemas/DriverListLink"),
-*     @OA\Property(property="first", ref="#/components/schemas/DriverListLink"),
-*     @OA\Property(property="last", ref="#/components/schemas/DriverListLink")
-* )
 *
 * @OA\Schema(
 *     schema="DriverListResponse",
@@ -41,7 +32,7 @@ namespace App\Http\OpenApi\Schemas;
 *         @OA\Items(ref="#/components/schemas/Driver")
 *     ),
 *     @OA\Property(property="_meta", ref="#/components/schemas/PaginationMeta"),
-*     @OA\Property(property="_links", ref="#/components/schemas/DriverPaginationLinks")
+*     @OA\Property(property="_links", ref="#/components/schemas/DriverLinks")
 * )
 */
 class DriverListResponseSchema

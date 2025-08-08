@@ -27,21 +27,21 @@ class DriverValidator extends AbstractValidator
         return $this->commonValidator($criteria->toArray(), $criteria->rules(), ErrorMessagesEnum::INVALID_DRIVER_DATA->message());
     }
 
-    public function validateRead(ListCriteria $criteria): bool
-    {
-        $result = true;
-
-        $rules = $this->appendDatabaseFields($criteria);
-        $validator = Validator::make($criteria->toArray(), $rules);
-
-        if ($validator->fails()) {
-            $this->exception = new ValidationException($validator);
-            $result = false;
-            Log::debug(sprintf("Validation fails: %s", $this->exception->getMessage()));
-        }
-
-        return $result;
-    }
+//    public function validateRead(ListCriteria $criteria): bool
+//    {
+//        $result = true;
+//
+//        $rules = $this->appendDatabaseFields($criteria);
+//        $validator = Validator::make($criteria->toArray(), $rules);
+//
+//        if ($validator->fails()) {
+//            $this->exception = new ValidationException($validator);
+//            $result = false;
+//            Log::debug(sprintf("Validation fails: %s", $this->exception->getMessage()));
+//        }
+//
+//        return $result;
+//    }
 
 
     public function validateUpdate($data): bool

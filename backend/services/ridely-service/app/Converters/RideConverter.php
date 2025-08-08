@@ -16,7 +16,11 @@ class RideConverter
         ];
 
         if (isset($ride['driver'])) {
-            $response['driver'] = DriverConverter::convertFromArrayToResponse($ride['driver']);
+            $driverData = $ride['driver'];
+            if (!is_array($ride['driver'])) {
+                $driverData = $ride['driver']->toArray();
+            }
+            $response['driver'] = DriverConverter::convertFromArrayToResponse($driverData);
             unset($response['driver']['id']);
         }
 
@@ -33,14 +37,27 @@ class RideConverter
                 'name' => $ride['passenger']['name'] ?? null,
                 'email' => $ride['passenger']['email'] ?? null
             ];
+        } else {
+            $response['passenger'] = [
+                'name' => $ride['passenger_name'] ?? null,
+                'email' => $ride['passenger_email'] ?? null
+            ];
         }
-
         return  $response;
     }
 
     public static function convertFromModelToResponse(Ride $ride): array
     {
         return self::convertFromArrayToResponse($ride->toArray());
+    }
+
+    public static function convertListFromArrayToResponse($items): array
+    {
+        $result = [];
+        foreach ($items as $item) {
+            $result[] = self::convertFromArrayToResponse($item);
+        }
+        return $result;
     }
 
 }

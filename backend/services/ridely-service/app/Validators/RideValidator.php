@@ -4,6 +4,7 @@ namespace App\Validators;
 
 use App\Enums\ErrorMessagesEnum;
 use App\Http\Criteria\Ride\CreateRideCriteria;
+use App\Models\Ride;
 use Illuminate\Support\Facades\Log;
 
 class RideValidator extends AbstractValidator
@@ -11,7 +12,7 @@ class RideValidator extends AbstractValidator
 
     protected function setValidFields()
     {
-        $this->validFields = [];
+        $this->validFields = Ride::$fields;
     }
 
     public function validateCreate(CreateRideCriteria $criteria)

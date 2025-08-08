@@ -77,6 +77,8 @@ class DriverCacheService
         if (empty($data)) {
             return null;
         }
-        return new Driver($data);
+        $driver = new Driver($data);
+        $driver->id = $driverId; // Ensure the ID is set correctly
+        return $driver;
     }
 }
