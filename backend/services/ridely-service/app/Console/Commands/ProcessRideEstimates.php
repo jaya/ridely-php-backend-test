@@ -32,6 +32,7 @@ class ProcessRideEstimates extends Command
      */
     public function handle()
     {
+        $maxItems = 10;
         $redis = Redis::connection('streams');
         $streamName = RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value;
 
@@ -50,12 +51,16 @@ class ProcessRideEstimates extends Command
 
         while (true) {
 
+
             $entries = $redis->xreadgroup('estimate_group', 'consumer-1', [
                 $streamName => '>'
-            ], 1, 5000);
+            ], $maxItems, 5000);
 
             if (!empty($entries)) {
-                Log::info('Received entries from Redis stream', ['entries' => $entries]);
+                $count = count($entries[$streamName] ?? []);
+                Log::info("======================================================================");
+                Log::info("Received entries from Redis stream ($count)");
+                Log::info("======================================================================");
                 foreach ($entries[$streamName] ?? [] as $id => $data) {
                     Log::info('Found entry in Redis stream', ['id' => $id, 'data' => $data]);
 

@@ -66,4 +66,9 @@ class RideManagerFacade
     {
         return $this->estimateRideService->find($id);
     }
+
+    public function acceptRide($id)
+    {
+        return $this->rideService->acceptRide($id);
+    }
 }

@@ -28,6 +28,13 @@ class RideConverter
             unset($response['estimate']['updated_at']);
         }
 
+        if (isset($ride['passenger'])) {
+            $response['passenger'] = [
+                'name' => $ride['passenger']['name'] ?? null,
+                'email' => $ride['passenger']['email'] ?? null
+            ];
+        }
+
         return  $response;
     }
 

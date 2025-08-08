@@ -12,4 +12,6 @@ interface RideServiceInterface
 
     public function create(CreateRideCriteria $criteria);
 
+    public function acceptRide($id);
+
 }

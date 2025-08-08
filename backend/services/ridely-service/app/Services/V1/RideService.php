@@ -15,6 +15,7 @@ use App\Models\RideEstimate;
 use App\Services\AbstractService;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
+use App\Services\RideCacheService;
 use App\Validators\RideValidator;
 use Couchbase\QueryException;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,12 +32,14 @@ class RideService extends AbstractService implements RideServiceInterface
     protected ValidationException $exception;
     private RideValidator $validator;
     private LocationServiceInterface $locationService;
+    private RideCacheService $rideCacheService;
 
-    public function __construct(Ride $ride, RideValidator $validator, LocationServiceInterface $locationService)
+    public function __construct(Ride $ride, RideValidator $validator, LocationServiceInterface $locationService, RideCacheService $rideCacheService)
     {
         $this->ride = $ride;
         $this->validator = $validator;
         $this->locationService = $locationService;
+        $this->rideCacheService = $rideCacheService;
     }
 
     /**
@@ -60,9 +63,8 @@ class RideService extends AbstractService implements RideServiceInterface
 
             $this->checkDatabase();
 
-            $driver = Driver::where('available', true)
-                ->orderBy('activation_date', 'asc')
-                ->first();
+            // Busca o próximo driver disponível
+            $driver = $this->rideCacheService->getNextAvailableDriver();
 
             if (!$driver) {
                 throw RideException::noDriversAvailable();
@@ -97,7 +99,10 @@ class RideService extends AbstractService implements RideServiceInterface
             // associate the driver and estimate to the ride
             $ride->load(['driver', 'estimate']);
 
+
             $this->publishToEstimateRideQueue($ride);
+
+            Log::info('Ride created successfully', ['ride_id' => $ride->id, 'driver_id' => $ride->driver_id]);
 
             return $ride;
 
@@ -115,7 +120,8 @@ class RideService extends AbstractService implements RideServiceInterface
 
     private function publishToEstimateRideQueue($ride)
     {
-        // Envia para o Redis Stream
+        Log::info('Publishing ride estimate to Redis stream', ['ride_id' => $ride->id]);
+
         Redis::xadd(RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value, '*', [
             'ride_id' => $ride->id,
             'estimate_id' => $ride->estimate->id,
@@ -124,5 +130,28 @@ class RideService extends AbstractService implements RideServiceInterface
             'timestamp' => now()->toIso8601String(),
         ]);
 
+    }
+
+    public function acceptRide($id)
+    {
+        if ($this->validator->validateId($id)) {
+
+            $this->checkDatabase();
+
+            Log::debug("Searching for the ride with ID: $id");
+            $ride = $this->ride->find($id);
+
+            Log::debug("Searching for the driver with ID: $ride->driver_id");
+            $driver = Driver::findOrFail($ride->driver_id);
+
+            $ride->accept($driver);
+            $this->rideCacheService->removeDriverFromCache($driver->id);
+
+            return $ride;
+
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
     }
 }

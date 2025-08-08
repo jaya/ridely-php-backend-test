@@ -5,10 +5,11 @@ namespace App\Http\Helpers;
 use App\Exceptions\ApplicationException;
 use App\Http\Hateos\HateosMetadata;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ResponseHelper
 {
-    public static function success($data, $statusCode = 200, HateosMetadata $metadata = null, bool $hateos = true): JsonResponse
+    public static function success($data, $statusCode = Response::HTTP_OK, HateosMetadata $metadata = null, bool $hateos = true): JsonResponse
     {
 
 

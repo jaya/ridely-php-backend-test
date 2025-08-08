@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\Monolog\Processors\RequestIdProcessor;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -68,6 +69,9 @@ return [
                 'batchMode' => Monolog\Formatter\JsonFormatter::BATCH_MODE_JSON,
                 'appendNewline' => true,
             ],
+            'processors' => [
+                RequestIdProcessor::class,
+            ],
         ],
 
         'single' => [
@@ -114,7 +118,10 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
-            'processors' => [PsrLogMessageProcessor::class],
+            'processors' => [
+                RequestIdProcessor::class,
+                PsrLogMessageProcessor::class
+            ],
         ],
 
         'syslog' => [

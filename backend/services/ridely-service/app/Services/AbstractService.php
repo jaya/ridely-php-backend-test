@@ -14,12 +14,14 @@ abstract class AbstractService
      */
     public function checkDatabase(): void
     {
-        try {
-            Log::debug('Checking database connection');
-            DB::connection()->getPdo();
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            throw ServiceException::databaseTemporarilyUnavailable($e->getMessage(), $e);
-        }
+        // Temporarily disabled database connection check (needs to improved)
+        return;
+//        try {
+//            Log::debug('Checking database connection');
+//            DB::connection()->getPdo();
+//        } catch (Exception $e) {
+//            Log::error($e->getMessage());
+//            throw ServiceException::databaseTemporarilyUnavailable($e->getMessage(), $e);
+//        }
     }
 }

@@ -27,7 +27,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', function (Request $request) {
             $limit = env('REQUEST_LIMIT_PER_MINUTE', 60);
-            Log::debug("RateLimiter: $limit");
+//            Log::debug("RateLimiter: $limit");
             return Limit::perMinute($limit)->by($request->user()?->id ?: $request->ip());
         });
 

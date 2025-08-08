@@ -212,23 +212,26 @@ class RideController extends Controller
      *     )
      * )
      */
-    public function acceptRide($id): JsonResponse
+    public function acceptRide($id, RideManagerFacade $facade): JsonResponse
     {
-        //$id = $request->id;
-        $ride = Ride::findOrFail($id);
-        $driver = Driver::findOrFail($ride->driver_id);
-        $ride->accept($driver);
+        try {
+            $ride = $facade->acceptRide($id);
+            return ResponseHelper::success(RideConverter::convertFromModelToResponse($ride));
 
-        return response()->json([
-            'id' => $ride->id,
-            'status' => $ride->status,
-            'drop_off' => $ride->drop_off,
-            'pick_up' => $ride->pick_up,
-            'passenger' => [
-                'name' => $ride->passenger_name,
-                'email' => $ride->passenger_email
-            ]
-        ]);
+//            return response()->json([
+//                'id' => $ride->id,
+//                'status' => $ride->status,
+//                'drop_off' => $ride->drop_off,
+//                'pick_up' => $ride->pick_up,
+//                'passenger' => [
+//                    'name' => $ride->passenger_name,
+//                    'email' => $ride->passenger_email
+//                ]
+//            ]);
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
+
     }
 
     /**
@@ -427,6 +430,7 @@ class RideController extends Controller
         try {
 
             $estimate = $facade->estimateRide($id);
+            Log::debug("Ride estimate created successfully");
             return ResponseHelper::success(RideEstimateConverter::convertFromModelToResponse($estimate), Response::HTTP_CREATED);
 
         } catch (ApplicationException $e) {

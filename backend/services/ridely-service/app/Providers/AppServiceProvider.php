@@ -10,6 +10,7 @@ use App\Services\Interfaces\DriverServiceInterface;
 use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
+use App\Services\RideCacheService;
 use App\Services\V1\DriverService;
 use App\Services\V1\EstimateRideService;
 use App\Services\V1\LocationService;
@@ -68,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
                $app->make(Ride::class),
                $app->make(RideValidator::class),
                $app->make(LocationServiceInterface::class),
+               $app->make(RideCacheService::class)
            );
         });
 
