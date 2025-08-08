@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Driver;
 use App\Models\PricingRule;
 use App\Models\Ride;
+use App\Observers\DriverObserver;
+use App\Services\DriverCacheService;
 use App\Services\Facades\DriverManagerFacade;
 use App\Services\Facades\RideManagerFacade;
 use App\Services\Interfaces\DriverServiceInterface;
@@ -42,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
                 ),
                 default => new DriverService(
                     $app->make(DriverValidator::class),
+                    $app->make(DriverCacheService::class)
                 ),
             };
         });
@@ -98,6 +102,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Driver::observe(DriverObserver::class);
     }
 }

@@ -18,10 +18,10 @@ php:
   replicas: 1
   resources:
     requests:
-      cpu: 200m
-      memory: 128Mi
+      cpu: 300m
+      memory: 256Mi
     limits:
-      cpu: 200m
+      cpu: 300m
       memory: 256Mi
 
 tasks:

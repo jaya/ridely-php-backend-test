@@ -8,8 +8,13 @@ use App\Models\Driver;
 
 class RideCacheService
 {
-    private string $cacheKey = 'available_drivers';
+    private string $availableDriversCacheKey = 'available_drivers';
+    private DriverCacheService $driverCacheService;
 
+    public function __construct(DriverCacheService $driverCacheService)
+    {
+        $this->driverCacheService = $driverCacheService;
+    }
     /**
      * Get the next available driver from cache or DB as fallback.
      */
@@ -17,15 +22,23 @@ class RideCacheService
     {
         Log::info("Fetching next available driver from cache.");
         // Try getting the first driver from cache
-        $driverId = Redis::zRange($this->cacheKey, 0, 0)[0] ?? null;
+        $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
 
         // If cache is empty, reload from database
         if (!$driverId) {
             $this->refreshCacheFromDatabase();
-            $driverId = Redis::zRange($this->cacheKey, 0, 0)[0] ?? null;
+            $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
         }
 
-        return $driverId ? Driver::find($driverId) : null;
+        $driver = $this->driverCacheService->getDriver($driverId);
+
+        if (!$driver) {
+            $this->driverCacheService->refreshCacheFromDatabase();
+            Log::info("Querying driver ID $driverId from database as it was not found in cache.");
+            $driver = Driver::find($driverId);
+        }
+
+        return $driver;
     }
 
     /**
@@ -34,7 +47,7 @@ class RideCacheService
     public function removeDriverFromCache(int $driverId): void
     {
         Log::info("Removing driver ID $driverId from cache.");
-        Redis::zRem($this->cacheKey, $driverId);
+        Redis::zRem($this->availableDriversCacheKey, $driverId);
     }
 
     /**
@@ -42,7 +55,7 @@ class RideCacheService
      */
     public function addDriverToCache(Driver $driver): void
     {
-        Redis::zAdd($this->cacheKey, strtotime($driver->activation_date), $driver->id);
+        Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
     }
 
     /**
@@ -50,14 +63,23 @@ class RideCacheService
      */
     public function refreshCacheFromDatabase(): void
     {
-        Log::info("Refreshing drivers cache from database.");
+        Log::info("Refreshing available drivers cache from database.");
 
+        $this->availableDrivers();
+
+    }
+
+    /**
+     * @return void
+     */
+    public function availableDrivers(): void
+    {
         $drivers = Driver::where('available', true)
             ->orderBy('activation_date', 'asc')
             ->get(['id', 'activation_date']);
 
         foreach ($drivers as $driver) {
-            Redis::zAdd($this->cacheKey, strtotime($driver->activation_date), $driver->id);
+            Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
         }
     }
 }

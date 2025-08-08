@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class RequestTimeLogger
 {
+
     /**
      * Handle an incoming request.
      *
@@ -19,7 +20,12 @@ class RequestTimeLogger
      */
     public function handle(Request $request, Closure $next)
     {
-//        Log::info("Before request: {$request->path()} | Method: {$request->method()} | IP: {$request->ip()} | User-Agent: {$request->header('User-Agent')}");
+        $enabled = env('REQUEST_TIME_LOGGER_ENABLED', true);
+        if (!$enabled) {
+            return $next($request);
+        }
+
+        Log::info("Request starting: {$request->path()} | Method: {$request->method()} | IP: {$request->ip()} | User-Agent: {$request->header('User-Agent')}");
         $startTime = microtime(true);
 
         $response = $next($request);

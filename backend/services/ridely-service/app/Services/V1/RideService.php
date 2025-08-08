@@ -63,7 +63,6 @@ class RideService extends AbstractService implements RideServiceInterface
 
             $this->checkDatabase();
 
-            // Busca o próximo driver disponível
             $driver = $this->rideCacheService->getNextAvailableDriver();
 
             if (!$driver) {

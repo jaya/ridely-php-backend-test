@@ -10,6 +10,7 @@ use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
+use App\Services\DriverCacheService;
 use App\Services\Interfaces\DriverServiceInterface;
 use App\Validators\DriverValidator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -22,12 +23,15 @@ class DriverService extends AbstractService implements DriverServiceInterface
 {
     protected ValidationException $exception;
     protected DriverValidator $validator;
+    private DriverCacheService $driverCacheService;
 
     public function __construct(
-        DriverValidator $validator
+        DriverValidator $validator,
+        DriverCacheService $driverCacheService
     )
     {
         $this->validator = $validator;
+        $this->driverCacheService = $driverCacheService;
     }
 
     public function create(CreateDriverCriteria $criteria): Driver
@@ -64,6 +68,8 @@ class DriverService extends AbstractService implements DriverServiceInterface
             $this->checkDatabase();
 
             try {
+                // TODO aplicar cache service
+                //$driverCacheService
                 return Driver::allDrivers($criteria);
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
