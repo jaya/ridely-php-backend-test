@@ -17,14 +17,16 @@ Route::prefix('drivers')->group(function () {
 
 Route::prefix('rides')->group(function () {
 
+    Route::post('/request-driver', [RideController::class, 'requestDriver']);
+
     Route::get('/{id}', [RideController::class, 'show']);
     Route::delete('/{id}', [RideController::class, 'destroy']);
+    Route::post('/{id}/cancel-ride', [RideController::class, 'cancelRide']);
+    Route::post('/{id}/accept-ride', [RideController::class, 'acceptRide']);
+    Route::post('/{id}/refuse-ride', [RideController::class, 'refuseRide']);
+    Route::post('/{id}/finish-ride', [RideController::class, 'finishRide']);
+
     Route::post('/{id}/estimate-ride', [RideController::class, 'estimateRide']);
     Route::get('/{id}/estimate-ride', [RideController::class, 'getRidePrice']);
-    Route::post('/request-driver', [RideController::class, 'requestDriver']);
-    Route::post('/cancel-ride', [RideController::class, 'cancelRide']);
-    Route::post('/accept-ride', [RideController::class, 'acceptRide']);
-    Route::post('/refuse-ride', [RideController::class, 'refuseRide']);
-    Route::post('/finish-ride', [RideController::class, 'finishRide']);
 
 });

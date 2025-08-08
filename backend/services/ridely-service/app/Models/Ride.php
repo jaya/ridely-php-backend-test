@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Enums\ErrorMessagesEnum;
 use App\Enums\RideStatusEnum;
 use App\Exceptions\RideException;
-use App\Exceptions\ServiceException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Ride extends Model
 {
@@ -24,12 +23,18 @@ class Ride extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'status' => RideStatusEnum::class
     ];
-
 
     public function driver()
     {
         return $this->belongsTo(Driver::class);
+    }
+
+    public function estimate()
+    {
+//        return $this->hasMany(RideEstimate::class);
+        return $this->hasOne(RideEstimate::class)->latestOfMany();
     }
 
     public function request()
@@ -44,6 +49,11 @@ class Ride extends Model
 
     public function accept(Driver $driver)
     {
+        Log::debug(sprintf(
+            "Accepting ride %d for driver %s, status: %s",
+            $this->id, $driver->name, $this->status->value
+        ));
+
         if ($this->status !== RideStatusEnum::REQUESTED) {
             throw RideException::invalidState('Ride must be in REQUESTED state to be accepted');
         }
@@ -100,14 +110,12 @@ class Ride extends Model
         $this->save();
     }
 
-    // TODO revisar se é o driver ou ride, revisar nome do metodo
     public function getRideWithDriver(int $id)
     {
         try {
             return self::with('driver')->findOrFail($id);
         } catch (\Exception $e) {
-            //throw ServiceException::notFound(ErrorMessagesEnum::RIDE_NOT_FOUND, ["id" => $id], $e);
-            throw RideException::notFound(["id" => $id]);
+            throw RideException::notFound();
         }
     }
 }

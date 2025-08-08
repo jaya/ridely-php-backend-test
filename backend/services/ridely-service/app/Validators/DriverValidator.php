@@ -68,15 +68,6 @@ class DriverValidator implements ValidatorInterface
     }
 
 
-
-    /**
-     * @return void
-     */
-    public function getInvalidDataException(): void
-    {
-        $this->exception = ValidationException::withMessages([ErrorMessagesEnum::INVALID_DRIVER_DATA->message()]);
-    }
-
     /**
      * @param $data
      * @param $rules
@@ -91,7 +82,7 @@ class DriverValidator implements ValidatorInterface
         $result = true;
 
         if (empty($data)) {
-            $this->getInvalidDataException();
+            $this->exception = ValidationException::withMessages([ErrorMessagesEnum::INVALID_DRIVER_DATA->message()]);
             $result = false;
         } else {
             $validator = Validator::make($data, $rules);

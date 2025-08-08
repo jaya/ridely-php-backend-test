@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RideStatusEnum;
 use App\Http\Criteria\ListCriteria;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -56,7 +57,7 @@ class Driver extends Model
     public function getOpenRides()
     {
         return $this->rides()
-            ->where('status', Ride::STATUS_REQUESTED)
+            ->where('status', RideStatusEnum::REQUESTED)
             ->get();
     }
 

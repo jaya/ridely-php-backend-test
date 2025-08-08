@@ -4,6 +4,7 @@ namespace App\Services\Facades;
 
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
+use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Http\Hateos\HateosItemLinks;
 use App\Services\Interfaces\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;

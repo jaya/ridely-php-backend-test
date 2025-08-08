@@ -33,20 +33,6 @@
                 }
             }
         },
-        "/health": {
-            "get": {
-                "tags": [
-                    "Public"
-                ],
-                "summary": "Health check endpoint",
-                "operationId": "1b08f26c6d3e6712513ec64ace17c564",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    }
-                }
-            }
-        },
         "/api/auth/login": {
             "post": {
                 "tags": [
@@ -452,7 +438,7 @@
         "/api/v1/rides/{id}": {
             "get": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Buscar detalhes de uma corrida",
                 "operationId": "ba49c05c73d20b23b3c7e0f8be7fecb6",
@@ -463,7 +449,8 @@
                         "description": "ID da corrida",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "example": "1"
                         }
                     }
                 ],
@@ -485,7 +472,7 @@
             },
             "delete": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Remover uma corrida",
                 "operationId": "b8196402ca7419128eefa197acd4624a",
@@ -510,13 +497,13 @@
                 }
             }
         },
-        "/api/v1/rides/request": {
+        "/api/v1/rides/request-driver": {
             "post": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Solicitar motorista",
-                "operationId": "ea006005f9b5cab61ee6de4034d9edb2",
+                "operationId": "05fda2848c2e4ca4c4f89dab503159a2",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -533,11 +520,11 @@
                                     },
                                     "pick_up": {
                                         "type": "string",
-                                        "example": "Rua X, 200"
+                                        "example": "Avenida Beira Mar, 25"
                                     },
                                     "drop_off": {
                                         "type": "string",
-                                        "example": "Av. Brasil, 1000"
+                                        "example": "Avenida Euclides Figueiredo, 65"
                                     }
                                 },
                                 "type": "object"
@@ -547,11 +534,32 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Corrida criada",
+                        "description": "Corrida criada com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RideFull"
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 0
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/RideFull"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -562,9 +570,36 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "error": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "common.error.ride_drivers_available"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 63
+                                        },
+                                        "message": {
                                             "type": "string",
                                             "example": "We do not have drivers available"
+                                        },
+                                        "params": {
+                                            "description": "Parametros da requisição",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "id"
+                                            }
+                                        },
+                                        "detail": {
+                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -578,7 +613,7 @@
         "/api/v1/rides/cancel": {
             "post": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Cancelar corrida",
                 "operationId": "f0b2a58f95283b96bf6b570afa0009f8",
@@ -618,32 +653,25 @@
                 }
             }
         },
-        "/api/v1/rides/accept": {
+        "/api/v1/rides/{id}/accept-ride": {
             "post": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Aceitar corrida",
-                "operationId": "6651f698831a8d0d2517b14b58b30666",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "id"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    }
-                                },
-                                "type": "object"
-                            }
+                "operationId": "d6b076842f8d0fb21b50bfefb4102e12",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do driver",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "Corrida aceita",
@@ -685,7 +713,7 @@
         "/api/v1/rides/refuse": {
             "post": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Recusar corrida",
                 "operationId": "2c2f4225b8b9d69cb6e476bfdf465318",
@@ -749,7 +777,7 @@
         "/api/v1/rides/finish": {
             "post": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Finalizar corrida",
                 "operationId": "437aa54038d63c9673f1eea4d12eb8fa",
@@ -820,7 +848,7 @@
         "/api/v1/drivers/{driverId}/open-rides": {
             "get": {
                 "tags": [
-                    "Ride"
+                    "Rides"
                 ],
                 "summary": "Listar corridas abertas para motorista",
                 "operationId": "29adaafeccc75b914e9d80fbee4f911e",
@@ -882,6 +910,150 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/rides/{id}/estimate-ride": {
+            "post": {
+                "tags": [
+                    "Rides"
+                ],
+                "summary": "Estimar corrida",
+                "description": "Retorna a estimativa de distância, duração e preço de uma corrida.",
+                "operationId": "estimateRide",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID da corrida",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "pick_up",
+                                    "drop_off"
+                                ],
+                                "properties": {
+                                    "pick_up": {
+                                        "type": "string",
+                                        "example": "Avenida Beira Mar, 25"
+                                    },
+                                    "drop_off": {
+                                        "type": "string",
+                                        "example": "Avenida Euclides Figueiredo, 65"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estimativa gerada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "distance_km": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 12.5
+                                                },
+                                                "duration_min": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 18.3
+                                                },
+                                                "price_estimate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 23.75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação ou endereço inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "label": {
+                                            "type": "string",
+                                            "example": "common.error.invalid_request_param"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid Request Parameter: The drop off field is required"
+                                        },
+                                        "params": {
+                                            "description": "Parametros da requisição",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "id"
+                                            }
+                                        },
+                                        "detail": {
+                                            "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -1051,6 +1223,10 @@
                     },
                     "car": {
                         "$ref": "#/components/schemas/Car"
+                    },
+                    "available": {
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -1079,6 +1255,51 @@
                         "items": {
                             "type": "object"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "EstimateRideErrorParams": {
+                "description": "Parâmetros da requisição que causaram o erro",
+                "type": "object",
+                "example": {
+                    "pick_up": "Rua A, 100 - Aracaju",
+                    "drop_offz": "Rua B, 200 - Aracaju"
+                },
+                "additionalProperties": {
+                    "schema": "EstimateRideErrorParamsSchema",
+                    "type": "string"
+                }
+            },
+            "EstimateRideErrorParamsSchema": {
+                "type": "string"
+            },
+            "EstimateRideShort": {
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "distance_km": {
+                        "type": "number",
+                        "example": "23"
+                    },
+                    "duration_min": {
+                        "type": "number",
+                        "example": "17"
+                    },
+                    "price_estimate": {
+                        "type": "decimal",
+                        "example": "12.50"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "PENDING",
+                            "PROCESSING",
+                            "READY",
+                            "FAILED"
+                        ],
+                        "example": "PENDING"
                     }
                 },
                 "type": "object"
@@ -1149,7 +1370,14 @@
                     },
                     "status": {
                         "type": "string",
-                        "example": "requested"
+                        "enum": [
+                            "REQUESTED",
+                            "ACCEPTED",
+                            "FINISHED",
+                            "CANCELLED",
+                            "REFUSED"
+                        ],
+                        "example": "REQUESTED"
                     },
                     "pick_up": {
                         "type": "string",
@@ -1162,13 +1390,8 @@
                     "driver": {
                         "$ref": "#/components/schemas/DriverShort"
                     },
-                    "passenger": {
-                        "$ref": "#/components/schemas/Passenger"
-                    },
-                    "price": {
-                        "type": "number",
-                        "format": "float",
-                        "example": 25
+                    "estimate": {
+                        "$ref": "#/components/schemas/EstimateRideShort"
                     }
                 },
                 "type": "object"
@@ -1266,8 +1489,8 @@
             "description": "Driver"
         },
         {
-            "name": "Ride",
-            "description": "Ride"
+            "name": "Rides",
+            "description": "Rides"
         }
     ]
 }

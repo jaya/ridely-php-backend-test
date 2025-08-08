@@ -20,7 +20,7 @@ class RideException extends ApplicationException
 
     public static function noDriversAvailable(): RideException
     {
-        return new self(ErrorMessagesEnum::RIDE_NO_DRIVERS_AVAILABLE, Response::HTTP_NOT_FOUND);
+        return new self(ErrorMessagesEnum::RIDE_NO_DRIVERS_AVAILABLE, Response::HTTP_BAD_REQUEST);
     }
 
     public static function unableToLocateAddressData(): RideException
@@ -32,5 +32,10 @@ class RideException extends ApplicationException
     {
         //throw new \Exception("Pricing rule not found");
         return new self(ErrorMessagesEnum::RIDE_PRICING_RULE_NOT_FOUND, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    public static function estimateNotFound()
+    {
+        return new self(ErrorMessagesEnum::RIDE_ESTIMATE_NOT_FOUND, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 } 

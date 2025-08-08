@@ -3,10 +3,12 @@
 namespace Tests\Unit\Http\Controllers;
 
 use App\Enums\ErrorMessagesEnum;
+use App\Enums\RideEstimateStatusEnum;
 use App\Enums\RideStatusEnum;
 use App\Http\Middleware\ValidateKeycloakJwt;
 use App\Models\Driver;
 use App\Models\Ride;
+use App\Models\RideEstimate;
 use App\Services\JWTKeysService;
 use Database\Seeders\DriverSeeder;
 use Database\Seeders\PricingRulesSeeder;
@@ -44,7 +46,7 @@ class RideControllerTest extends UnitTestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED
+            'status' => RideStatusEnum::REQUESTED->value
         ]);
 
 
@@ -90,7 +92,7 @@ class RideControllerTest extends UnitTestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED
+            'status' => RideStatusEnum::REQUESTED->value
         ]);
 
         $ride->accept($driver);
@@ -149,7 +151,7 @@ class RideControllerTest extends UnitTestCase
             "drop_off" => LocationHelper::$dropOff,
         ];
 
-        $ride = Ride::factory()->create();
+        $ride = $this->createRideWithRideEstimation();
         $rideId = $ride->id;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
@@ -187,7 +189,7 @@ class RideControllerTest extends UnitTestCase
             "drop_off" => "",
         ];
 
-        $ride = Ride::factory()->create();
+        $ride = $this->createRideWithRideEstimation();
         $rideId = $ride->id;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
@@ -219,7 +221,7 @@ class RideControllerTest extends UnitTestCase
             "drop_off" => "invalid",
         ];
 
-        $ride = Ride::factory()->create();
+        $ride = $this->createRideWithRideEstimation();
         $rideId = $ride->id;
 
         $response = $this->withHeader('Authorization', "Bearer $token")
@@ -237,6 +239,54 @@ class RideControllerTest extends UnitTestCase
         $data = $response->json();
         $this->assertFalse($data['success']);
         $this->assertEquals(ErrorMessagesEnum::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA->label(), $data['label']);
+    }
+
+    public function testRequestDriverSuccess()
+    {
+
+        $this->mockTokenValidation();
+        $token = TokenHelper::getFakeToken();
+
+        Driver::factory()->count(5)->create();
+
+        $data = [
+            'pick_up' => LocationHelper::$pickUp,
+            'drop_off' => LocationHelper::$dropOff,
+            'passenger' => [
+                'name' => 'John Doe',
+                'email' => 'john.doe@example.com',
+            ]
+        ];
+
+        $response = $this->withHeader('Authorization', "Bearer $token")
+            ->post("/api/v1/rides/request-driver", $data);
+
+        $response->assertStatus(201);
+//        $response->assertJsonStructure([
+//            'success',
+//            'label',
+//            'code',
+//            'message',
+//            'data' => [
+//                'id',
+//                'status',
+//                'pick_up',
+//                'drop_off',
+//                'driver' => [
+//                    'name',
+//                    'car' => [
+//                        'license_plate',
+//                        'model',
+//                        'color',
+//                    ],
+//                ],
+//            ],
+//        ]);
+//
+//        $dataObject = $response->json();
+//        $data = $dataObject['data'];
+//
+//        $this->assertResponse($data);
     }
 
     private function mockTokenValidation(): void
@@ -298,6 +348,21 @@ class RideControllerTest extends UnitTestCase
             }
         }
 
+    }
+
+    /**
+     * @return Ride|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+     */
+    public function createRideWithRideEstimation(): Ride|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
+    {
+        $ride = Ride::factory()->create();
+        $estimate = RideEstimate::create([
+            'ride_id' => $ride->id,
+            'status' => RideEstimateStatusEnum::PENDING,
+        ]);
+
+        $ride->estimate()->save($estimate);
+        return $ride;
     }
 
 

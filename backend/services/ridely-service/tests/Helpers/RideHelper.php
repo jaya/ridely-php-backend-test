@@ -57,7 +57,7 @@ class RideHelper
 
 
         return Ride::factory()->create([
-            'status' => RideStatusEnum::REQUESTED,
+            'status' => RideStatusEnum::REQUESTED->value,
             'pick_up' => $pickUp,
             'drop_off' => $dropOff,
         ]);

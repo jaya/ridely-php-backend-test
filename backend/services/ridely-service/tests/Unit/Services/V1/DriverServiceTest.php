@@ -139,26 +139,26 @@ class DriverServiceTest extends UnitTestCase
         $this->assertTrue($deleted);
     }
 
-//    public function testDeleteFailDriverHasDependencies()
-//    {
-//        Log::info(
-//            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
-//        );
-//
-//        self::markTestSkipped("Test needs to be fixed, as it is not working as expected");
-//
-//        $this->expectException(DriverException::class);
-//        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
-//
-//        $driver = Driver::factory()->create();
-//        $ride = Ride::factory()->create();
-//        $ride->status = RideStatusEnum::REQUESTED;
-//        $ride->accept($driver);
-//
-//
-//        $deleted = $this->service->delete($driver->id);
-//        $this->assertTrue($deleted);
-//    }
+    public function testDeleteFailDriverHasDependencies()
+    {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        self::markTestSkipped("Test needs to be reviewed");
+
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
+
+        $driver = Driver::factory()->create();
+        $ride = Ride::factory()->create();
+        $ride->status = RideStatusEnum::REQUESTED->value;
+        $ride->accept($driver);
+
+
+        $deleted = $this->service->delete($driver->id);
+        $this->assertTrue($deleted);
+    }
 //
 //    public function testFindSuccess()
 //    {

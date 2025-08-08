@@ -7,13 +7,16 @@ use App\Models\Ride;
 use App\Services\Facades\DriverManagerFacade;
 use App\Services\Facades\RideManagerFacade;
 use App\Services\Interfaces\DriverServiceInterface;
+use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
 use App\Services\V1\DriverService;
+use App\Services\V1\EstimateRideService;
 use App\Services\V1\LocationService;
 use App\Services\V1\RideService;
 use App\Services\V2\V2DriverService;
 use App\Validators\DriverValidator;
+use App\Validators\EstimateRideValidator;
 use App\Validators\LocationValidator;
 use App\Validators\RideValidator;
 use Illuminate\Support\ServiceProvider;
@@ -60,17 +63,28 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(RideServiceInterface::class, RideService::class);
-        $this->app->bind(RideService::class, function ($app) {
+        $this->app->singleton(RideService::class, function ($app) {
            return new RideService(
                $app->make(Ride::class),
                $app->make(RideValidator::class),
+               $app->make(LocationServiceInterface::class),
            );
         });
 
+        $this->app->bind(EstimateRideServiceInterface::class, EstimateRideService::class);
+        $this->app->singleton(EstimateRideService::class, function ($app) {
+            return new EstimateRideService(
+                $app->make(EstimateRideValidator::class),
+                $app->make(LocationServiceInterface::class),
+            );
+        });
+
         $this->app->singleton(RideManagerFacade::class, function ($app) {
+            $rideService = $app->make(RideServiceInterface::class);
             return new RideManagerFacade(
-                $app->make(RideService::class),
-                $app->make(LocationServiceInterface::class)
+                $rideService,
+                $app->make(EstimateRideServiceInterface::class),
+                $rideService->getLocationService()
             );
         });
 

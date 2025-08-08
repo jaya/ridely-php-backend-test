@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Converters\DriverConverter;
-use App\Enums\ErrorMessagesEnum;
 use App\Exceptions\ApplicationException;
-use App\Exceptions\ServiceException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;

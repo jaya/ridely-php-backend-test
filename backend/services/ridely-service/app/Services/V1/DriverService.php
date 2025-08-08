@@ -7,6 +7,7 @@ use App\Exceptions\DriverException;
 use App\Exceptions\ServiceException;
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
+use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Models\Driver;
 use App\Services\AbstractService;
 use App\Services\Interfaces\DriverServiceInterface;

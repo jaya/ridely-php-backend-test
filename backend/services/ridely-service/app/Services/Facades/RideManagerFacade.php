@@ -4,55 +4,46 @@ namespace App\Services\Facades;
 
 use App\Exceptions\RideException;
 use App\Http\Criteria\EstimateRideCriteria;
+use App\Http\Criteria\Ride\CreateRideCriteria;
+use App\Models\Ride;
+use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
+use App\Services\V1\EstimateRideService;
+use Illuminate\Support\Facades\Log;
 
 class RideManagerFacade
 {
     protected LocationServiceInterface $locationService;
     private RideServiceInterface $rideService;
+    private EstimateRideServiceInterface $estimateRideService;
 
-    public function __construct(RideServiceInterface $rideService, LocationServiceInterface $searchLocationService)
+    public function __construct(RideServiceInterface $rideService, EstimateRideServiceInterface $estimateRideService, LocationServiceInterface $searchLocationService)
     {
         $this->rideService = $rideService;
         $this->locationService = $searchLocationService;
+        $this->estimateRideService = $estimateRideService;
     }
 
     /**
      * @throws RideException
      */
-    public function estimateRide(EstimateRideCriteria $criteria): array
+    public function estimateRide(EstimateRideCriteria $criteria, string $id = null): array
     {
-        $origin = $this->getCoordinatesFromAddress($criteria->getPickUp());
-        $destination = $this->getCoordinatesFromAddress($criteria->getDropOff(), true);
+        return $this->estimateRideService->estimateRide($criteria, $id);
 
-        if (!$origin || !$destination) {
-            throw RideException::unableToLocateAddressData();
-        }
-
-        $distanceKm = $this->locationService->calculateArea(
-            $origin['lat'], $origin['lon'],
-            $destination['lat'], $destination['lon']
-        );
-
-        $durationMin = $this->locationService->calculateDurationTime($distanceKm);
-
-        $price = $this->locationService->calculatePrice($distanceKm);
-
-        return [
-            'distance_km' => round($distanceKm, 1),
-            'duration_min' => $durationMin,
-            'price_estimate' => $price,
-        ];
     }
 
-    private function getCoordinatesFromAddress(string $address, $wait = false)
+
+    public function create(CreateRideCriteria $criteria): Ride
     {
-        return $this->locationService->execute($address, $wait);
+        return $this->rideService->create($criteria);
     }
 
-    public function getRide(string $id)
+    public function find(string $id)
     {
-        return $this->rideService->getRide((int)$id);
+        $ride = $this->rideService->find((int)$id);
+        $ride->load('estimate'); // Load the estimate relationship
+        return $ride;
     }
 }

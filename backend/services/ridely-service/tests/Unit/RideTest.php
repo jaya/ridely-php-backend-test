@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Enums\RideStatusEnum;
 use Tests\TestCase;
 use App\Models\Ride;
 use App\Models\Driver;
@@ -31,12 +32,12 @@ class RideTest extends TestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => Ride::STATUS_REQUESTED
+            'status' => RideStatusEnum::REQUESTED->value
         ]);
 
         $ride->accept($driver);
 
-        $this->assertEquals(Ride::STATUS_ACCEPTED, $ride->status);
+        $this->assertEquals(RideStatusEnum::ACCEPTED->value, $ride->status);
         $this->assertEquals($driver->id, $ride->driver_id);
         $this->assertFalse($driver->available);
     }
@@ -58,7 +59,7 @@ class RideTest extends TestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => Ride::STATUS_REQUESTED
+            'status' => RideStatusEnum::REQUESTED->value
         ]);
 
         $this->expectException(RideException::class);

@@ -24,7 +24,7 @@ class RideFactory extends Factory
             'drop_off' =>  $this->faker->streetAddress,
             'passenger_name' => $this->faker->name,
             'passenger_email' => $this->faker->email,
-            'status' => $this->faker->randomElement($statuses),
+            'status' => ($this->faker->randomElement($statuses)),
             'driver_id' => Driver::factory(),
             'price' => $this->faker->randomFloat(2, 1, 100),
         ];

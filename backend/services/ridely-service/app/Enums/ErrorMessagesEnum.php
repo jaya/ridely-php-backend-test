@@ -48,8 +48,13 @@ enum ErrorMessagesEnum: int
 
     case RIDE_PRICING_RULE_NOT_FOUND = 65;
 
-
     case UNABLE_TO_ESTIMATE_RIDE = 66;
+
+    case INVALID_RIDE_DATA = 67;
+
+    case UNABLE_TO_CREATE_RIDE = 68;
+
+    case RIDE_ESTIMATE_NOT_FOUND = 69;
 
     public function label(): string
     {
@@ -80,6 +85,9 @@ enum ErrorMessagesEnum: int
             self::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA => 'common.error.ride_unable_to_locate_address_data',
             self::RIDE_PRICING_RULE_NOT_FOUND => 'common.error.ride_pricing_rule_not_found',
             self::UNABLE_TO_ESTIMATE_RIDE => 'common.error.unable_to_estimate_ride',
+            self::INVALID_RIDE_DATA => 'common.error.invalid_ride_data',
+            self::UNABLE_TO_CREATE_RIDE => 'common.error.unable_to_create_ride',
+            self::RIDE_ESTIMATE_NOT_FOUND => 'common.error.ride_estimate_not_found',
 
 
         };
@@ -99,6 +107,7 @@ enum ErrorMessagesEnum: int
             self::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE => 'Unable to save auth public key file',
             self::INVALID_TOKEN => 'Invalid token: %s',
             self::MISSING_BEARER_TOKEN => 'Missing bearer token',
+            self::SERVICE_NOT_IMPLEMENTED => 'This service is not implemented yet.',
 
             self::UNABLE_TO_CREATE_DRIVER => 'Unable to create driver.',
             self::UNABLE_TO_UPDATE_DRIVER => 'Unable to update driver.',
@@ -106,7 +115,6 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'Driver not found.',
             self::UNABLE_TO_LIST_DRIVERS => 'Unable to list drivers.',
             self::INVALID_DRIVER_DATA => 'Invalid Driver Data.',
-            self::SERVICE_NOT_IMPLEMENTED => 'This service is not implemented yet.',
 
             self::RIDE_NOT_FOUND => 'Ride not found.',
             self::RIDE_INVALID_STATE => 'Ride invalid state: %s',
@@ -114,6 +122,9 @@ enum ErrorMessagesEnum: int
             self::RIDE_UNABLE_TO_LOCATE_ADDRESS_DATA => 'Unable to locate address data.',
             self::RIDE_PRICING_RULE_NOT_FOUND => 'Pricing rule not found.',
             self::UNABLE_TO_ESTIMATE_RIDE => 'Unable to estimate ride.',
+            self::INVALID_RIDE_DATA => 'Invalid Ride Data.',
+            self::UNABLE_TO_CREATE_RIDE => 'Unable to create ride.',
+            self::RIDE_ESTIMATE_NOT_FOUND => 'Ride estimate not found.',
         };
 
         if ($args) {

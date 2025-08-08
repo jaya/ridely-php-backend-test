@@ -9,3 +9,13 @@ Indicar extensões necessarias
 - MySQL
 - XDebug
 - Curl
+
+
+## Atualizar documentação da API
+
+Execute o seguinte comando:
+
+```bash
+    ./scripts/init.sh
+```
+> Nota: este comando dever ser executado na pasta do serviço.

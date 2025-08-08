@@ -5,6 +5,7 @@ namespace App\Enums;
 enum RideStatusEnum: string
 {
     case REQUESTED = 'REQUESTED';
+
     case ACCEPTED = 'ACCEPTED';
 
     case FINISHED = 'FINISHED';
