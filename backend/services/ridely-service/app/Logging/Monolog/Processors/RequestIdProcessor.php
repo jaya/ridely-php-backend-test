@@ -11,8 +11,11 @@ class RequestIdProcessor implements ProcessorInterface
     {
         $requestId = request()?->attributes->get('requestId');
 
-        return $record->with(extra: array_merge($record->extra, [
-            'request_id' => $requestId,
-        ]));
+        if ($requestId) {
+            return $record->with(extra: array_merge($record->extra, [
+                'request_id' => $requestId,
+            ]));
+        }
+        return $record;
     }
 }

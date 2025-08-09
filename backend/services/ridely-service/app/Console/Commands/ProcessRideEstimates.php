@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\ServerException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+
 class ProcessRideEstimates extends Command
 {
     /**
@@ -33,7 +34,14 @@ class ProcessRideEstimates extends Command
     public function handle()
     {
         $maxItems = 10;
-        $redis = Redis::connection('streams');
+        try {
+            $redis = Redis::connection('streams');
+        } catch (\Exception $e) {
+            Log::error("Redis connection error: " . $e->getMessage());
+            Log::error("Exiting...");
+            exit(1);
+        }
+
         $streamName = RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value;
 
         Log::info('Starting ProcessRideEstimates command');

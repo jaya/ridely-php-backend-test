@@ -5,12 +5,24 @@ namespace App\Services;
 use App\Models\Driver;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use PHPUnit\Exception;
 
 class DriverCacheService
 {
     private $driversExpirationTime = 60;
 
     private $driversIdExpirationTime = 600;
+    /**
+     * @var array|\class-string[]
+     */
+    private array $context;
+
+    public function __construct()
+    {
+        $this->context = [
+            "class" => self::class
+        ];
+    }
 
     private string $driversCacheKey = 'drivers:sorted';
 
@@ -21,7 +33,7 @@ class DriverCacheService
     // TODO: Considerar um job para automatizar essas rotinas
     public function allDrivers(): void
     {
-        Log::info('Fetching all drivers from the database.');
+        Log::info('Fetching all drivers from the database.', $this->context);
         // Retrieve all drivers sorted by activation_date
         $drivers = Driver::orderBy('activation_date', 'asc')->get();
 
@@ -29,7 +41,7 @@ class DriverCacheService
 //        Redis::del($this->driversIdsCacheKey);
         Redis::del($this->driversCacheKey);
 
-        Log::info('Storing all drivers in cache.', ['count' => $drivers->count()]);
+        Log::info('Storing all drivers in cache.', array_merge($this->context, ['count' => $drivers->count()]));
         foreach ($drivers as $driver) {
             $this->addDriver($driver);
         }
@@ -47,7 +59,7 @@ class DriverCacheService
 
     public function refreshCacheFromDatabase(): void
     {
-        Log::info("Refreshing all drivers cache from database.");
+        Log::info("Refreshing all drivers cache from database.", $this->context);
 
         $this->allDrivers();
 
@@ -72,13 +84,20 @@ class DriverCacheService
 
     public function getDriver(string $driverId): ?Driver
     {
+        $driver = null;
         $data = Redis::hGetAll("$this->driversCacheKey:$driverId");
-        Log::info('Fetching driver from cache...', ['driver_id' => $driverId, 'data' => $data]);
+        Log::info('Fetching driver from cache...', array_merge($this->context, ['driver_id' => $driverId, 'data' => $data]));
         if (empty($data)) {
             return null;
         }
-        $driver = new Driver($data);
-        $driver->id = $driverId; // Ensure the ID is set correctly
+
+        try {
+            $driver = new Driver($data);
+            $driver->id = $driverId; // Ensure the ID is set correctly
+        } catch (\Throwable $e) {
+            Log::error($e->getMessage());
+        }
+
         return $driver;
     }
 }

@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Exception;
 
 class RideService extends AbstractService implements RideServiceInterface
 {
@@ -125,11 +126,15 @@ class RideService extends AbstractService implements RideServiceInterface
                 Log::debug("Transaction end - commit");
                 Log::debug("==================================================");
 
-            } catch (QueryException $e) {
+            } catch (\Throwable $e) {
                 Log::debug("==================================================");
                 Log::debug("Transaction end - rollback");
                 Log::debug("==================================================");
                 DB::rollBack();
+
+                Log::error("Removing the ID [$driverId] from the cache due an error of SQL (Maybe the cached id is not present on the DB)");
+                // Remove invalid $driverId from the cache
+                $this->rideCacheService->removeDriverFromCache($driverId);
 
                 Log::error($e->getMessage());
                 throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_RIDE, [], $e);

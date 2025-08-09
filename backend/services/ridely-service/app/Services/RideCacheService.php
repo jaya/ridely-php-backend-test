@@ -10,28 +10,35 @@ class RideCacheService
 {
     private string $availableDriversCacheKey = 'available_drivers';
     private DriverCacheService $driverCacheService;
+    /**
+     * @var array|\class-string[]
+     */
+    private array $context;
 
     public function __construct(DriverCacheService $driverCacheService)
     {
         $this->driverCacheService = $driverCacheService;
+        $this->context = [
+            "class" => self::class
+        ];
     }
     /**
      * Get the next available driver from cache or DB as fallback.
      */
     public function getNextAvailableDriver(): ?Driver
     {
-        Log::info("Fetching next available driver from cache.");
+        Log::info("Fetching next available driver from cache.", $this->context);
         // Try getting the first driver from cache
         $driverId = $this->getDriverId();
 
         // If cache is empty, reload from database
         if (!$driverId) {
-            Log::debug("No available drivers found in cache, refreshing from database.");
+            Log::debug("No available drivers found in cache, refreshing from database.", $this->context);
             $this->refreshCacheFromDatabase();
             return null;
         }
 
-        Log::debug("Found available driver ID $driverId in cache.");
+        Log::debug("Found available driver ID $driverId in cache.", $this->context);
         $driver = $this->driverCacheService->getDriver($driverId);
         if (!$driver) {
             $this->driverCacheService->refreshCacheFromDatabase();
@@ -46,7 +53,7 @@ class RideCacheService
      */
     public function removeDriverFromCache(int $driverId): void
     {
-        Log::info("Removing driver ID $driverId from cache.");
+        Log::info("Removing driver ID $driverId from cache.", $this->context);
         Redis::zRem($this->availableDriversCacheKey, $driverId);
     }
 
@@ -63,7 +70,7 @@ class RideCacheService
      */
     public function refreshCacheFromDatabase(): void
     {
-        Log::info("Refreshing available drivers cache from database.");
+        Log::info("Refreshing available drivers cache from database.", $this->context);
 
         $this->availableDrivers();
 
