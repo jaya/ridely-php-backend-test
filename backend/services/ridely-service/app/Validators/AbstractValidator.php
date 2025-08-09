@@ -71,7 +71,7 @@ abstract class AbstractValidator
 
         $validator = Validator::make([
             'id' => $id
-        ], $this->rules());
+        ], $this->idRules());
 
         if ($validator->fails()) {
             $this->exception = new ValidationException($validator);

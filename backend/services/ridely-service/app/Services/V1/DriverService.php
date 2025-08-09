@@ -137,31 +137,51 @@ class DriverService extends AbstractService implements DriverServiceInterface
 
     public function find($id): Driver
     {
-        throw ServiceException::notImplemented();
+        if ($this->validator->validateId($id)) {
+            Log::debug("Searching for the driver with ID: $id");
+            try {
+                return Driver::findOrFail($id);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+                throw DriverException::notFound();
+            }
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
 
-//        try {
-//            return Driver::findOrFail($id);
-//        } catch (ModelNotFoundException $e) {
-//            Log::warning("Driver not found with ID: $id");
-//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
-//        }
     }
 
-//    public function count(ListCriteria $criteria): int
-//    {
+    public function getOpenRides($id, ListCriteria $criteria): LengthAwarePaginator
+    {
+        if ($this->validator->validateId($id) && $this->validator->validateRead($criteria)) {
+
+            $this->checkDatabase();
+
+            Log::debug("Searching for the driver with ID: $id");
+            /**
+             * @var Driver $driver
+             */
+            $driver = null;
+            try {
+                $driver = Driver::findOrFail($id);
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+                throw DriverException::notFound();
+            }
+
+            $paginator = $driver->getOpenRides($criteria);
+
+            if ($paginator->isEmpty()) {
+                throw DriverException::noRidesWaitingToBeAccepted();
+            }
+
+            return $paginator;
 //
-//        try {
-//            $query = Driver::query();
-//
-//            $query->select(DB::raw('count(*) as count'));
-//
-//            $query->orderBy($criteria->orderBy, $criteria->sortBy);
-//
-//            Log::debug(sprintf("Count query: %s", $query->toSql()));
-//            return $query->count();
-//        } catch (QueryException $e) {
-//            Log::error($e->getMessage());
-//            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
-//        }
-//    }
+        } else {
+            Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
+            throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+
+    }
 }

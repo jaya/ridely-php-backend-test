@@ -185,10 +185,146 @@
                 }
             }
         },
+        "/api/v1/drivers/{id}": {
+            "get": {
+                "tags": [
+                    "Drivers"
+                ],
+                "summary": "Buscar um motorista",
+                "operationId": "1d3ed74a84af9e876a1b2e9662e61574",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do motorista",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Motorista encontrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DriverShowSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Corrida não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseRideNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Drivers"
+                ],
+                "summary": "Remove um motorista",
+                "operationId": "3670a9b76c6831f3c02d896166bb485a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do motorista",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Motorista removido com sucesso"
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInvalidParams"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/drivers": {
             "get": {
                 "tags": [
-                    "Driver"
+                    "Drivers"
                 ],
                 "summary": "Lista os motoristas com filtros opcionais",
                 "operationId": "7f3fc5cabb720d907c416cbf56c91826",
@@ -252,17 +388,17 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/DriverListResponse"
+                                    "$ref": "#/components/schemas/DriverListSuccessResponse"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Erro de validação dos critérios",
+                        "description": "Erro de validação",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ErrorResponseInvalidParams"
                                 }
                             }
                         }
@@ -272,27 +408,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
                                 }
                             }
                         }
                     },
                     "500": {
-                        "description": "Outros erros",
+                        "description": "Erro interno no serviço",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
                                 }
                             }
                         }
                     },
                     "503": {
-                        "description": "Serviço indisponível",
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -306,7 +442,7 @@
             },
             "post": {
                 "tags": [
-                    "Driver"
+                    "Drivers"
                 ],
                 "summary": "Cria um novo motorista",
                 "operationId": "616886d5a7effb20d218264e6804538a",
@@ -339,11 +475,51 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Driver criado com sucesso",
+                        "description": "Motoristas criado com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Driver"
+                                    "$ref": "#/components/schemas/DriverCreatedSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInvalidParams"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -356,38 +532,10 @@
                 ]
             }
         },
-        "/api/v1/drivers/{id}": {
-            "delete": {
-                "tags": [
-                    "Driver"
-                ],
-                "summary": "Remove um motorista",
-                "operationId": "3670a9b76c6831f3c02d896166bb485a",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID do driver",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Driver removido com sucesso"
-                    },
-                    "404": {
-                        "description": "Driver não encontrado"
-                    }
-                }
-            }
-        },
         "/api/v1/drivers/{id}/get-rides": {
             "get": {
                 "tags": [
-                    "Driver"
+                    "Drivers"
                 ],
                 "summary": "Lista corridas abertas para um motorista",
                 "operationId": "1e91ae6a7e7f76ddc842d69403e6cd09",
@@ -408,10 +556,17 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Ride"
-                                    }
+                                    "$ref": "#/components/schemas/DriverGetRidesSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInvalidParams"
                                 }
                             }
                         }
@@ -421,13 +576,37 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No rides waiting to be accepted"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ErrorResponseNoRidesWaiting"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseServiceUnavailable"
                                 }
                             }
                         }
@@ -460,7 +639,17 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RideShowSuccess"
+                                    "$ref": "#/components/schemas/RideShowSuccessResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
                                 }
                             }
                         }
@@ -476,7 +665,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -508,6 +707,16 @@
                     "204": {
                         "description": "Corrida removida"
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -519,7 +728,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -587,6 +806,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -598,7 +827,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -650,6 +889,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -661,7 +910,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -703,6 +962,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida invalida,sem motorista ou não encontrada",
                         "content": {
@@ -714,7 +983,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -756,6 +1035,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -767,7 +1056,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -819,6 +1118,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -830,7 +1139,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -935,11 +1254,11 @@
                         }
                     },
                     "500": {
-                        "description": "Outros erros",
+                        "description": "Erro interno no serviço",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
                                 }
                             }
                         }
@@ -1031,6 +1350,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -1042,7 +1371,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1126,6 +1465,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Não autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseUnauthorized"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Corrida não encontrada",
                         "content": {
@@ -1137,7 +1486,17 @@
                         }
                     },
                     "500": {
-                        "description": "Erro interno do servidor",
+                        "description": "Erro interno no serviço",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseInternalError"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Serviço indisponivel",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1175,6 +1534,94 @@
                     "color": {
                         "type": "string",
                         "example": "Vermelho"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverGetRidesListLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers/1/get-rides?limit=2&fields=id&page=1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverGetRidesLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers/1/get-rides"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverGetRidesLinks": {
+                "properties": {
+                    "self": {
+                        "$ref": "#/components/schemas/DriverGetRidesListLink"
+                    },
+                    "next": {
+                        "$ref": "#/components/schemas/DriverGetRidesListLink"
+                    },
+                    "previous": {
+                        "$ref": "#/components/schemas/DriverGetRidesListLink"
+                    },
+                    "first": {
+                        "$ref": "#/components/schemas/DriverGetRidesListLink"
+                    },
+                    "last": {
+                        "$ref": "#/components/schemas/DriverGetRidesListLink"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverListLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers?limit=2&fields=id&page=1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverLink": {
+                "properties": {
+                    "href": {
+                        "type": "string",
+                        "example": "http://127.0.0.1:8000/api/v1/drivers/1"
+                    },
+                    "rel": {
+                        "type": "string",
+                        "example": "get"
+                    },
+                    "method": {
+                        "type": "string",
+                        "example": "GET"
                     }
                 },
                 "type": "object"
@@ -1383,41 +1830,64 @@
                 },
                 "type": "object"
             },
-            "DriverListLink": {
+            "DriverCreatedSuccessResponse": {
                 "properties": {
-                    "href": {
-                        "type": "string",
-                        "example": "http://127.0.0.1:8000/api/v1/drivers?limit=2&fields=id&page=1"
+                    "success": {
+                        "type": "boolean",
+                        "example": true
                     },
-                    "rel": {
+                    "label": {
                         "type": "string",
-                        "example": "get"
+                        "example": "success"
                     },
-                    "method": {
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
                         "type": "string",
-                        "example": "GET"
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Driver"
                     }
                 },
                 "type": "object"
             },
-            "DriverLink": {
+            "DriverGetRidesSuccessResponse": {
                 "properties": {
-                    "href": {
-                        "type": "string",
-                        "example": "http://127.0.0.1:8000/api/v1/drivers/1"
+                    "success": {
+                        "type": "boolean",
+                        "example": true
                     },
-                    "rel": {
+                    "label": {
                         "type": "string",
-                        "example": "get"
+                        "example": "success"
                     },
-                    "method": {
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
                         "type": "string",
-                        "example": "GET"
+                        "example": "Success"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Ride"
+                        }
+                    },
+                    "_meta": {
+                        "$ref": "#/components/schemas/PaginationMeta"
+                    },
+                    "_links": {
+                        "$ref": "#/components/schemas/DriverGetRidesLinks"
                     }
                 },
                 "type": "object"
             },
-            "DriverListResponse": {
+            "DriverListSuccessResponse": {
                 "properties": {
                     "success": {
                         "type": "boolean",
@@ -1446,6 +1916,174 @@
                     },
                     "_links": {
                         "$ref": "#/components/schemas/DriverLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "DriverShowSuccessResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "success"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Success"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/Driver"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseDriverNotFound": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.invalid_request_param"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Invalid Request Parameter: The selected fields.0 is invalid."
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseInternalError": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.internal_error"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 20
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Internal server error"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseInvalidParams": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.invalid_request_param"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Invalid Request Parameter: The selected fields.0 is invalid."
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponseNoRidesWaiting": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.driver_no_rides_to_be_accepted"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 47
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Driver has no rides to be accepted."
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
@@ -1622,6 +2260,42 @@
                 },
                 "type": "object"
             },
+            "ErrorResponseUnauthorized": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "common.error.invalid_token"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Invalid token: token is expired"
+                    },
+                    "params": {
+                        "description": "Parametros da requisição",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id"
+                        }
+                    },
+                    "detail": {
+                        "description": "Stack trace (visível apenas em ambiente de desenvolvimento)",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "RideCancelledResponseSuccess": {
                 "properties": {
                     "success": {
@@ -1751,7 +2425,7 @@
                 },
                 "type": "object"
             },
-            "RideShowSuccess": {
+            "RideShowSuccessResponse": {
                 "properties": {
                     "success": {
                         "type": "boolean",
@@ -1979,8 +2653,8 @@
             "description": "Public"
         },
         {
-            "name": "Driver",
-            "description": "Driver"
+            "name": "Drivers",
+            "description": "Drivers"
         },
         {
             "name": "Rides",

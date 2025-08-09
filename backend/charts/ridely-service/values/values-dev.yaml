@@ -60,6 +60,8 @@ env:
 
   CACHE_DRIVER: redis
 
+  # Dev mode "true" to avoid token validation
+  APP_DEV_MODE: true
   APP_ENV: development
   APP_DEBUG: "false"
   DB_CONNECTION: mysql

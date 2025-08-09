@@ -34,8 +34,13 @@ class RideController extends Controller
      *     @OA\Response(
      *          response=200,
      *          description="Corrida encontrada",
-     *          @OA\JsonContent(ref="#/components/schemas/RideShowSuccess")
+     *          @OA\JsonContent(ref="#/components/schemas/RideShowSuccessResponse")
      *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
      *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
@@ -43,7 +48,12 @@ class RideController extends Controller
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -79,13 +89,23 @@ class RideController extends Controller
      *         description="Corrida removida"
      *     ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -121,13 +141,23 @@ class RideController extends Controller
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideUnavailable")
      *     ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -177,13 +207,23 @@ class RideController extends Controller
      *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideWithInvalidState")
      *    ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -232,13 +272,23 @@ class RideController extends Controller
      *         @OA\JsonContent(ref="#/components/schemas/AcceptRequestSuccess")
      *     ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida invalida,sem motorista ou não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -277,13 +327,23 @@ class RideController extends Controller
      *          @OA\JsonContent(ref="#/components/schemas/RideRefusedSuccess")
      *      ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -334,13 +394,23 @@ class RideController extends Controller
      *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideWithInvalidState")
      *    ),
      *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -426,9 +496,9 @@ class RideController extends Controller
      *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
      *     ),
      *     @OA\Response(
-     *          response=500,
-     *          description="Outros erros",
-     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
      *     ),
      *     @OA\Response(
      *          response=503,
@@ -485,7 +555,11 @@ class RideController extends Controller
      *             )
      *         )
      *     ),
-     *
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
      *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
@@ -493,7 +567,12 @@ class RideController extends Controller
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
@@ -548,7 +627,11 @@ class RideController extends Controller
      *             )
      *         )
      *     ),
-     *
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
      *     @OA\Response(
      *         response=404,
      *         description="Corrida não encontrada",
@@ -556,7 +639,12 @@ class RideController extends Controller
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Erro interno do servidor",
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
      *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )

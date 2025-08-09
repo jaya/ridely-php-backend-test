@@ -8,7 +8,7 @@ Route::prefix('drivers')->group(function () {
 
     Route::post('/', [DriverController::class, 'store']);
     Route::get('/', [DriverController::class, 'listDrivers']);
-//    Route::get('{id}', [DriverController::class, 'show']);
+    Route::get('/{id}', [DriverController::class, 'show']);
 //    Route::put('{id}', [DriverController::class, 'update']);
     Route::delete('{id}', [DriverController::class, 'destroy']);
     Route::get('/{id}/get-rides', [DriverController::class, 'getOpenRides']);

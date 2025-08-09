@@ -2,6 +2,7 @@
 
 namespace App\Http\Hateos;
 
+use App\Models\Ride;
 use Illuminate\Support\Collection;
 
 class HateosHelper
@@ -39,17 +40,23 @@ class HateosHelper
         }
 
         $modifiedItems = [];
-        foreach ($items as $driver) {
-
-            if (is_object($driver)) {
-                $driver = $driver->toArray();
+        foreach ($items as $model) {
+            $instanceType = "";
+            if (is_object($model)) {
+                $instanceType = get_class($model);
+                $model = $model->toArray();
             }
 
-            $self = sprintf("%s/%s", $path, $driver['id']);
+            $self = sprintf("%s/%s", $path, $model['id']);
+            if ($instanceType === Ride::class) {
+                $links = new RideHateosItemLinks($self);
+            } else {
+                $links = new HateosItemLinks($self);
+            }
             $metadata = [
-                '_links' => new HateosItemLinks($self)
+                '_links' => $links
             ];
-            $modifiedItems[] = array_merge($driver, $metadata);
+            $modifiedItems[] = array_merge($model, $metadata);
         }
         return $modifiedItems;
 

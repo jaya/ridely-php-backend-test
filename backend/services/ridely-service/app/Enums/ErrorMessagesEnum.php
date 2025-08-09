@@ -12,11 +12,13 @@ enum ErrorMessagesEnum: int
 
 
 
-    // Request errors 11 - 20
+    // Request errors 11 - 19
     case INVALID_REQUEST = 11;
     case INVALID_REQUEST_PARAM = 12;
 
-    // Service errors 21 - 40
+    // Service errors 20 - 40
+    case INTERNAL_ERROR = 20;
+
     case SERVICE_TEMPORARILY_UNAVAILABLE = 21;
 
     case UNABLE_TO_REQUEST_AUTH_PUBLIC_KEY = 22;
@@ -36,6 +38,8 @@ enum ErrorMessagesEnum: int
     case DRIVER_NOT_FOUND = 44;
     case UNABLE_TO_LIST_DRIVERS = 45;
     case INVALID_DRIVER_DATA = 46;
+
+    case DRIVER_NO_RIDES_TO_BE_ACCEPTED = 47;
 
     // Ride errors 61 - 80
     case RIDE_NOT_FOUND = 61;
@@ -58,6 +62,8 @@ enum ErrorMessagesEnum: int
 
     case UNABLE_LIST_RIDES = 70;
 
+
+
     public function label(): string
     {
         return match ($this) {
@@ -67,6 +73,7 @@ enum ErrorMessagesEnum: int
             self::INVALID_REQUEST => 'common.error.invalid_request',
             self::INVALID_REQUEST_PARAM => 'common.error.invalid_request_param',
 
+            self::INTERNAL_ERROR => 'common.error.internal_error',
             self::SERVICE_TEMPORARILY_UNAVAILABLE => 'common.error.service_unavailable',
             self::UNABLE_TO_REQUEST_AUTH_PUBLIC_KEY => 'common.error.unable_to_request_auth_public_key',
             self::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE => 'common.error.unable_to_save_auth_public_key_file',
@@ -80,6 +87,7 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'common.error.driver_not_found',
             self::UNABLE_TO_LIST_DRIVERS => 'common.error.unable_to_list_drivers',
             self::INVALID_DRIVER_DATA => 'common.error.invalid_driver_data',
+            self::DRIVER_NO_RIDES_TO_BE_ACCEPTED => 'common.error.driver_no_rides_to_be_accepted',
 
             self::RIDE_NOT_FOUND => 'common.error.ride_not_found',
             self::RIDE_INVALID_STATE => 'common.error.ride_invalid_state',
@@ -105,6 +113,7 @@ enum ErrorMessagesEnum: int
             self::INVALID_REQUEST => 'Invalid Request: %s',
             self::INVALID_REQUEST_PARAM => 'Invalid Request Parameter: %s',
 
+            self::INTERNAL_ERROR => 'Internal server error',
             self::SERVICE_TEMPORARILY_UNAVAILABLE => 'Service temporarily unavailable',
             self::UNABLE_TO_REQUEST_AUTH_PUBLIC_KEY => 'Unable to request auth public key',
             self::UNABLE_TO_SAVE_AUTH_PUBLIC_KEY_FILE => 'Unable to save auth public key file',
@@ -118,6 +127,7 @@ enum ErrorMessagesEnum: int
             self::DRIVER_NOT_FOUND => 'Driver not found.',
             self::UNABLE_TO_LIST_DRIVERS => 'Unable to list drivers.',
             self::INVALID_DRIVER_DATA => 'Invalid driver data.',
+            self::DRIVER_NO_RIDES_TO_BE_ACCEPTED => 'Driver has no rides to be accepted.',
 
             self::RIDE_NOT_FOUND => 'Ride not found.',
             self::RIDE_INVALID_STATE => 'Ride invalid state: %s',

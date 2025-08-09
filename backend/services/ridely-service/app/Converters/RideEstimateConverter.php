@@ -2,7 +2,6 @@
 
 namespace App\Converters;
 
-use App\Models\Ride;
 use App\Models\RideEstimate;
 
 class RideEstimateConverter

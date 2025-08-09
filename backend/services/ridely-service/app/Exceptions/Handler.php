@@ -51,6 +51,6 @@ class Handler extends ExceptionHandler
             return ResponseHelper::error(ServiceException::invalidRequestParam($e->getMessage(), $params, $e));
         }
 
-        return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
+        return ResponseHelper::error(new ApplicationException(ErrorMessagesEnum::INTERNAL_ERROR, Response::HTTP_INTERNAL_SERVER_ERROR, previous: $e));
     }
 }

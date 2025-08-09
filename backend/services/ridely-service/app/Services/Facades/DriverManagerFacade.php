@@ -7,6 +7,7 @@ use App\Http\Criteria\ListCriteria;
 use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Http\Hateos\HateosHelper;
 use App\Http\Hateos\HateosItemLinks;
+use App\Models\Driver;
 use App\Services\Interfaces\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -21,13 +22,9 @@ class DriverManagerFacade
         $this->driverService = $driverService;
     }
 
-    public function create(CreateDriverCriteria $criteria): array
+    public function create(CreateDriverCriteria $criteria): Driver
     {
-
-        $data = $this->driverService->create($criteria);
-        $path = request()->path();
-        $newData = HateosHelper::addHateosLinksToItems($data, $path);
-        return $newData[0];
+        return $this->driverService->create($criteria);
     }
 
     public function read($id)
@@ -72,6 +69,35 @@ class DriverManagerFacade
 
         return $paginator;
 
+    }
+
+    public function find(string $id)
+    {
+        return $this->driverService->find($id);
+    }
+
+    public function getOpenRides($id, ListCriteria $criteria)
+    {
+        $paginator = $this->driverService->getOpenRides($id, $criteria);
+        if (is_array($paginator->items())) {
+            $data = $paginator->items();
+            $path = str_replace("/{$id}/get-rides", "", $paginator->path());
+            $path = str_replace("drivers", "rides", $path);
+
+            $modifiedItems = HateosHelper::addHateosLinksToItems($data, $path);
+            return new LengthAwarePaginator(
+                $modifiedItems,
+                $paginator->total(),
+                $paginator->perPage(),
+                $paginator->currentPage(),
+                [
+                    'path' => request()->url(),
+                    'query' => request()->query(),
+                ]
+            );
+        }
+
+        return $paginator;
     }
 
 

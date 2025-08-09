@@ -85,7 +85,8 @@ class RideManagerFacade
         $paginator = $this->rideService->listRidesWithoutDriver($criteria);
         if (is_array($paginator->items())) {
             $data = $paginator->items();
-            $path = $paginator->path();
+            $path = str_replace("/without-driver", "", $paginator->path());
+//            $path = str_replace("drivers", "rides", $path);
 
             $modifiedItems = HateosHelper::addHateosLinksToItems($data, $path);
             return new LengthAwarePaginator(

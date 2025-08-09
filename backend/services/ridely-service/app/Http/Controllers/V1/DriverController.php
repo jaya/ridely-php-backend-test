@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Converters\DriverConverter;
+use App\Converters\RideConverter;
 use App\Exceptions\ApplicationException;
 use App\Http\Controllers\Controller;
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
+use App\Http\Hateos\HateosHelper;
 use App\Http\Hateos\HateosMetadata;
 use App\Http\Helpers\ResponseHelper;
 use App\Models\Driver;
@@ -20,9 +22,61 @@ class DriverController extends Controller
 {
     /**
      * @OA\Get(
+     *     path="/api/v1/drivers/{id}",
+     *     summary="Buscar um motorista",
+     *     tags={"Drivers"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID do motorista",
+     *         @OA\Schema(type="string", example="1")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Motorista encontrado com sucesso",
+     *          @OA\JsonContent(ref="#/components/schemas/DriverShowSuccessResponse")
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Corrida não encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseRideNotFound")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
+     * )
+     */
+    public function show(string $id, DriverManagerFacade $facade): JsonResponse
+    {
+        try {
+            $path = str_replace("/${id}", "", request()->fullUrl());
+            $driver = $facade->find($id);
+            $driverResponse = DriverConverter::convertFromArrayToResponse($driver->toArray());
+            $driverResponse = HateosHelper::appendHateosLinks($driverResponse, $path, $driver->id);
+            return ResponseHelper::success($driverResponse);
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
+        }
+
+    }
+    /**
+     * @OA\Get(
      *     path="/api/v1/drivers",
      *     summary="Lista os motoristas com filtros opcionais",
-     *     tags={"Driver"},
+     *     tags={"Drivers"},
      *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="page",
@@ -62,30 +116,29 @@ class DriverController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Lista de motoristas retornada com sucesso",
-     *         @OA\JsonContent(ref="#/components/schemas/DriverListResponse")
+     *         @OA\JsonContent(ref="#/components/schemas/DriverListSuccessResponse")
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Erro de validação dos critérios",
-     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *         description="Erro de validação",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInvalidParams")
      *     ),
      *     @OA\Response(
      *          response=401,
      *          description="Não autorizado",
-     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
      *     ),
      *     @OA\Response(
-     *          response=500,
-     *          description="Outros erros",
-     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
      *     ),
      *     @OA\Response(
-     *          response=503,
-     *          description="Serviço indisponível",
-     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *         response=503,
+     *         description="Serviço indisponivel",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
      *     ),
      * )
-     * // TODO revisar os exemplos dos erros, pois estão todos com a mesma mensagem, qualquer coisa criar outros schemas ou ver como passar os valores para o schema
      */
     public function listDrivers(Request $request, DriverManagerFacade $facade)
     {
@@ -96,7 +149,7 @@ class DriverController extends Controller
             Log::debug(sprintf("Drivers list - request criteria: %s", json_encode($criteria->toArray())));
 
             // The request will be validated inside the facade/service
-//            $request->validate($criteria->rules());
+            // $request->validate($criteria->rules());
 
             $paginator = $facade->list($criteria);
             $metadata = new HateosMetadata($paginator);
@@ -107,11 +160,12 @@ class DriverController extends Controller
         }
 
     }
+
     /**
      * @OA\Post(
      *     path="/api/v1/drivers",
      *     summary="Cria um novo motorista",
-     *     tags={"Driver"},
+     *     tags={"Drivers"},
      *     security={{"bearerAuth": {}}},
      *     @OA\RequestBody(
      *         required=true,
@@ -124,9 +178,29 @@ class DriverController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Driver criado com sucesso",
-     *         @OA\JsonContent(ref="#/components/schemas/Driver")
-     *     )
+     *         description="Motoristas criado com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/DriverCreatedSuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInvalidParams")
+     *     ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
      */
     public function store(Request $request, DriverManagerFacade $facade): JsonResponse
@@ -138,8 +212,12 @@ class DriverController extends Controller
             // The request will be validated inside the facade/service
             // $request->validate($criteria->rules());
 
+            $path = request()->fullUrl();
             $driver = $facade->create($criteria);
-            return ResponseHelper::success(DriverConverter::convertFromArrayToResponse($driver), Response::HTTP_CREATED);
+
+            $driverResponse = DriverConverter::convertFromArrayToResponse($driver->toArray());
+            $driverResponse = HateosHelper::appendHateosLinks($driverResponse, $path, $driver->id);
+            return ResponseHelper::success($driverResponse, Response::HTTP_CREATED);
         } catch (ApplicationException $e) {
             return ResponseHelper::error($e);
         }
@@ -149,39 +227,52 @@ class DriverController extends Controller
      * @OA\Delete(
      *     path="/api/v1/drivers/{id}",
      *     summary="Remove um motorista",
-     *     tags={"Driver"},
+     *     tags={"Drivers"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID do driver",
+     *         description="ID do motorista",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Driver removido com sucesso"
+     *         description="Motorista removido com sucesso"
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Driver não encontrado"
-     *     )
+     *         response=400,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInvalidParams")
+     *     ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
+     * )
      * )
      */
-    public function destroy($id, DriverManagerFacade $facade): JsonResponse
+    public function destroy($id, DriverManagerFacade $facade)
     {
-        try {
-            $facade->delete($id);
-            return ResponseHelper::success(null, Response::HTTP_NO_CONTENT);
-        } catch (ApplicationException $e) {
-            return ResponseHelper::error($e);
-        }
+        $facade->delete($id);
+        return response()->noContent();
     }
 
     /**
      * @OA\Get(
      *     path="/api/v1/drivers/{id}/get-rides",
      *     summary="Lista corridas abertas para um motorista",
-     *     tags={"Driver"},
+     *     tags={"Drivers"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -192,43 +283,58 @@ class DriverController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Lista de rides abertas",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Ride")
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/DriverGetRidesSuccessResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Erro de validação",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInvalidParams")
      *     ),
      *     @OA\Response(
      *         response=404,
      *         description="Nenhuma corrida aberta",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="No rides waiting to be accepted")
-     *         )
-     *     )
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseNoRidesWaiting")
+     *     ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Não autorizado",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponseUnauthorized")
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erro interno no serviço",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseInternalError")
+     *     ),
+     *     @OA\Response(
+     *         response=503,
+     *         description="Serviço indisponivel",
+     *         @OA\JsonContent(ref="#/components/schemas/ErrorResponseServiceUnavailable")
+     *     ),
      * )
      */
-    public function getOpenRides($id): JsonResponse
+    public function getOpenRides($id, Request $request, DriverManagerFacade $facade): JsonResponse
     {
-        // TODO I need to review
-        $driver = Driver::findOrFail($id);
-        $rides = $driver->getOpenRides();
-
-        if ($rides->isEmpty()) {
-            return response()->json([
-                'message' => 'No rides waiting to be accepted',
-            ], 404);
+        try {
+            $criteria = new ListCriteria($request->all());
+            $paginator = $facade->getOpenRides($id, $criteria);
+            $metadata = new HateosMetadata($paginator);
+            return ResponseHelper::success(RideConverter::convertListFromArrayToResponse($paginator->items()), metadata: $metadata);
+        } catch (ApplicationException $e) {
+            return ResponseHelper::error($e);
         }
 
-        return response()->json($rides->map(function ($ride) {
-            return [
-                'id' => $ride->id,
-                'status' => $ride->status,
-                'drop_off' => $ride->drop_off,
-                'pick_up' => $ride->pick_up,
-                'passenger' => [
-                    'name' => $ride->passenger_name,
-                    'email' => $ride->passenger_email
-                ]
-            ];
-        }));
+
+//        return response()->json($rides->map(function ($ride) {
+//            return [
+//                'id' => $ride->id,
+//                'status' => $ride->status,
+//                'drop_off' => $ride->drop_off,
+//                'pick_up' => $ride->pick_up,
+//                'passenger' => [
+//                    'name' => $ride->passenger_name,
+//                    'email' => $ride->passenger_email
+//                ]
+//            ];
+//        }));
     }
 }

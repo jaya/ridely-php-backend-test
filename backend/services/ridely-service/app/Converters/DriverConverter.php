@@ -21,7 +21,7 @@ class DriverConverter
 
     public static function convertFromArrayToResponse(array $driver): array
     {
-        $array = [
+        $response = [
             'id' => $driver['id'] ?? null,
             'name' => $driver['name'] ?? null,
             'car' => [
@@ -32,12 +32,11 @@ class DriverConverter
             'available' => $driver['available'] ?? null,
         ];
 
-        return $array;
-    }
+        if (isset($ride['_links'])) {
+            $response['_links'] = $ride['_links'];
+        }
 
-    public static function convertFromModelToResponse(Driver $driver): array
-    {
-        return self::convertFromArrayToResponse($driver->toArray());
+        return $response;
     }
 
     public static function convertListFromArrayToResponse(array $items):array

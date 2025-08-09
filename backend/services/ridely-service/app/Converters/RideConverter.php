@@ -43,12 +43,12 @@ class RideConverter
                 'email' => $ride['passenger_email'] ?? null
             ];
         }
-        return  $response;
-    }
 
-    public static function convertFromModelToResponse(Ride $ride): array
-    {
-        return self::convertFromArrayToResponse($ride->toArray());
+        if (isset($ride['_links'])) {
+            $response['_links'] = $ride['_links'];
+        }
+
+        return  $response;
     }
 
     public static function convertListFromArrayToResponse($items): array

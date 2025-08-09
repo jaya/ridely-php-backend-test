@@ -6,7 +6,7 @@ namespace App\Http\OpenApi\Schemas\Responses;
  *
  *
  * @OA\Schema(
- *     schema="RideShowSuccess",
+ *     schema="RideShowSuccessResponse",
  *     type="object",
  *     @OA\Property(property="success", type="boolean", example=true),
  *     @OA\Property(property="label", type="string", example="success"),
@@ -15,7 +15,7 @@ namespace App\Http\OpenApi\Schemas\Responses;
  *     @OA\Property(property="data", ref="#/components/schemas/RideFull")
  * )
  */
-class RideShowSuccessSchema
+class RideShowSuccessResponseSchema
 {
 
 }

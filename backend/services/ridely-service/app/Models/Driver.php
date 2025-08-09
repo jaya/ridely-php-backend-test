@@ -54,11 +54,26 @@ class Driver extends Model
         $this->save();
     }
 
-    public function getOpenRides()
+    public function getOpenRides(ListCriteria $criteria): LengthAwarePaginator
     {
-        return $this->rides()
-            ->where('status', RideStatusEnum::REQUESTED)
-            ->get();
+//        return $this->rides()
+//            ->where('status', RideStatusEnum::REQUESTED)
+//            ->get();
+        //$query = self::query();
+
+        $query = $this->rides()->newQuery();
+        if ($criteria->fields) {
+            $query->select($criteria->fields);
+        }
+        $query->orderBy($criteria->orderBy, $criteria->sortBy);
+        $query->where('status', RideStatusEnum::REQUESTED);
+
+        $perPage = $criteria->limit ?? ListCriteria::LIMIT;
+        $currentPage = $criteria->page ?? ListCriteria::PAGE;
+
+        Log::debug($query->toSql());
+        Log::debug("pagination params: \$perPage: $perPage, \$currentPage: $currentPage");
+        return $query->paginate($perPage, ['*'], 'page', $currentPage);
     }
 
     // TODO modificar para não ficar estático

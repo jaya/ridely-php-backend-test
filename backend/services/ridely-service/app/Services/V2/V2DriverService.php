@@ -52,4 +52,9 @@ class V2DriverService extends AbstractService implements DriverServiceInterface
     {
         throw ServiceException::notImplemented();
     }
+
+    public function getOpenRides($id, ListCriteria $criteria): LengthAwarePaginator
+    {
+        throw ServiceException::notImplemented();
+    }
 }

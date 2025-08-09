@@ -22,4 +22,6 @@ interface DriverServiceInterface
     public function delete($id): bool;
 
     public function softDelete($id): bool;
+
+    public function getOpenRides($id, ListCriteria $criteria): LengthAwarePaginator;
 }

@@ -16,7 +16,6 @@ class ValidateKeycloakJwt
 {
     protected JWTKeysService $jwtKeysService;
 
-    const DEV_MODE = true;
 
     public function __construct(JWTKeysService $jwtKeysService)
     {
@@ -31,7 +30,8 @@ class ValidateKeycloakJwt
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (self::DEV_MODE) {
+        $devMode = env('APP_DEV_MODE', false);
+        if ($devMode) {
             return $next($request);
         }
 
