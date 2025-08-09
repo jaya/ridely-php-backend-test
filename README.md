@@ -136,7 +136,7 @@ A arquitetura local do Ridely é baseada em Kubernetes, utilizando **Helm** para
   - Desenvolvido em Laravel, interage com banco de dados MySQL e cache Redis.
   - Utiliza Redis para filas e eventos relacionados a preços.
 
-> Para mais detalhes ver a documentação do serviço: [README.md](README.md).
+> Para mais detalhes ver a documentação do serviço: [README.md](backend/services/ridely-service/README.md).
 
 
 - **Auth Service**
@@ -151,9 +151,6 @@ A arquitetura local do Ridely é baseada em Kubernetes, utilizando **Helm** para
   Em um teste foi utilizado um helm chart com o serviço mais o arquivo de endereços para a região do nordeste (https://download.geofabrik.de/south-america/brazil.html),
   Porém a inicialização do serviço toma muito tempo para ficar pronto para uso, o que limitou inicialmente a sua aplicação.   
    
-  
-   
-
 
 ## Dependencies do projeto
 
@@ -215,6 +212,12 @@ Execute o comando a seguir na raiz do projeto:
   ./scripts/kubectl/kubectl-create-namespace.sh 
 ```
 > Nota: Você deve executar este comando na raiz do projeto.
+
+### Preparando o Ridely Service (PHP)
+Antes de executar o rodar o projeto é necessário fazer o setup da aplicação.
+Execute o passo a passo descrito na documentação.
+
+> Nota: os detalhes estarão descritos no documento: [README.md](backend/services/ridely-service/README.md)
 
 ## Como Rodar Localmente
 
