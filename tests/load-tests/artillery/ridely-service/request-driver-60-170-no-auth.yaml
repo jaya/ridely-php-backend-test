@@ -2,7 +2,7 @@ config:
   target: "http://localhost:8000"
   phases:
     - duration: 60
-      arrivalRate: 50
+      arrivalRate: 170
   processor: "./functions.js"
   payload:
     path: "./users.csv"
@@ -11,7 +11,7 @@ config:
       - password
     order: sequence # ou "random" se preferir
   http:
-    requestTimeout: 30000 # 10000
+    requestTimeout: 60000 # 10000
     headers:
       Content-Type: application/json
 
