@@ -85,18 +85,6 @@ class DriverService extends AbstractService implements DriverServiceInterface
     public function update(): Driver
     {
         throw ServiceException::notImplemented();
-        // TODO: Implement update() method.
-//        try {
-//            $driver = Driver::findOrFail($id); // Throws ModelNotFoundException if not found
-//            $driver->update($data);
-//            return $driver;
-//        } catch (ModelNotFoundException $e) {
-//            Log::warning("Driver not found with ID: $id");
-//            throw ServiceException::notFound(ErrorMessagesEnum::DRIVER_NOT_FOUND, ["id" => $id], $e);
-//        } catch (QueryException $e) {
-//            Log::error($e->getMessage());
-//            throw RepositoryException::queryException(ErrorMessagesEnum::UNABLE_TO_UPDATE_DRIVER, ["id" => $id], $e);
-//        }
     }
 
     public function softDelete($id): bool

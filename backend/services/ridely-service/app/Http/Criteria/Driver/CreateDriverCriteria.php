@@ -35,7 +35,7 @@ class CreateDriverCriteria
                 'model' => $this->model ?? '',
                 'color' => $this->color ?? '',
             ],
-            'available' => $this->available ?? false,
+            'available' => $this->available ?? true,
         ];
     }
 

@@ -37,6 +37,13 @@ class Driver extends Model
         'updated_at'
     ];
 
+    public static function getNextAvailableDriver()
+    {
+        return self::where('available', true)
+            ->orderBy('activation_date', 'asc')
+            ->first();
+    }
+
     public function rides()
     {
         return $this->hasMany(Ride::class);

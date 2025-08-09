@@ -1,23 +1,22 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Integration;
 
 use App\Enums\RideStatusEnum;
-use Tests\TestCase;
-use App\Models\Ride;
-use App\Models\Driver;
 use App\Exceptions\RideException;
+use App\Models\Driver;
+use App\Models\Ride;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 
-// TODO be deleted
-class RideTest extends TestCase
+class RideTest extends IntegrationTestCase
 {
     use RefreshDatabase;
 
     public function test_can_accept_ride_when_driver_is_available()
     {
-        $this->markTestSkipped('This test will be removed');
+//        $this->markTestSkipped('This test will be reviewed');
 
         $driver = Driver::create([
             'name' => 'John Doe',
@@ -32,19 +31,19 @@ class RideTest extends TestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED->value
+            'status' => RideStatusEnum::REQUESTED
         ]);
 
         $ride->accept($driver);
 
-        $this->assertEquals(RideStatusEnum::ACCEPTED->value, $ride->status);
+        $this->assertEquals(RideStatusEnum::ACCEPTED, $ride->status);
         $this->assertEquals($driver->id, $ride->driver_id);
         $this->assertFalse($driver->available);
     }
 
     public function test_cannot_accept_ride_when_driver_is_unavailable()
     {
-        $this->markTestSkipped('This test will be removed');
+//        $this->markTestSkipped('This test will be reviewed');
 
         $driver = Driver::create([
             'name' => 'John Doe',
@@ -59,7 +58,7 @@ class RideTest extends TestCase
             'passenger_email' => 'jane@example.com',
             'pick_up' => '123 Main St',
             'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED->value
+            'status' => RideStatusEnum::REQUESTED
         ]);
 
         $this->expectException(RideException::class);

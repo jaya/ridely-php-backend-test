@@ -72,17 +72,24 @@ class RideService extends AbstractService implements RideServiceInterface
 
             $driver = $this->rideCacheService->getNextAvailableDriver();
 
+            if( !$driver) {
+                $driver = Driver::getNextAvailableDriver();
+            }
+
             if (!$driver) {
                 throw RideException::noDriversAvailable();
             }
 
             $fields = $criteria->toArray();
+            $driverId = $driver->id;
 
             try {
 
-                if (!$driver->id) {
+                if (!$driverId) {
                     throw ServiceException::queryException(ErrorMessagesEnum::INVALID_DRIVER_DATA, []);
                 }
+                Log::debug("Driver found with ID: {$driverId}");
+
                 Log::debug("==================================================");
                 Log::debug("Transaction started for ride creation");
                 Log::debug("==================================================");
@@ -97,7 +104,7 @@ class RideService extends AbstractService implements RideServiceInterface
                     'passenger_email' => $fields['passenger']['email'],
                     'pick_up' => $fields['pick_up'],
                     'drop_off' => $fields['drop_off'],
-                    'driver_id' => $driver->id
+                    'driver_id' => $driverId
                 ]);
 
                 Log::debug("Creating ride-estimate on the database");

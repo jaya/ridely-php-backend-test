@@ -22,20 +22,20 @@ class RideCacheService
     {
         Log::info("Fetching next available driver from cache.");
         // Try getting the first driver from cache
-        $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
+        $driverId = $this->getDriverId();
 
         // If cache is empty, reload from database
         if (!$driverId) {
+            Log::debug("No available drivers found in cache, refreshing from database.");
             $this->refreshCacheFromDatabase();
-            $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
+            return null;
         }
 
+        Log::debug("Found available driver ID $driverId in cache.");
         $driver = $this->driverCacheService->getDriver($driverId);
-
         if (!$driver) {
             $this->driverCacheService->refreshCacheFromDatabase();
-            Log::info("Querying driver ID $driverId from database as it was not found in cache.");
-            $driver = Driver::find($driverId);
+            return null;
         }
 
         return $driver;
@@ -81,5 +81,14 @@ class RideCacheService
         foreach ($drivers as $driver) {
             Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
         }
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getDriverId(): mixed
+    {
+        $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
+        return $driverId;
     }
 }
