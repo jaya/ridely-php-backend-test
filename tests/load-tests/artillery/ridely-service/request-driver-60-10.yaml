@@ -11,7 +11,7 @@ config:
       - password
     order: sequence # ou "random" se preferir
   http:
-    requestTimeout: 15000 # 10000
+    requestTimeout: 30000 # 10000
     headers:
       Content-Type: application/json
 

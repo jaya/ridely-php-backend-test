@@ -26,6 +26,7 @@ Então temos a seguinte configuração:
     - 6 a 8 instancias
   - alterações no helm:
     - A principio acredito que a configuração atual atende bem. Provavelmente 6 instancias vão resolver o problema.
+    - Criar um usuario de banco de dados dedicado aos workers. 
 - redis-cache-database-redis:
   - inicia:
     - 4 instancias 
@@ -62,7 +63,7 @@ Além disso, considerando o uso de estratégias de deploy inteligentes, como Can
 
 ## Otimizações no Banco de Dados
 
-- **Índices:** É importante considerar a aplicação de índices em colunas de consulta frequente, especialmente em campos como: `created_at`, `status` e `activation_date`.
+- **Índices:** É importante considerar a aplicação de índices em colunas de consulta frequente, especialmente em campos como: `rides.status`, `drivers.available` e `drivers.activation_date`. (Aplicado)
 - **Read replicas:** será configurada uma instância read-only para balancear a carga de leitura e melhorar a performance de queries menos críticas.
 - **Transações**: Utilização de transações com mais frequência na aplicação, principalmente em pontos críticos da mesma.
 - **Views ou tabelas temporárias**: Quem sabe a criação de views ou tabelas temporárias pode ajudar na performance de consulta de dados constantes.
@@ -92,3 +93,4 @@ Acredito que uma boa estratégia é explorar mais o uso de cache nas aplicaçõe
 
 - Pode ser um solução a ser considerada também, ara suportar consultas otimizadas com base em localização.
   - A principio é algo que precisa ser analisado.
+  

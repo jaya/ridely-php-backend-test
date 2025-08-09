@@ -20,7 +20,7 @@
     "test:ridely-service:request-driver-no-auth": "artillery run --output ./artillery/ridely-service/reports/request-driver-no-auth.json ./artillery/ridely-service/request-driver-no-auth.yaml",
     "test:ridely-service:request-driver-60-10": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-10.json ./artillery/ridely-service/request-driver-60-10.yaml",
     "test:ridely-service:request-driver-60-10-no-auth": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-10.json ./artillery/ridely-service/request-driver-60-10-no-auth.yaml",
-    "test:ridely-service:request-driver-60-50": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-10.json ./artillery/ridely-service/request-driver-60-50.yaml",
-    "test:ridely-service:request-driver-60-50-no-auth": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-10.json ./artillery/ridely-service/request-driver-60-50-no-auth.yaml"
+    "test:ridely-service:request-driver-60-50": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-50.json ./artillery/ridely-service/request-driver-60-50.yaml",
+    "test:ridely-service:request-driver-60-50-no-auth": "artillery run  --output ./artillery/ridely-service/reports/request-driver-60-50.json ./artillery/ridely-service/request-driver-60-50-no-auth.yaml"
   }
 }
