@@ -1,0 +1,37 @@
+config:
+  target: "http://localhost:8000"
+  phases:
+    - duration: 60
+      arrivalRate: 50
+  processor: "./functions.js"
+  payload:
+    path: "./users.csv"
+    fields:
+      - username
+      - password
+    order: sequence # ou "random" se preferir
+  http:
+    requestTimeout: 10000 # 10000
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: Request driver (Authenticated)
+    flow:
+      - function: "authenticate"
+      - function: "requestDriverDataGenerator"
+      - post:
+          url: "/api/v1/rides/request-driver"
+          headers:
+            Custom-User: "{{ username }}"
+            Authorization: "Bearer {{ token }}"
+          json: "{{ ride_data }}"
+          capture:
+            - json: "$.data.id"
+              as: "ride_id"
+      - get:
+          url: "/api/v1/rides/{{ ride_id }}"
+          headers:
+            Custom-User: "{{ username }}"
+            Authorization: "Bearer {{ token }}"
+
