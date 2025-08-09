@@ -58,7 +58,7 @@ class ProcessRideEstimates extends Command
 
         while (true) {
 
-
+            Log::info("Reading stream: $streamName - batch size: $maxItems");
             $entries = $redis->xreadgroup('estimate_group', 'consumer-1', [
                 $streamName => '>'
             ], $maxItems, 5000);
@@ -94,10 +94,13 @@ class ProcessRideEstimates extends Command
 
 
                 }
+            } else {
+                // avoid busy loop
+                sleep(1);
             }
 
             // avoid busy loop
-            sleep(1);
+            //sleep(1);
         }
 
     }

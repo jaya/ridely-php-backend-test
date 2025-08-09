@@ -92,12 +92,6 @@ Execute the follow commando:
     composer install
 ```
 
-### Environment setup
-After this setup the environment file:
-```bash
-  cp .env.example .env
-```
-
 > Note: Initially you don't need to change the .env values, because it is configured for the local development.
 
 ### Application setup
@@ -125,6 +119,12 @@ Check if your system has the required extensions.
     sudo apt install php8.1-mysql
     sudo apt install php8.1-redis
     sudo apt install php8.1-xdebug
+```
+
+### Environment setup
+After this setup the environment file:
+```bash
+  cp .env.example .env
 ```
 
 ### Running the Migrations

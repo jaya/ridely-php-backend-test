@@ -56,7 +56,7 @@ app:
 env:
   LOG_CHANNEL: stack
   LOG_STACK_CHANNELS: json
-  LOG_LEVEL: debug
+  LOG_LEVEL: info
 
   CACHE_DRIVER: redis
 

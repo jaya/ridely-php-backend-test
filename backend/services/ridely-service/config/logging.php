@@ -55,8 +55,8 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-//            'channels' => ['json', 'stderr'],
-            'channels' => ['json'],
+            'channels' => ['json', 'stderr'],
+//            'channels' => ['json'],
             'ignore_exceptions' => false,
         ],
 
