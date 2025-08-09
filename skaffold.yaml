@@ -73,7 +73,7 @@ portForward:
     port: 5432
     localPort: 5432
   - resourceType: service
-    resourceName: ridely-service
+    resourceName: ridely-service-nginx
     port: 80
     localPort: 8000
 
@@ -115,7 +115,7 @@ profiles:
   - name: ridely-service-only
     portForward:
       - resourceType: service
-        resourceName: ridely-service
+        resourceName: ridely-service-nginx
         port: 80
         localPort: 8000
       - resourceType: service
