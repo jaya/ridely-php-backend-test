@@ -12,5 +12,5 @@ interface EstimateRideServiceInterface
 
     public function updateStatus($id, RideEstimateStatusEnum $estimateStatusEnum): bool;
 
-    public function find($id): RideEstimate;
+    public function find($id): ?RideEstimate;
 }

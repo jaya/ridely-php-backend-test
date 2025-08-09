@@ -89,14 +89,24 @@ class EstimateRideService extends AbstractService implements EstimateRideService
     public function updateStatus($id, RideEstimateStatusEnum $estimateStatusEnum): bool
     {
         $estimate = $this->find($id);
-        $estimate->updateStatus($estimateStatusEnum);
-        return ($estimate->status == $estimateStatusEnum);
+        if ($estimate) {
+            $estimate->updateStatus($estimateStatusEnum);
+            return ($estimate->status == $estimateStatusEnum);
+        }
+        return false;
+
     }
 
-    public function find($id): RideEstimate
+    public function find($id): ?RideEstimate
     {
         if ($this->validator->validateId($id)) {
-            return RideEstimate::findOrFail($id);
+            try {
+                return RideEstimate::findOrFail($id);
+            } catch (\Throwable $e) {
+                Log::error($e->getMessage());
+                return null;
+            }
+
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);

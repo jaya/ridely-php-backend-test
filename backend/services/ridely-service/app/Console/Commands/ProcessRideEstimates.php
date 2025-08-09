@@ -6,7 +6,6 @@ use App\Enums\RedisStreamsEnum;
 use App\Enums\RideEstimateStatusEnum;
 use App\Http\Criteria\EstimateRideCriteria;
 use App\Services\Interfaces\EstimateRideServiceInterface;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -33,7 +32,7 @@ class ProcessRideEstimates extends Command
      */
     public function handle()
     {
-        $maxItems = 10;
+        $maxItems = 45;
         try {
             $redis = Redis::connection('streams');
         } catch (\Exception $e) {
@@ -86,7 +85,9 @@ class ProcessRideEstimates extends Command
                     try {
                         $estimateRideService->estimateRide($estimateId, $criteria);
                         $redis->xack(RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value, 'estimate_group', [$id]);
-                    } catch (ServerException $e) {
+                        // Remove from redis after the success
+                        $redis->xdel('ride_estimates_stream', [$id]);
+                    } catch (\Throwable $e) {
                         Log::error("Error processing estimate for ride ID: $rideId, estimate ID: $estimateId. Error: " . $e->getMessage());
                         $estimateRideService->updateStatus($estimateId, RideEstimateStatusEnum::FAILED);
                     }
