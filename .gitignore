@@ -23,7 +23,14 @@
 /backend/charts/auth-service/charts/keycloak-19.3.4.tgz
 /databases/charts/ridely-cache-database/charts/redis-19.3.4.tgz
 
-# tests
+# load tests
 /tests/load-tests/.env
 /tests/load-tests/node_modules/
+/tests/load-tests/artillery/ridely-service/reports/
+
+# php tests
 /backend/services/ridely-service/target/unit/
+/backend/services/ridely-service/target/integration/
+
+
+

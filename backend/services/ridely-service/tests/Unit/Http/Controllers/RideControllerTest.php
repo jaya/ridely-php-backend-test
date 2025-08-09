@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\Log;
 use Tests\Helpers\LocationHelper;
 use Tests\Helpers\TokenHelper;
 use Tests\Unit\UnitTestCase;
@@ -179,6 +180,9 @@ class RideControllerTest extends UnitTestCase
 
     public function testEstimateRideFailWithInvalidRideId()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
 
         // Mock the external calls
         $this->mockCalls();
@@ -208,6 +212,9 @@ class RideControllerTest extends UnitTestCase
     public function testRequestDriverSuccess()
     {
 
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
 
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
@@ -274,6 +281,10 @@ class RideControllerTest extends UnitTestCase
 
     private function mockTokenValidation(): void
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
         $parsedKeys = TokenHelper::getParseKeySet();
 
         $mockKeysService = $this->createMock(JWTKeysService::class);

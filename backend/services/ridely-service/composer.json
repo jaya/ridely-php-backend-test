@@ -56,7 +56,9 @@
         "dev": "composer run prerun && php artisan serve",
         "test": "./vendor/bin/phpunit --configuration phpunit.xml",
         "test-unit": "./vendor/bin/phpunit --configuration phpunit.xml --testsuite Unit",
-        "test-unit:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --testsuite Unit --coverage-html target/unit/coverage-html/ --coverage-clover target/unit/coverage.xml --coverage-text='target/unit/coverage.txt' --log-junit target/unit/report.xml"
+        "test-unit:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --testsuite Unit --coverage-html target/unit/coverage-html/ --coverage-clover target/unit/coverage.xml --coverage-text='target/unit/coverage.txt' --log-junit target/unit/report.xml",
+        "test-integration": "./vendor/bin/phpunit --configuration phpunit.xml --testsuite Integration",
+        "test-integration:coverage": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --configuration phpunit.xml --testsuite Integration --coverage-html target/integration/coverage-html/ --coverage-clover target/integration/coverage.xml --coverage-text='target/integration/coverage.txt' --log-junit target/integration/report.xml"
     },
     "extra": {
         "laravel": {
