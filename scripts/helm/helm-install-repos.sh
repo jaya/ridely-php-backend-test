@@ -25,8 +25,11 @@ echo 'Adding repositories...'
 echo '----------------------------------------'
 echo 'helm repo add bitnami https://charts.bitnami.com/bitnami'
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
 
+#echo 'helm repo add prometheus-community https://prometheus-community.github.io/helm-charts'
+#helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+helm repo update
 #echo '----------------------------------------'
 #echo 'Compiling chart locally...'
 #echo '----------------------------------------'

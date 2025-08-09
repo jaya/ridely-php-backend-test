@@ -120,3 +120,11 @@ if wait_for_service "ridely-service-nginx" "$PROJECT_NAMESPACE"; then
   echo ""
 fi
 
+if wait_for_service "kube-prometheus-stack-grafana" "monitoring"; then
+#  POD_NAME=$(kubectl get pods -n "$PROJECT_NAMESPACE" -l "app=ridely-service-nginx" -o jsonpath="{.items[0].metadata.name}")
+#  echo "kubectl port-forward $POD_NAME 8000:80 -n $PROJECT_NAMESPACE"
+#  kubectl port-forward "$POD_NAME" 8000:80 -n "$PROJECT_NAMESPACE" > /dev/null 2>&1 &
+  echo "kubectl port-forward  svc/kube-prometheus-stack-grafana 3001:80 -n monitoring"
+  kubectl port-forward  svc/kube-prometheus-stack-grafana 3001:80 -n monitoring > /dev/null 2>&1 &
+  echo ""
+fi
