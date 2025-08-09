@@ -215,9 +215,23 @@ Execute o comando a seguir na raiz do projeto:
 
 ### Preparando o Ridely Service (PHP)
 Antes de executar o rodar o projeto é necessário fazer o setup da aplicação.
-Execute o passo a passo descrito na documentação.
 
+#### Configuração Automatica
+Para facilitar/simplicar o processo de instalação execute:
+```bash
+  ./scripts/backend/backend-ridely-service-php-setup.sh 
+```
+
+#### Configuração Manual
+Execute o passo a passo descrito na documentação.
 > Nota: os detalhes estarão descritos no documento: [README.md](backend/services/ridely-service/README.md)
+
+
+### Preparando o Nginx
+O Nginx precisa de certificados, então execute o seguinte commando:
+```bash
+  ./scripts/backend/backend-ridely-service-nginx-setup.sh 
+```
 
 ## Como Rodar Localmente
 

@@ -50,7 +50,7 @@ migrate:
   enabled: true
 
 app:
-  appKey: "base64:FF7T5Jj4AnEY80EmNzcP5Vm5HbEWnTgz2ea8DBGFG/A="
+  appKey: "base64:7cp6nc1Z5bUUmHA51SdI7AWWoh2tHj3p1gYLAf28H8I="
   KeycloakClientSecret: "4OYZ6GvG3we5UKsZ2kUM6HyrHGRsFtyQ"
 
 env:

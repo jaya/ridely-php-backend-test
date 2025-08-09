@@ -83,8 +83,14 @@ Project routes are registered here: [routes](routes)
 
 Bellow there are the installation steps to be followed.
 
+### Configuration via script
+To install the projects dependencies and other required steps, execute the follow commando:
+```bash
+    ./scripts/setup-env.sh
+```
 
-### Project dependencies
+### Manual Configuration 
+#### Project dependencies
 To install the projects dependencies.
 
 Execute the follow commando:
@@ -92,13 +98,22 @@ Execute the follow commando:
     composer install
 ```
 
+#### Environment setup
+After this setup the environment file:
+```bash
+  cp .env.example .env
+```
+
 > Note: Initially you don't need to change the .env values, because it is configured for the local development.
 
-### Application setup
+#### Application setup
 First generate the application key.
 ```bash
   php artisan key:generate
 ```
+
+> Nota: Você vai precisar atualizar o arquivo com a chave gerada
+> [values-dev.yaml](../../charts/ridely-service/values/values-dev.yaml)
 
 
 ## Development
