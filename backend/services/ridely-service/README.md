@@ -186,3 +186,11 @@ For tests with coverage, execute:
 ### Load Tests
 The main project have more tests, in special load tests managed by the artillery, maybe you can take a look here: 
 [load-tests](../../../tests/load-tests)
+
+## TODO List
+There are pending improvements to be done such as:
+ - UUID for endpoints
+ - CORS revision
+ - etc
+
+> Note: The full project TODO list is here: [TODO.md](../../../docs/TODO.md)

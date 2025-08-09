@@ -14,11 +14,11 @@
           - [x] Sequence
       - [x] Atualizar diagramas após a restruturação do projeto. 
     - Serviços
-      - [ ] Revisão de README.md
-      - [ ] Revisão do SETTINGS.md
+      - [x] Revisão de README.md
+      - [x] ~~Revisão do SETTINGS.md~~
     - Geral
         - [x] Criar README com visão geral do projeto
-        - [ ] Documentar fluxo de autenticação e consumo de API
+        - [x] Documentar fluxo de autenticação e consumo de API
         - [ ] ~~Documentar eventos/mensageria e serviços envolvidos~~
         - [ ] ~~Documentar alertas e dashboards de observabilidade~~
   - Execução
@@ -63,13 +63,13 @@
   - ridely-service (PHP + Laravel)
     - Docs
       - [x] Coleções do Postman
-        - [ ] ridely-service
-        - [ ] auth-service (Keycloak)
+        - [x] ridely-service
+        - [x] auth-service (Keycloak)
       - Api Docs
         - [x] Docs/Swagger (ridely-service)
         - [x] ~~Docs/Swagger (pricing-service)~~
         - [ ] ~~Docs/Swagger auth-service (Keycloak)~~
-      - [ ] README.md
+      - [x] README.md
     - GitActions
       - [ ] ~~Templates~~
       - [ ] ~~Code review~~
@@ -77,7 +77,7 @@
     - Tests 
       - [x] Unit tests
       - [x] Coverage
-      - [ ] ~~Integration tests~~
+      - [x] Integration tests
     - Segurança
       - [ ] CORS
       - [ ] ~~UUID~~
@@ -127,17 +127,17 @@
       - [ ] ~~Scan de vulnerabilidades~~
   - [ ] ~~Adicionar versionamento de imagem/tag automático~~
 - Testes e Validações
-  - [ ] Testes de unidade
+  - [x] Testes de unidade
     - [x] Escrever testes unitários dos serviços
       - [x] ridely-service
       - [ ] ~~pricing-service~~
-  - [ ] Testes de integração
+  - [x] Testes de integração
     - [ ] Escrever testes de integração (ridely-service)
       - [ ] ~~Estimativa de corrida~~
       - [ ] ~~Listagem de motoristas~~
-      - [ ] ~~Alocação do motorista mais próximo~~
+      - [x] Alocação do motorista mais próximo
     - [ ] ~~Escrever testes de integração (API + mensageria)~~
-    - [ ] ~~Escrever testes de integração (API + Auth)~~
+    - [x] Escrever testes de integração (API + Auth)
   - [ ] Testes de contrato
     - [ ] ~~Implementar testes de contrato com Pact~~
       - [ ] ~~Criar contratos para o ridely-service~~
@@ -155,7 +155,9 @@
             - [x] estimate-ride
             - [x] list-drivers
     - [ ] ~~Testar escalabilidade dos serviços com HPA~~
-    - [ ] Validar tolerância a falhas (ex: restart de pods, falha no RabbitMQ)
+    - [ ] ~~Validar tolerância a falhas~~ 
+      - [ ] ~~Restart de pods~~
+      - [ ] ~~Falha no RabbitMQ~~
 - Observabilidade e Monitoramento
   - [ ] ~~Deploy do Prometheus e Grafana via Helm~~
   - [ ] ~~Deploy do Loki para logs + Fluent Bit~~
