@@ -10,6 +10,15 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
 
+    /**
+     * @var \Mockery\LegacyMockInterface|(\Mockery\MockInterface&RideCacheService)
+     */
+    protected \Mockery\MockInterface|RideCacheService|\Mockery\LegacyMockInterface $rideCacheServiceMock;
+    /**
+     * @var DriverCacheService|\Mockery\LegacyMockInterface|\Mockery\MockInterface|(\Mockery\MockInterface&DriverCacheService)
+     */
+    protected DriverCacheService|\Mockery\LegacyMockInterface|\Mockery\MockInterface $driverCacheServiceMock;
+
     public static function setUpBeforeClass(): void
     {
         // Fallback for IDE when it is not configured properly
@@ -21,35 +30,47 @@ abstract class TestCase extends BaseTestCase
 
     }
 
-    public function mockRideCacheService(): \Mockery\LegacyMockInterface
+
+
+    public function mockRideCacheService():void
     {
+        $this->rideCacheServiceMock =$this->getRideCacheService();
 
-        $rideCacheServiceMock = \Mockery::mock(RideCacheService::class)->makePartial();
-        $rideCacheServiceMock
-            ->shouldReceive('getDriverId')
-            ->andReturn(null);
-        $rideCacheServiceMock->shouldReceive('addRideToStream');
+        $this->rideCacheServiceMock->shouldReceive('getDriverId')->andReturn(null);
+        $this->rideCacheServiceMock->shouldReceive('removeDriverFromCache');
+        $this->rideCacheServiceMock->shouldReceive('addRideToStream');
+        $this->rideCacheServiceMock->shouldReceive('availableDrivers');
+        $this->rideCacheServiceMock->shouldReceive('getDriverId');
 
-        $this->app->instance(RideCacheService::class, $rideCacheServiceMock);
 
-        return $rideCacheServiceMock;
+        $this->app->instance(RideCacheService::class, $this->rideCacheServiceMock);
+
+    }
+
+    public function mockDriverCacheService(): void
+    {
+        $this->driverCacheServiceMock = $this->getDriverCacheService();
+        $this->driverCacheServiceMock->shouldReceive('getDriver')->andReturn(null);
+        $this->driverCacheServiceMock->shouldReceive('addDriver');
+        $this->driverCacheServiceMock->shouldReceive('updateDriver');
+        $this->driverCacheServiceMock->shouldReceive('deleteDriver');
+
+        $this->app->instance(DriverCacheService::class, $this->driverCacheServiceMock);
     }
 
     /**
-     * @return DriverCacheService|(DriverCacheService&\Mockery\MockInterface&object&\Mockery\LegacyMockInterface)|(\Mockery\MockInterface&object&\Mockery\LegacyMockInterface)
+     * @return \Mockery\LegacyMockInterface|(\Mockery\MockInterface&DriverCacheService)
      */
-    public function mockDriverCacheService()
+    public function getDriverCacheService(): \Mockery\LegacyMockInterface|\Mockery\MockInterface|DriverCacheService
     {
-        $driverCacheServiceMock = \Mockery::mock(DriverCacheService::class)->makePartial();
-        $driverCacheServiceMock
-            ->shouldReceive('getDriver')
-            ->andReturn(null);
-        $driverCacheServiceMock->shouldReceive('addDriver');
-        $driverCacheServiceMock->shouldReceive('updateDriver');
-        $driverCacheServiceMock->shouldReceive('deleteDriver');
+        return \Mockery::mock(DriverCacheService::class)->makePartial();
+    }
 
-        $this->app->instance(DriverCacheService::class, $driverCacheServiceMock);
-
-        return $driverCacheServiceMock;
+    /**
+     * @return \Mockery\LegacyMockInterface|(\Mockery\MockInterface&RideCacheService)
+     */
+    public function getRideCacheService()
+    {
+        return \Mockery::mock(RideCacheService::class)->makePartial();
     }
 }
