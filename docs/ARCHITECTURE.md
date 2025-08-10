@@ -558,6 +558,13 @@ Para aumentar a confiabilidade das entregas e possibilitar validações progress
 
 Essa estrutura de CI/CD está alinhada às melhores práticas de DevOps e oferece uma base sólida para escalar o projeto com segurança, velocidade e qualidade contínua.
 
+### Exemplos
+Por exemplo eu faria algo parecido com isso porém para EKS usando comandos do helm ou o skaffold:
+https://github.com/andersoncontreira/distributed-n8n-services-template/blob/main/buildspec.yaml
+
+Para as Github Actions faria algo assim:
+https://github.com/andersoncontreira/serverless-python-template/tree/main/.github/workflows
+
 
  
 ## Desenvolvimento e Testes
