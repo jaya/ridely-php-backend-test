@@ -3,63 +3,51 @@
 namespace Tests\Helpers;
 
 use App\Converters\DriverConverter;
+use App\Converters\RideConverter;
 use App\Enums\RideStatusEnum;
 use App\Models\Ride;
+use Faker\Factory as Faker;
 
 class RideHelper
 {
-    public static function getRidesListSample(): array
+    public static function getRideListSample(int $count = 5): array
     {
+        $faker = Faker::create();
+        $drivers = [];
+
+        for ($i = 1; $i <= $count; $i++) {
+            $drivers[] = static::getRideSample($i);
+        }
+
+        return $drivers;
+    }
+
+    public static function getRideSample($id = null): array
+    {
+        $faker = Faker::create();
+
         return [
-//            ['id' => 1, 'name' => 'John Doe'],
-//            ['id' => 2, 'name' => 'Jane Smith']
+            'id' => $id ?? $faker->unique()->numberBetween(1, 1000),
+            'status' => $faker->randomElement(array_map(fn($case) => $case->value, RideStatusEnum::cases())),
+            'pick_up' => $faker->streetAddress(),
+            'drop_off' => $faker->streetAddress(),
+            'passenger' => [
+                'name' => $faker->name,
+                'email' => $faker->email,
+            ]
         ];
     }
 
-    public static function getRidesSample(): array
-    {
-        return [
-//            'id' => 1,
-//            'name' => 'John Doe',
-//            'car' => [
-//                'license_plate' => 'XYZ1234',
-//                'model' => 'Tesla Model S',
-//                'color' => 'Black',
-//            ],
-//            'available' => true,
-        ];
-    }
-
-    public static function getRidesModelListSample(): array
+    public static function getRideModelListSample(): array
     {
         $newData = [];
-//        $data = static::getRidesListSample();
-//        foreach ($data as $driver) {
-//            $newData[] = DriverConverter::convertFromArrayToModel($driver);
-//        }
+        $data = static::getRideListSample();
+        foreach ($data as $ride) {
+            $newData[] = RideConverter::convertFromArrayToModel($ride);
+        }
 
         return $newData;
     }
 
-    /**
-     * @param string|null $pickUp
-     * @param string|null $dropOff
-     * @return Ride|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model
-     */
-    public static function createRide(string $pickUp = null, string $dropOff = null)
-    {
-        if (!$pickUp) {
-            $pickUp = "Avenida Beira Mar, 25";
-        }
-        if (!$dropOff) {
-            $dropOff = "Avenida Euclides Figueiredo, 65";
-        }
 
-
-        return Ride::factory()->create([
-            'status' => RideStatusEnum::REQUESTED->value,
-            'pick_up' => $pickUp,
-            'drop_off' => $dropOff,
-        ]);
-    }
 }

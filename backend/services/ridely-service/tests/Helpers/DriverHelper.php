@@ -3,28 +3,34 @@
 namespace Tests\Helpers;
 
 use App\Converters\DriverConverter;
+use Faker\Factory as Faker;
 
 class DriverHelper
 {
-    public static function getDriversListSample(): array
+    public static function getDriversListSample(int $count = 5): array
     {
-        return [
-            ['id' => 1, 'name' => 'John Doe'],
-            ['id' => 2, 'name' => 'Jane Smith']
-        ];
+        $drivers = [];
+
+        for ($i = 1; $i <= $count; $i++) {
+            $drivers[] = static::getDriverSample($i);
+        }
+
+        return $drivers;
     }
 
-    public static function getDriverSample(): array
+    public static function getDriverSample($id = null): array
     {
+        $faker = Faker::create();
+
         return [
-            'id' => 1,
-            'name' => 'John Doe',
+            'id' => $id ?? $faker->unique()->numberBetween(1, 1000),
+            'name' => $faker->name,
             'car' => [
-                'license_plate' => 'XYZ1234',
-                'model' => 'Tesla Model S',
-                'color' => 'Black',
+                'license_plate' => strtoupper($faker->bothify('???####')), // Ex: ABC1234
+                'model' => $faker->randomElement(['Tesla Model S', 'Toyota Corolla', 'Ford Focus', 'Honda Civic']),
+                'color' => $faker->safeColorName,
             ],
-            'available' => true,
+            'available' => $faker->boolean(80), // 80% chance de estar disponível
         ];
     }
 
