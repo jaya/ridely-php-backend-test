@@ -2,6 +2,9 @@
 
 namespace Tests\Integration;
 
+use App\Models\Ride;
+use Database\Seeders\DriverSeeder;
+use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -13,11 +16,14 @@ class RideSuccessScenarioTest extends IntegrationTestCase
     /**
      * Prepare the database before each test
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         // Reset database for a clean state
         Artisan::call('migrate:fresh');
+
+        $this->seed(DriverSeeder::class);
+        $this->seed(PricingRulesSeeder::class);
     }
 
     /**

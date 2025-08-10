@@ -13,7 +13,7 @@ class RideEstimateSuccessScenarioTest extends IntegrationTestCase
     /**
      * Prepare the database before each test
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         // Reset database for a clean state

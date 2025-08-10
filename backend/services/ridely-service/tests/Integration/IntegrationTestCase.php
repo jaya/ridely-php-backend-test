@@ -4,35 +4,19 @@ namespace Tests\Integration;
 
 use App\Services\DriverCacheService;
 use App\Services\RideCacheService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Redis;
 use Tests\TestCase;
 
 class IntegrationTestCase extends TestCase
 {
-
-    protected function setUp(): void
+    use RefreshDatabase;
+    public function setUp(): void
     {
         parent::setUp();
-
-        // Mocks to prevent the usage of cache
-        $rideCacheServiceMock = \Mockery::mock(RideCacheService::class)->makePartial();
-        $rideCacheServiceMock
-            ->shouldReceive('getDriverId')
-            ->andReturn(null);
-
-        $this->app->instance(RideCacheService::class, $rideCacheServiceMock);
-
-        $driverCacheServiceMock = \Mockery::mock(DriverCacheService::class);
-        $driverCacheServiceMock
-            ->shouldReceive('getDriver')
-            ->andReturn(null);
-        $driverCacheServiceMock->shouldReceive('addDriver');
-        $driverCacheServiceMock->shouldReceive('updateDriver');
-
-        $this->app->instance(DriverCacheService::class, $driverCacheServiceMock);
-
+        $this->mockRideCacheService();
+        $this->mockDriverCacheService();
     }
-
 
     /**
      * @return \Illuminate\Testing\TestResponse
