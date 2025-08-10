@@ -2,10 +2,35 @@
 
 namespace App\Converters;
 
+use App\Enums\RideStatusEnum;
+use App\Models\Driver;
 use App\Models\Ride;
 
 class RideConverter
 {
+    public static function convertFromArrayToModel(array $data)
+    {
+        $ride = new Ride();
+        $ride->id = $data['id'] ?? null;
+        $ride->driver_id = $data['driver_id'] ?? null;
+        $ride->pick_up = $data['pick_up'] ?? null;
+        $ride->drop_off = $data['drop_off'] ?? null;
+
+        if (isset($data['passenger'])) {
+            $ride->passenger_name = $data['passenger']['name'] ?? null;
+            $ride->passenger_email = $data['passenger']['email'] ?? null;
+        }
+        if($data['status']){
+            $ride->status =  RideStatusEnum::tryFrom($data['status']);
+        }
+
+        $ride->created_at = $data['created_at'] ?? null;
+        $ride->updated_at = $data['updated_at'] ?? null;
+
+
+        return $ride;
+    }
+
     public static function convertFromArrayToResponse(array $ride): array
     {
         $response =  [

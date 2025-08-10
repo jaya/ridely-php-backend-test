@@ -26,10 +26,12 @@ class DriverService extends AbstractService implements DriverServiceInterface
     private DriverCacheService $driverCacheService;
 
     public function __construct(
+        Driver $driver,
         DriverValidator $validator,
         DriverCacheService $driverCacheService
     )
     {
+        $this->driverModel = $driver;
         $this->validator = $validator;
         $this->driverCacheService = $driverCacheService;
     }
@@ -42,18 +44,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
             $this->checkDatabase();
 
             $data = $criteria->toArray();
-            try {
-                return Driver::create([
-                    'name' => $data['name'],
-                    'car_license_plate' => $data['car']['license_plate'],
-                    'car_model' => $data['car']['model'],
-                    'car_color' => $data['car']['color'],
-                    'available' => $data['available'] ?? true,
-                ]);
-            } catch (QueryException $e) {
-                Log::error($e->getMessage());
-                throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, [], $e);
-            }
+            return $this->createDriver($data);
         } else {
             $this->exception = $this->validator->getException();
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
@@ -68,9 +59,7 @@ class DriverService extends AbstractService implements DriverServiceInterface
             $this->checkDatabase();
 
             try {
-                // TODO aplicar cache service
-                //$driverCacheService
-                return Driver::allDrivers($criteria);
+                return $this->driverModel->allDrivers($criteria);
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
                 throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_LIST_DRIVERS, ["criteria" => $criteria->toArray()], $e);
@@ -100,7 +89,8 @@ class DriverService extends AbstractService implements DriverServiceInterface
     {
         if ($this->validator->validateDelete($id)) {
             try {
-                $driver = Driver::findOrFail($id);
+                //$driver = Driver::findOrFail($id);
+                $driver = $this->driverModel->findOrFail($id);
                 $deleted = $driver->delete();
 
                 if (!$deleted) {
@@ -171,5 +161,27 @@ class DriverService extends AbstractService implements DriverServiceInterface
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
         }
 
+    }
+
+    /**
+     * @param array $data
+     * @return mixed
+     * @throws ServiceException
+     */
+    private function createDriver(array $data)
+    {
+        try {
+            Log::debug("Creating driver on the database");
+            return $this->driverModel->create([
+                'name' => $data['name'],
+                'car_license_plate' => $data['car']['license_plate'],
+                'car_model' => $data['car']['model'],
+                'car_color' => $data['car']['color'],
+                'available' => $data['available'] ?? true,
+            ]);
+        } catch (QueryException $e) {
+            Log::error($e->getMessage());
+            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_DRIVER, [], $e);
+        }
     }
 }

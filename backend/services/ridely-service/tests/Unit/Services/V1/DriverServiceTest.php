@@ -21,7 +21,6 @@ use Tests\Unit\UnitTestCase;
 
 class DriverServiceTest extends UnitTestCase
 {
-    use RefreshDatabase;
     private ListCriteria $criteria;
 
     private DriverService $service;
@@ -32,7 +31,7 @@ class DriverServiceTest extends UnitTestCase
     /**
      * @throws Exception
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

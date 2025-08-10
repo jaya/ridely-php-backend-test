@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\RedisStreamsEnum;
+use App\Exceptions\ServiceException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use App\Models\Driver;
@@ -13,32 +15,31 @@ class RideCacheService
     /**
      * @var array|\class-string[]
      */
-    private array $context;
+    protected static array $context = [];
 
     public function __construct(DriverCacheService $driverCacheService)
     {
         $this->driverCacheService = $driverCacheService;
-        $this->context = [
-            "class" => self::class
-        ];
+
     }
+
     /**
      * Get the next available driver from cache or DB as fallback.
      */
     public function getNextAvailableDriver(): ?Driver
     {
-        Log::info("Fetching next available driver from cache.", $this->context);
+        Log::info("Fetching next available driver from cache.", $this->context());
         // Try getting the first driver from cache
         $driverId = $this->getDriverId();
 
         // If cache is empty, reload from database
         if (!$driverId) {
-            Log::debug("No available drivers found in cache, refreshing from database.", $this->context);
+            Log::debug("No available drivers found in cache, refreshing from database.", $this->context());
             $this->refreshCacheFromDatabase();
             return null;
         }
 
-        Log::debug("Found available driver ID $driverId in cache.", $this->context);
+        Log::debug("Found available driver ID $driverId in cache.", $this->context());
         $driver = $this->driverCacheService->getDriver($driverId);
         if (!$driver) {
             $this->driverCacheService->refreshCacheFromDatabase();
@@ -53,8 +54,15 @@ class RideCacheService
      */
     public function removeDriverFromCache(int $driverId): void
     {
-        Log::info("Removing driver ID $driverId from cache.", $this->context);
-        Redis::zRem($this->availableDriversCacheKey, $driverId);
+        Log::info("Removing driver ID $driverId from cache.", $this->context());
+        try {
+            Redis::zRem($this->availableDriversCacheKey, $driverId);
+        } catch (\Throwable $e) {
+            $ex = ServiceException::cacheOperationFailure($e->getMessage());
+            Log::error($ex->getMessage());
+            throw $ex;
+        }
+
     }
 
     /**
@@ -62,7 +70,14 @@ class RideCacheService
      */
     public function addDriverToCache(Driver $driver): void
     {
-        Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
+        try {
+
+            Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
+        } catch (\Throwable $e) {
+            $ex = ServiceException::cacheOperationFailure($e->getMessage());
+            Log::error($ex->getMessage());
+            throw $ex;
+        }
     }
 
     /**
@@ -70,7 +85,7 @@ class RideCacheService
      */
     public function refreshCacheFromDatabase(): void
     {
-        Log::info("Refreshing available drivers cache from database.", $this->context);
+        Log::info("Refreshing available drivers cache from database.", $this->context());
 
         $this->availableDrivers();
 
@@ -81,13 +96,21 @@ class RideCacheService
      */
     public function availableDrivers(): void
     {
+        Log::info("Fetching available drivers from the DB");
         $drivers = Driver::where('available', true)
             ->orderBy('activation_date', 'asc')
             ->get(['id', 'activation_date']);
 
-        foreach ($drivers as $driver) {
-            Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
+        try {
+            foreach ($drivers as $driver) {
+                Redis::zAdd($this->availableDriversCacheKey, strtotime($driver->activation_date), $driver->id);
+            }
+        } catch (\Throwable $e) {
+            $ex = ServiceException::cacheOperationFailure($e->getMessage());
+            Log::error($ex->getMessage());
+            throw $ex;
         }
+
     }
 
     /**
@@ -95,7 +118,48 @@ class RideCacheService
      */
     public function getDriverId(): mixed
     {
-        $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
-        return $driverId;
+        try {
+            $driverId = Redis::zRange($this->availableDriversCacheKey, 0, 0)[0] ?? null;
+            return $driverId;
+        } catch (\Throwable $e) {
+            $ex = ServiceException::cacheOperationFailure($e->getMessage());
+            Log::error($ex->getMessage());
+            throw $ex;
+        }
+
+    }
+
+    /**
+     * @param $ride
+     * @return void
+     */
+    public function addRideToStream($ride): void
+    {
+        try {
+            Redis::xadd(RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value, '*', [
+                'ride_id' => $ride->id,
+                'estimate_id' => $ride->estimate->id,
+                'pick_up' => $ride->pick_up,
+                'drop_off' => $ride->drop_off,
+                'timestamp' => now()->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {
+            $ex = ServiceException::cacheOperationFailure($e->getMessage());
+            Log::error($ex->getMessage());
+            throw $ex;
+        }
+
+    }
+
+    private function context()
+    {
+        if (!self::$context) {
+            self::$context = [
+                "class" => self::class
+            ];
+        }
+
+        return self::$context;
+
     }
 }

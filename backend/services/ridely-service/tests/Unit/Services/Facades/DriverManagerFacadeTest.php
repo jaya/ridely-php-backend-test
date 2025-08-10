@@ -57,7 +57,7 @@ class DriverManagerFacadeTest extends UnitTestCase
         $this->assertEquals('GET', $links['self']['method']);
     }
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 

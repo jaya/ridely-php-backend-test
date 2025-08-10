@@ -2,6 +2,8 @@
 
 namespace App\Converters;
 
+use App\Enums\RideStatusEnum;
+use App\Models\Ride;
 use App\Models\RideEstimate;
 
 class RideEstimateConverter
@@ -19,6 +21,20 @@ class RideEstimateConverter
     public static function convertFromModelToResponse(RideEstimate $ride): array
     {
         return self::convertFromArrayToResponse($ride->toArray());
+    }
+
+    public static function convertFromArrayToModel($data)
+    {
+        $rideEstimate = new RideEstimate();
+        $rideEstimate->id = $data['id'] ?? null;
+        $rideEstimate->distance_km = $data['distance_km'] ?? null;
+        $rideEstimate->duration_min = $data['duration_min'] ?? null;
+        $rideEstimate->price_estimate = $data['price_estimate'] ?? null;
+        $rideEstimate->created_at = $data['created_at'] ?? null;
+        $rideEstimate->updated_at = $data['updated_at'] ?? null;
+
+
+        return $rideEstimate;
     }
 
 }

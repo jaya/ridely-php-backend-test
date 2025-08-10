@@ -5,58 +5,63 @@ namespace Tests\Unit\Http\Controllers;
 use App\Enums\ErrorMessagesEnum;
 use App\Enums\RideEstimateStatusEnum;
 use App\Enums\RideStatusEnum;
-use App\Http\Middleware\ValidateKeycloakJwt;
 use App\Models\Driver;
+use App\Models\PricingRule;
 use App\Models\Ride;
 use App\Models\RideEstimate;
 use App\Services\JWTKeysService;
 use App\Services\RideCacheService;
-use Database\Seeders\DriverSeeder;
-use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Log;
+use Tests\Helpers\DriverHelper;
 use Tests\Helpers\LocationHelper;
+use Tests\Helpers\PricingRuleHelper;
+use Tests\Helpers\RideEstimateHelper;
+use Tests\Helpers\RideHelper;
 use Tests\Helpers\TokenHelper;
 use Tests\Unit\UnitTestCase;
 
 class RideControllerTest extends UnitTestCase
 {
-    use RefreshDatabase;
-
-    private $locationServiceUrl;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->withoutMiddleware(ThrottleRequests::class);
-        $this->withoutMiddleware(ValidateKeycloakJwt::class);
-
         $this->locationServiceUrl = env('LOCATION_SERVICE_URL', 'https://nominatim.openstreetmap.org/search');
 
-        $this->seed(DriverSeeder::class);
-        $this->seed(PricingRulesSeeder::class);
+        $this->mockRideCacheService();
+        $this->mockRideService($this->rideCacheServiceMock);
+        $locationService = $this->mockLocationService($this->locationServiceUrl);
+        $this->mockRideEstimateService($locationService);
+
     }
 
     public function testShowWithoutDriverSuccess()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        // Arrange
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        $ride = Ride::create([
-            'passenger_name' => 'Jane Smith',
-            'passenger_email' => 'jane@example.com',
-            'pick_up' => '123 Main St',
-            'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED->value
-        ]);
+        $sample = RideHelper::getRideSample();
+        $rideId = $sample['id'];
 
+        $fakeRide = $this->createModelMockWithData(Ride::class, $sample);
 
+        $this->rideModelMock->shouldReceive('findRide')
+            ->once()
+            ->andReturn($fakeRide);
+
+        // Act
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->get("/api/v1/rides/{$ride->id}");
+            ->get("/api/v1/rides/{$rideId}");
 
+
+        // Assert
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'success',
@@ -79,35 +84,36 @@ class RideControllerTest extends UnitTestCase
 
     public function testShowWithDriverSuccess()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        // Arrange
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        $driver = Driver::create([
-            'name' => 'John Doe',
-            'car_license_plate' => 'ABC123',
-            'car_model' => 'Toyota Corolla',
-            'car_color' => 'Blue',
-            'available' => true
-        ]);
-        //TODO usar helper
+        $driverSample = DriverHelper::getDriverSample();
+        $driverSample['available'] = true;
+        $fakeDriver = $this->createModelMockWithData(Driver::class, $driverSample);
 
-        $ride = Ride::create([
-            'passenger_name' => 'Jane Smith',
-            'passenger_email' => 'jane@example.com',
-            'pick_up' => '123 Main St',
-            'drop_off' => '456 Park Ave',
-            'status' => RideStatusEnum::REQUESTED->value
-        ]);
+        $sample = RideHelper::getRideSample();
+        $sample['status'] = RideStatusEnum::REQUESTED->value;
+        $fakeRide = $this->createModelMockWithData(Ride::class, $sample);
 
-        $ride->accept($driver);
+        $this->rideModelMock->shouldReceive('findRide')
+            ->once()
+            ->andReturn($fakeRide);
 
-        $rideId = $ride->id;
+        $fakeRide->accept($fakeDriver);
+        $rideId = $sample['id'];
 
-
+        // Act
         $response = $this->withHeader('Authorization', "Bearer $token")
             ->get("/api/v1/rides/{$rideId}");
 
+        // Assert
         $response->assertStatus(200);
+        //Only assert the full body of the response in the integration tests
         $response->assertJsonStructure([
             'success',
             'label',
@@ -118,14 +124,6 @@ class RideControllerTest extends UnitTestCase
                 'status',
                 'pick_up',
                 'drop_off',
-                'driver' => [
-                    'name',
-                    'car' => [
-                        'license_plate',
-                        'model',
-                        'color',
-                    ],
-                ],
             ],
         ]);
 
@@ -145,18 +143,40 @@ class RideControllerTest extends UnitTestCase
      */
     public function testEstimateRideSuccess()
     {
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
 
-        // Mock the external calls
+        // Arrange
         $this->mockCalls();
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        $ride = $this->createRideWithRideEstimation();
-        $rideId = $ride->id;
 
+        $fakeRide = $this->createRideWithRideEstimation();
+
+        $fakeRule = $this->createPricingRule();
+
+        $this->rideModelMock->shouldReceive('findRide')
+            ->once()
+            ->andReturn($fakeRide);
+
+        $this->rideEstimateModelMock->shouldReceive('findRideEstimate')
+            ->once()
+            ->andReturn($fakeRide->estimate);
+
+        $this->pricingRuleModelMock->shouldReceive('filterRuleBasedOnTime')
+            ->withAnyArgs()
+            ->once()
+            ->andReturn($fakeRule);
+
+        $rideId = $fakeRide->id;
+
+        // Act
         $response = $this->withHeader('Authorization', "Bearer $token")
             ->postJson("/api/v1/rides/$rideId/estimate-ride");
 
+        // Assert
         $response->assertStatus(201);
         $response->assertJsonStructure([
             'success',
@@ -211,16 +231,16 @@ class RideControllerTest extends UnitTestCase
 
     public function testRequestDriverSuccess()
     {
-
         Log::info(
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arrange
         $this->mockTokenValidation();
         $token = TokenHelper::getFakeToken();
 
-        $drivers = Driver::factory()->count(5)->create();
-        $fakeDriver = $drivers[0];
+        $sample = DriverHelper::getDriverSample();
+        $fakeDriver = $this->createModelMockWithData(Driver::class, $sample);
 
         $data = [
             'pick_up' => LocationHelper::$pickUp,
@@ -230,15 +250,21 @@ class RideControllerTest extends UnitTestCase
                 'email' => 'john.doe@example.com',
             ]
         ];
-        // Mock do serviço de cache
-        $rideCacheServiceMock = \Mockery::mock(RideCacheService::class);
-        $rideCacheServiceMock
+
+
+        $this->rideCacheServiceMock
             ->shouldReceive('getNextAvailableDriver')
             ->once()
             ->andReturn($fakeDriver);
 
-        // Injeta o mock no container do Laravel
-        $this->app->instance(RideCacheService::class, $rideCacheServiceMock);
+        $fakeRide = $this->createRideWithRideEstimation();
+        $fakeRide->status = null;
+        $fakeRide->estimate->shouldReceive('create')->once()
+            ->andReturn($fakeRide->estimate);
+
+        $this->rideModelMock->shouldReceive('create')
+            ->once()
+            ->andReturn($fakeRide);
 
 
         $response = $this->withHeader('Authorization', "Bearer $token")
@@ -255,28 +281,8 @@ class RideControllerTest extends UnitTestCase
                 'status',
                 'pick_up',
                 'drop_off',
-                'driver' => [
-                    'name',
-                    'car' => [
-                        'license_plate',
-                        'model',
-                        'color',
-                    ],
-                    'available',
-                ],
-                'estimate' => [
-                    'status',
-                    'distance_km',
-                    'duration_min',
-                    'price_estimate',
-                ],
             ],
         ]);
-//
-//        $dataObject = $response->json();
-//        $data = $dataObject['data'];
-//
-//        $this->assertResponse($data);
     }
 
     private function mockTokenValidation(): void
@@ -308,6 +314,9 @@ class RideControllerTest extends UnitTestCase
         LocationHelper::mockCall($this->locationServiceUrl, LocationHelper::$pickUp, LocationHelper::getDatasourceDataForPickUpSuccessResponse());
         LocationHelper::mockCall($this->locationServiceUrl, LocationHelper::$dropOff, LocationHelper::getDatasourceDataForDropOffSuccessResponse());
     }
+
+
+
 
     private function mockFailCalls()
     {
@@ -347,19 +356,38 @@ class RideControllerTest extends UnitTestCase
     /**
      * @return Ride|Collection|Model
      */
-    public function createRideWithRideEstimation(): Ride|Collection|Model
+    public function createRideWithRideEstimation(RideStatusEnum $statusEnum = null): Ride|Collection|Model
     {
-        $ride = Ride::factory()->create([
-            "pick_up" => LocationHelper::$pickUp,
-            "drop_off" => LocationHelper::$dropOff,
-        ]);
-        $estimate = RideEstimate::create([
-            'ride_id' => $ride->id,
-            'status' => RideEstimateStatusEnum::PENDING,
-        ]);
+        $fakeRideEstimate = $this->createRideEstimate();
 
-        $ride->estimate()->save($estimate);
-        return $ride;
+        $sample = RideHelper::getRideSample();
+        $sample['status'] = $statusEnum ? $statusEnum->value : null;
+        $fakeRide = $this->createModelMockWithData(Ride::class, $sample);
+
+        $fakeRide->shouldReceive('estimate')
+            ->andReturn($fakeRideEstimate);
+        $fakeRide->estimate = $fakeRideEstimate;
+
+        return $fakeRide;
+    }
+
+    private function createPricingRule()
+    {
+        $ruleSample = PricingRuleHelper::getPricingRuleSample();
+        $fakeRule = $this->createModelMockWithData(PricingRule::class, $ruleSample);
+        return $fakeRule;
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function createRideEstimate(): mixed
+    {
+        $rideEstimateSample = RideEstimateHelper::getRideEstimateSample();
+        $rideEstimateSample['status'] = RideEstimateStatusEnum::PENDING->value;
+        $fakeRideEstimate = $this->createModelMockWithData(RideEstimate::class, $rideEstimateSample);
+        return $fakeRideEstimate;
     }
 
 

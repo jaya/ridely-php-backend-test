@@ -12,7 +12,7 @@ use App\Models\RideEstimate;
 use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
-use App\Services\V1\EstimateRideService;
+use App\Services\V1\RideEstimateService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;

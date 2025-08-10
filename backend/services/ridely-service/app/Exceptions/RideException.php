@@ -13,6 +13,11 @@ class RideException extends ApplicationException
         return new self(ErrorMessagesEnum::RIDE_NOT_FOUND, Response::HTTP_NOT_FOUND);
     }
 
+    public static function rideEstimateNotFound(): RideException
+    {
+        return new self(ErrorMessagesEnum::RIDE_ESTIMATE_NOT_FOUND, Response::HTTP_NOT_FOUND);
+    }
+
     public static function invalidState($message): RideException
     {
         return new self(ErrorMessagesEnum::RIDE_INVALID_STATE, Response::HTTP_BAD_REQUEST, $message);

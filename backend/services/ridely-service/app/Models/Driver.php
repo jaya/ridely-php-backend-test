@@ -63,11 +63,6 @@ class Driver extends Model
 
     public function getOpenRides(ListCriteria $criteria): LengthAwarePaginator
     {
-//        return $this->rides()
-//            ->where('status', RideStatusEnum::REQUESTED)
-//            ->get();
-        //$query = self::query();
-
         $query = $this->rides()->newQuery();
         if ($criteria->fields) {
             $query->select($criteria->fields);
@@ -83,10 +78,9 @@ class Driver extends Model
         return $query->paginate($perPage, ['*'], 'page', $currentPage);
     }
 
-    // TODO modificar para não ficar estático
-    public static function allDrivers(ListCriteria $criteria): LengthAwarePaginator
+    public function allDrivers(ListCriteria $criteria): LengthAwarePaginator
     {
-        $query = self::query();
+        $query = $this->rides()->newQuery();
         if ($criteria->fields) {
             $query->select($criteria->fields);
         }

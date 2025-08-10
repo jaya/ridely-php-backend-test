@@ -10,19 +10,22 @@ use App\Models\RideEstimate;
 use App\Services\AbstractService;
 use App\Services\Interfaces\EstimateRideServiceInterface;
 use App\Services\Interfaces\LocationServiceInterface;
-use App\Validators\EstimateRideValidator;
+use App\Validators\RideEstimateValidator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class EstimateRideService extends AbstractService implements EstimateRideServiceInterface
+class RideEstimateService extends AbstractService implements EstimateRideServiceInterface
 {
 
     protected ValidationException $exception;
-    private EstimateRideValidator $validator;
+    private RideEstimateValidator $validator;
     private LocationServiceInterface $locationService;
 
-    public function __construct(EstimateRideValidator $validator, LocationServiceInterface $locationService)
+    private RideEstimate $rideEstimateModel;
+
+    public function __construct(RideEstimate $rideEstimateModel, RideEstimateValidator $validator, LocationServiceInterface $locationService)
     {
+        $this->rideEstimateModel = $rideEstimateModel;
         $this->validator = $validator;
         $this->locationService = $locationService;
     }
@@ -101,7 +104,9 @@ class EstimateRideService extends AbstractService implements EstimateRideService
     {
         if ($this->validator->validateId($id)) {
             try {
-                return RideEstimate::findOrFail($id);
+                Log::debug("Searching for the RideEstimate with ID: $id");
+
+                return $this->rideEstimateModel->findRideEstimate($id);
             } catch (\Throwable $e) {
                 Log::error($e->getMessage());
                 return null;

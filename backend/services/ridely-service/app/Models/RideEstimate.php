@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Enums\RideEstimateStatusEnum;
+use App\Exceptions\RideException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class RideEstimate extends Model
 {
@@ -52,5 +54,21 @@ class RideEstimate extends Model
     {
         $this->status = $status;
         $this->save();
+    }
+
+    public function findRideEstimate(int $id, $loaded = false): RideEstimate
+    {
+        try {
+            if (!$loaded) {
+                return $this->findOrFail($id);
+            }
+
+            return $this->findOrFail($id);
+            //return $this->with(['?'])->findOrFail($id);
+
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            throw RideException::rideEstimateNotFound();
+        }
     }
 }

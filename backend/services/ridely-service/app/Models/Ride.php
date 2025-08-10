@@ -147,13 +147,14 @@ class Ride extends Model
         }
     }
 
-    public function find(int $id, $loaded = false): Ride
+    public function findRide(int $id, $loaded = false): Ride
     {
         try {
             if (!$loaded) {
-                return self::findOrFail($id);
+                return $this->findOrFail($id);
             }
-            return self::with(['driver', 'estimate'])->findOrFail($id);
+
+            return $this->with(['driver', 'estimate'])->findOrFail($id);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             throw RideException::notFound();

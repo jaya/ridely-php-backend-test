@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Driver;
 use App\Models\PricingRule;
 use App\Models\Ride;
+use App\Models\RideEstimate;
 use App\Observers\DriverObserver;
 use App\Services\DriverCacheService;
 use App\Services\Facades\DriverManagerFacade;
@@ -15,12 +16,12 @@ use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\Interfaces\RideServiceInterface;
 use App\Services\RideCacheService;
 use App\Services\V1\DriverService;
-use App\Services\V1\EstimateRideService;
+use App\Services\V1\RideEstimateService;
 use App\Services\V1\LocationService;
 use App\Services\V1\RideService;
 use App\Services\V2\V2DriverService;
 use App\Validators\DriverValidator;
-use App\Validators\EstimateRideValidator;
+use App\Validators\RideEstimateValidator;
 use App\Validators\LocationValidator;
 use App\Validators\RideValidator;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
                     $app->make(DriverValidator::class),
                 ),
                 default => new DriverService(
+                    $app->make(Driver::class),
                     $app->make(DriverValidator::class),
                     $app->make(DriverCacheService::class)
                 ),
@@ -77,10 +79,11 @@ class AppServiceProvider extends ServiceProvider
            );
         });
 
-        $this->app->bind(EstimateRideServiceInterface::class, EstimateRideService::class);
-        $this->app->singleton(EstimateRideService::class, function ($app) {
-            return new EstimateRideService(
-                $app->make(EstimateRideValidator::class),
+        $this->app->bind(EstimateRideServiceInterface::class, RideEstimateService::class);
+        $this->app->singleton(RideEstimateService::class, function ($app) {
+            return new RideEstimateService(
+                $app->make(RideEstimate::class),
+                $app->make(RideEstimateValidator::class),
                 $app->make(LocationServiceInterface::class),
             );
         });

@@ -31,6 +31,8 @@ enum ErrorMessagesEnum: int
 
     case SERVICE_NOT_IMPLEMENTED = 26;
 
+    case CACHE_OPERATION_FAILURE = 27;
+
     // Driver errors 41 - 60
     case UNABLE_TO_CREATE_DRIVER = 41;
     case UNABLE_TO_UPDATE_DRIVER = 42;
@@ -80,6 +82,7 @@ enum ErrorMessagesEnum: int
             self::INVALID_TOKEN => 'common.error.invalid_token',
             self::MISSING_BEARER_TOKEN => 'common.error.missing_bearer',
             self::SERVICE_NOT_IMPLEMENTED => 'common.error.service_not_implemented',
+            self::CACHE_OPERATION_FAILURE => 'common.error.cache_operation_failure',
 
             self::UNABLE_TO_CREATE_DRIVER =>  'common.error.unable_to_create_driver',
             self::UNABLE_TO_UPDATE_DRIVER => 'common.error.unable_to_update_driver',
@@ -120,6 +123,7 @@ enum ErrorMessagesEnum: int
             self::INVALID_TOKEN => 'Invalid token: %s',
             self::MISSING_BEARER_TOKEN => 'Missing bearer token',
             self::SERVICE_NOT_IMPLEMENTED => 'This service is not implemented yet.',
+            self::CACHE_OPERATION_FAILURE => 'Cache operation failure: %s',
 
             self::UNABLE_TO_CREATE_DRIVER => 'Unable to create driver.',
             self::UNABLE_TO_UPDATE_DRIVER => 'Unable to update driver.',

@@ -57,4 +57,9 @@ class ServiceException extends ApplicationException
     {
         return new ServiceException(ErrorMessagesEnum::SERVICE_TEMPORARILY_UNAVAILABLE, Response::HTTP_SERVICE_UNAVAILABLE, $message, [], $previous);
     }
+
+    public static function cacheOperationFailure($message, Throwable $previous = null): ServiceException
+    {
+        return new ServiceException(ErrorMessagesEnum::CACHE_OPERATION_FAILURE, Response::HTTP_INTERNAL_SERVER_ERROR, $message, [], $previous);
+    }
 } 

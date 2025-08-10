@@ -34,16 +34,16 @@ use PHPUnit\Exception;
 
 class RideService extends AbstractService implements RideServiceInterface
 {
-    private Ride $ride;
+    private Ride $rideModel;
 
     protected ValidationException $exception;
     private RideValidator $validator;
     private LocationServiceInterface $locationService;
     private RideCacheService $rideCacheService;
 
-    public function __construct(Ride $ride, RideValidator $validator, LocationServiceInterface $locationService, RideCacheService $rideCacheService)
+    public function __construct(Ride $rideModel, RideValidator $validator, LocationServiceInterface $locationService, RideCacheService $rideCacheService)
     {
-        $this->ride = $ride;
+        $this->rideModel = $rideModel;
         $this->validator = $validator;
         $this->locationService = $locationService;
         $this->rideCacheService = $rideCacheService;
@@ -56,7 +56,7 @@ class RideService extends AbstractService implements RideServiceInterface
     {
         if ($this->validator->validateId($id)) {
             Log::debug("Searching for the ride with ID: $id");
-            return $this->ride->find($id, true);
+            return $this->rideModel->findRide($id, true);
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
@@ -73,7 +73,7 @@ class RideService extends AbstractService implements RideServiceInterface
 
             $driver = $this->rideCacheService->getNextAvailableDriver();
 
-            if( !$driver) {
+            if (!$driver) {
                 $driver = Driver::getNextAvailableDriver();
             }
 
@@ -96,17 +96,7 @@ class RideService extends AbstractService implements RideServiceInterface
                 Log::debug("==================================================");
                 DB::beginTransaction();
 
-                Log::debug("Creating ride on the database");
-                /**
-                 * @var Ride $ride
-                 */
-                $ride = Ride::create([
-                    'passenger_name' => $fields['passenger']['name'],
-                    'passenger_email' => $fields['passenger']['email'],
-                    'pick_up' => $fields['pick_up'],
-                    'drop_off' => $fields['drop_off'],
-                    'driver_id' => $driverId
-                ]);
+                $ride = $this->createRide($fields, $driverId);
 
                 Log::debug("Creating ride-estimate on the database");
                 $ride->estimate()->create([
@@ -166,13 +156,7 @@ class RideService extends AbstractService implements RideServiceInterface
     {
         Log::info('Publishing ride estimate to Redis stream', ['ride_id' => $ride->id]);
 
-        Redis::xadd(RedisStreamsEnum::RIDE_ESTIMATES_STREAM->value, '*', [
-            'ride_id' => $ride->id,
-            'estimate_id' => $ride->estimate->id,
-            'pick_up' => $ride->pick_up,
-            'drop_off' => $ride->drop_off,
-            'timestamp' => now()->toIso8601String(),
-        ]);
+        $this->rideCacheService->addRideToStream($ride);
 
     }
 
@@ -184,7 +168,7 @@ class RideService extends AbstractService implements RideServiceInterface
 
             // TODO incluir transaction
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id, true);
+            $ride = $this->rideModel->findRide($id, true);
 
             try {
                 $driver = $this->findDriverOrFail($ride);
@@ -213,7 +197,7 @@ class RideService extends AbstractService implements RideServiceInterface
             $this->checkDatabase();
 
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id);
+            $ride = $this->rideModel->findRide($id);
 
             $driver = $this->findDriverOrFail($ride);
 
@@ -254,7 +238,7 @@ class RideService extends AbstractService implements RideServiceInterface
             try {
 
                 Log::debug("Listing rides without driver");
-                return $this->ride->withoutDriver($criteria);
+                return $this->rideModel->withoutDriver($criteria);
 
             } catch (QueryException $e) {
                 Log::error($e->getMessage());
@@ -271,7 +255,7 @@ class RideService extends AbstractService implements RideServiceInterface
     {
         if ($this->validator->validateId($id)) {
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id);
+            $ride = $this->rideModel->findRide($id);
             $ride->delete();
             return true;
         } else {
@@ -287,7 +271,7 @@ class RideService extends AbstractService implements RideServiceInterface
             $this->checkDatabase();
 
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id);
+            $ride = $this->rideModel->findRide($id);
             $ride->refuse();
             return $ride;
 
@@ -304,13 +288,35 @@ class RideService extends AbstractService implements RideServiceInterface
             $this->checkDatabase();
 
             Log::debug("Searching for the ride with ID: $id");
-            $ride = $this->ride->find($id);
+            $ride = $this->rideModel->findRide($id);
             $ride->finish();
             return $ride;
 
         } else {
             Log::error(sprintf("Validation error: %s", $this->exception->getMessage()));
             throw ServiceException::invalidRequestParam($this->exception->getMessage(), ['rideId' => $id], $this->exception);
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @param mixed $driverId
+     * @return Ride
+     */
+    public function createRide(array $fields, mixed $driverId): Ride
+    {
+        try {
+            Log::debug("Creating ride on the database");
+            return $this->rideModel->create([
+                'passenger_name' => $fields['passenger']['name'],
+                'passenger_email' => $fields['passenger']['email'],
+                'pick_up' => $fields['pick_up'],
+                'drop_off' => $fields['drop_off'],
+                'driver_id' => $driverId
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error($e->getMessage());
+            throw ServiceException::queryException(ErrorMessagesEnum::UNABLE_TO_CREATE_RIDE, [], $e);
         }
     }
 }
