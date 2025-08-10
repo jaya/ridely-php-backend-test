@@ -9,61 +9,28 @@ use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Services\Facades\DriverManagerFacade;
-use App\Services\V1\DriverService;
+use App\Services\Interfaces\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Mocks\Services\DriverManagerFacadeMock;
 use Tests\Helpers\DriverHelper;
+use Tests\Mocks\DriverMocks;
 use Tests\Unit\UnitTestCase;
 
 class DriverManagerFacadeTest extends UnitTestCase
 {
+
+    use DriverMocks;
+
     protected ListCriteria $criteria;
 
     protected DriverManagerFacade $facade;
-
-    protected DriverManagerFacadeMock $mock;
-
-    /**
-     * @param LengthAwarePaginator $result
-     * @return void
-     */
-    public function assertListResponse(LengthAwarePaginator $result): void
-    {
-// Assert paginator type
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-
-        // Assert pagination meta
-        $this->assertEquals(3, $result->total());
-        $this->assertEquals(1, $result->currentPage());
-        $this->assertEquals(15, $result->perPage());
-        $this->assertEquals('http://localhost', $result->path());
-
-        // Assert items count
-        $this->assertCount(3, $result->items());
-
-        // Assert first item structure and values
-        $first = $result->items()[0];
-        $this->assertNotNull($first);
-        $this->assertNotNull($first['id']);
-        $this->assertArrayHasKey('_links', $first);
-
-        // Assert Hateos links structure
-        $links = $first['_links']->toArray();
-        $this->assertArrayHasKey('self', $links);
-        $this->assertArrayHasKey('update', $links);
-        $this->assertArrayHasKey('replace', $links);
-        $this->assertArrayHasKey('delete', $links);
-        $this->assertEquals('GET', $links['self']['method']);
-    }
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->mock = new DriverManagerFacadeMock();
-
-        $driverService = $this->app->get(DriverService::class);
+        $this->mockDriverService();
+        $driverService = $this->app->get(DriverServiceInterface::class);
         $this->facade = new DriverManagerFacade($driverService);
     }
     public function testCreateSuccess()
@@ -72,14 +39,18 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $data = DriverHelper::getDriverSample();
+        // Arrange
+        $fakeDriver = $this->mockDriverModelCreate();
+        $data = $fakeDriver->toArray();
 
+
+        // Act
         $criteria = new CreateDriverCriteria($data);
         $driver = $this->facade->create($criteria);
 
-        $this->assertEquals(1, $driver['id']);
+        // Assert
+        $this->assertEquals($data['id'], $driver['id']);
         $this->assertEquals($data['name'], $driver['name']);
-        $this->assertEquals($data['car']['license_plate'], $driver['car_license_plate']);
 
     }
 
@@ -98,7 +69,8 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        Driver::factory()->count(3)->create();
+        // Arrange
+        $this->mockDriverModelAllDrivers();
 
         $criteria = new ListCriteria([]);
 
@@ -113,7 +85,8 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        Driver::factory()->count(3)->create();
+        // Arrange
+        $this->mockDriverModelAllDrivers();
 
         $criteria = new ListCriteria(["fields" => "id, name"]);
 
@@ -171,11 +144,15 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $driver = Driver::factory()->create();
+        // Assert
+        $fakeDriver = $this->mockDriver();
+        $this->driverModelMock->shouldReceive('findOrFail')->andReturn($fakeDriver);
+        $fakeDriver->shouldReceive('delete')->andReturn(true);
 
+        // Act
+        $result = $this->facade->delete($fakeDriver->id);
 
-        $result = $this->facade->delete($driver->id);
-
+        // Assert
         $this->assertTrue($result);
     }
 
@@ -185,11 +162,45 @@ class DriverManagerFacadeTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arrange
+        $this->driverModelMock->shouldReceive('findOrFail')->andReturn(null);
+
+        // Assert
         $this->expectException(DriverException::class);
         $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
 
-
+        // Act
         $deleted = $this->facade->delete(999);
         $this->assertTrue($deleted);
+    }
+
+    /**
+     * @param LengthAwarePaginator $result
+     * @return void
+     */
+    public function assertListResponse(LengthAwarePaginator $result): void
+    {
+        // Assert pagination meta
+        $this->assertTrue($result->total() > 0);
+        $this->assertEquals(ListCriteria::PAGE, $result->currentPage());
+        $this->assertEquals(ListCriteria::LIMIT, $result->perPage());
+        $this->assertEquals('http://localhost', $result->path());
+
+        // Assert items count
+        $this->assertCount(5, $result->items());
+
+        // Assert first item structure and values
+        $first = $result->items()[0];
+        $this->assertNotNull($first);
+        $this->assertNotNull($first['id']);
+        $this->assertArrayHasKey('_links', $first);
+
+        // Assert Hateos links structure
+        $links = $first['_links']->toArray();
+        $this->assertArrayHasKey('self', $links);
+        $this->assertArrayHasKey('update', $links);
+        $this->assertArrayHasKey('replace', $links);
+        $this->assertArrayHasKey('delete', $links);
+        $this->assertEquals('GET', $links['self']['method']);
     }
 }

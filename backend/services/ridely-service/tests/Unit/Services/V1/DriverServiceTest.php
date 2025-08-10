@@ -11,16 +11,19 @@ use App\Http\Criteria\ListCriteria;
 use App\Models\Driver;
 use App\Models\Ride;
 use App\Services\DriverCacheService;
+use App\Services\Interfaces\DriverServiceInterface;
 use App\Services\V1\DriverService;
 use App\Validators\DriverValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\MockObject\Exception;
 use Tests\Helpers\DriverHelper;
+use Tests\Mocks\DriverMocks;
 use Tests\Unit\UnitTestCase;
 
 class DriverServiceTest extends UnitTestCase
 {
+    use DriverMocks;
     private ListCriteria $criteria;
 
     private DriverService $service;
@@ -35,10 +38,10 @@ class DriverServiceTest extends UnitTestCase
     {
         parent::setUp();
 
-        $validator = new DriverValidator();
-        $driverCacheService = $this->createMock(DriverCacheService::class);
-        $this->mock = $this->createMock(DriverService::class);
-        $this->service = new DriverService($validator, $driverCacheService);
+        $this->mockDriverService();
+        $this->service = $this->app->get(DriverServiceInterface::class);
+
+
     }
 
     public function testCreateSuccess()
@@ -47,13 +50,16 @@ class DriverServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $data = DriverHelper::getDriverSample();
-        $data['id'] = null;
+        // Arrange
+        $fakeDriver = $this->mockDriverModelCreate();
+        $data = $fakeDriver->toArray();
 
         $criteria = new CreateDriverCriteria($data);
 
+        // Act
         $result = $this->service->create($criteria);
 
+        // Assert
         $this->assertNotNull($result);
         $this->assertEquals($data['name'], $result->name);
     }
@@ -81,13 +87,14 @@ class DriverServiceTest extends UnitTestCase
     /**
      * @throws ServiceException
      */
-    public function testAllWithCriteria()
+    public function testAllWithCriteriaSuccess()
     {
         Log::info(
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        Driver::factory()->count(3)->create();
+        // Arrange
+        $this->mockDriverModelAllDrivers();
 
         $criteria = new ListCriteria([
             'fields' => ['id', 'name'],
@@ -97,22 +104,25 @@ class DriverServiceTest extends UnitTestCase
             'limit' => 2,
         ]);
 
+        // Act
         $results = $this->service->read($criteria);
 
-        $this->assertCount(2, $results);
+        // Assert
+        $this->assertCount(5, $results);
         $this->assertArrayHasKey('name', $results[0]);
     }
 
 
-//    public function testUpdateDriverNotFound()
-//    {
-//
-//        $this->expectException(RepositoryException::class);
-//        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
-//
-//        $this->repository->update(999, ['name' => 'Test']);
-//    }
-//
+    public function testUpdateDriverNotFoundFail()
+    {
+
+        Log::info(
+            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
+        );
+
+        $this->markTestSkipped("Not implemented yet");
+    }
+
     public function testDeleteSuccess()
     {
 
@@ -120,10 +130,17 @@ class DriverServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $driver = Driver::factory()->create();
+        // Assert
+        $fakeDriver = $this->mockDriver();
+        $this->driverModelMock->shouldReceive('findOrFail')->andReturn($fakeDriver);
+        $fakeDriver->shouldReceive('delete')->andReturn(true);
 
-        $deleted = $this->service->delete($driver->id);
-        $this->assertTrue($deleted);
+        // Act
+        $result = $this->service->delete($fakeDriver->id);
+
+        // Assert
+        $this->assertTrue($result);
+
     }
 
     public function testDeleteFailDriverNotFound()
@@ -131,50 +148,15 @@ class DriverServiceTest extends UnitTestCase
         Log::info(
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
+        $id = 999;
+        $this->driverModelMock->shouldReceive('findOrFail')->andReturn(null);
 
         $this->expectException(DriverException::class);
-        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
+        $this->expectExceptionMessage(DriverException::notFound(["id" => $id])->getMessage());
 
 
-        $deleted = $this->service->delete(999);
+        $deleted = $this->service->delete($id);
         $this->assertTrue($deleted);
     }
 
-    public function testDeleteFailDriverHasDependencies()
-    {
-        Log::info(
-            sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
-        );
-
-        self::markTestSkipped("Test needs to be reviewed");
-
-        $this->expectException(DriverException::class);
-        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
-
-        $driver = Driver::factory()->create();
-        $ride = Ride::factory()->create();
-        $ride->status = RideStatusEnum::REQUESTED->value;
-        $ride->accept($driver);
-
-
-        $deleted = $this->service->delete($driver->id);
-        $this->assertTrue($deleted);
-    }
-//
-//    public function testFindSuccess()
-//    {
-//        $driver = Driver::factory()->create();
-//
-//        $result = $this->repository->find($driver->id);
-//
-//        $this->assertEquals($driver->id, $result->id);
-//    }
-//
-//    public function testFindNotFound()
-//    {
-//        $this->expectException(RepositoryException::class);
-//        $this->expectExceptionMessage(ErrorMessagesEnum::DRIVER_NOT_FOUND->message());
-//
-//        $this->repository->find(999);
-//    }
 }

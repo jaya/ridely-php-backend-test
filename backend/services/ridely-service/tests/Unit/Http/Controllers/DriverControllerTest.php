@@ -2,21 +2,15 @@
 
 namespace Tests\Unit\Http\Controllers;
 
-use App\Converters\DriverConverter;
-use App\Models\Driver;
-use App\Models\Ride;
-use App\Services\DriverCacheService;
-use App\Services\Interfaces\DriverServiceInterface;
-use App\Services\V1\DriverService;
-use App\Validators\DriverValidator;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Tests\Helpers\DriverHelper;
 use Tests\Helpers\TokenHelper;
+use Tests\Mocks\DriverMocks;
 use Tests\Unit\UnitTestCase;
 
 class DriverControllerTest extends UnitTestCase
 {
+
+    use DriverMocks;
 
     public function setUp(): void
     {
@@ -37,21 +31,7 @@ class DriverControllerTest extends UnitTestCase
         );
 
         // Arrange
-        $sampleList = DriverHelper::getDriversModelListSample();
-        $paginator =  new LengthAwarePaginator(
-            $sampleList,
-            count($sampleList),
-            16,
-            1,
-            [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
-        $this->driverModelMock->shouldReceive('allDrivers')
-            ->withAnyArgs()
-            ->once()
-            ->andReturn($paginator);
+        $this->mockDriverModelAllDrivers();
 
         $token = TokenHelper::getFakeToken();
 
@@ -86,18 +66,14 @@ class DriverControllerTest extends UnitTestCase
         );
 
         // Arrange
-        $sample = DriverHelper::getDriverSample();
-        $fakeDriver = $this->createModelMockWithData(Driver::class, $sample);
-
-        $this->driverModelMock->shouldReceive('create')
-            ->once()
-            ->andReturn($fakeDriver);
+        $fakeDriver = $this->mockDriverModelCreate();
+        $data = $fakeDriver->toArray();
 
         $token = TokenHelper::getFakeToken();
-        unset($sample['id']);
+        unset($data['id']);
 
         // Act
-        $response = $this->withHeader('Authorization', "Bearer $token")->post('/api/v1/drivers', $sample);
+        $response = $this->withHeader('Authorization', "Bearer $token")->post('/api/v1/drivers', $data);
 
         // Assert
         $response->assertStatus(201);
@@ -125,8 +101,5 @@ class DriverControllerTest extends UnitTestCase
         $this->assertEquals($fakeDriver->id, $data['id']);
 
     }
-
-
-
 
 }

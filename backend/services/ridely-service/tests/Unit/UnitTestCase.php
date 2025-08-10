@@ -151,7 +151,7 @@ class UnitTestCase extends TestCase
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function mockLocationService($locationServiceUrl): LocationService
+    public function mockLocationService($locationServiceUrl = null): LocationService
     {
         $this->pricingRuleModelMock = $this->getPricingRuleModelMock();
         $locationService = new LocationService(

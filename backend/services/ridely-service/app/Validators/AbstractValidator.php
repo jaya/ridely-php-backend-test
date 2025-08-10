@@ -48,8 +48,6 @@ abstract class AbstractValidator
     protected function commonValidator(array $data, array $rules, $errorMessage): bool
     {
         $result = true;
-        Log::debug("commonValidator data called");
-
         if (empty($data)) {
             $this->exception = ValidationException::withMessages([$errorMessage]);
             $result = false;

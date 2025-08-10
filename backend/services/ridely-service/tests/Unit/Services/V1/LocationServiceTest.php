@@ -3,29 +3,29 @@
 namespace Tests\Unit\Services\V1;
 
 use App\Exceptions\RideException;
-use App\Models\PricingRule;
+use App\Services\Interfaces\LocationServiceInterface;
 use App\Services\V1\LocationService;
-use App\Validators\LocationValidator;
 use Carbon\Carbon;
-use Database\Seeders\PricingRulesSeeder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Tests\Helpers\LocationHelper;
+use Tests\Helpers\PricingRuleHelper;
+use Tests\Mocks\PricingRuleMocks;
 use Tests\Unit\UnitTestCase;
 
 class LocationServiceTest extends UnitTestCase
 {
 
+    use PricingRuleMocks;
+
     protected LocationService $service;
     public function setUp(): void
     {
         parent::setUp();
-        $this->validator = new LocationValidator();
-        $this->pricingRule = $this->app->make(PricingRule::class);
-        $this->service = new LocationService($this->pricingRule, $this->validator);
+        $this->mockLocationService();
+        $this->service = $this->app->get(LocationServiceInterface::class);
 
-        $this->seed(PricingRulesSeeder::class);
     }
     public function testGetCoordinatesFromAddressWithSuccess()
     {
@@ -33,19 +33,17 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arrange
         $address = LocationHelper::$pickUp;
-
         $this->mockCalls(LocationHelper::getDatasourceDataForDropOffSuccessResponse());
 
-
-
+        // Act
         $result = $this->service->getCoordinatesFromAddress($address);
 
+        // Assert
         $this->assertIsArray($result);
         $this->assertNotEmpty($result['lat']);
         $this->assertNotEmpty($result['lon']);
-//        $this->assertEquals(-10.8819106, $result['lat']);
-//        $this->assertEquals(-37.0808969, $result['lon']);
     }
 
     public function testGetCoordinatesFromAddressUsingCacheWithSuccess()
@@ -55,10 +53,10 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        //Assert
         $address = LocationHelper::$pickUp;
         $lat = -10.8819106;
         $lon = -37.0808969;
-
         $this->mockCalls(LocationHelper::getDatasourceDataForDropOffSuccessResponse());
 
         Cache::shouldReceive('remember')
@@ -67,11 +65,12 @@ class LocationServiceTest extends UnitTestCase
                 'lat' => $lat,
                 'lon' => $lon,
             ]);
-        
+
+        // Act
         $result = $this->service->getCoordinatesFromAddress($address);
 
+        // Assert
         $this->assertIsArray($result);
-
         $this->assertEquals($lat, $result['lat']);
         $this->assertEquals($lon, $result['lon']);
     }
@@ -83,10 +82,13 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arrange
         $this->mockCalls([]);
 
-
+        // Act
         $result = $this->service->getCoordinatesFromAddress('Some address');
+
+        // Assert
         if (LocationService::MOCK_RESPONSE) {
             $this->assertNotEmpty($result['lat']);
             $this->assertNotEmpty($result['lon']);
@@ -102,11 +104,14 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arramge
         $this->mockCalls([['lat' => '-10.9472']]);
 
 
+        // Act
         $result = $this->service->getCoordinatesFromAddress('Some address');
 
+        // Assert
         if (LocationService::MOCK_RESPONSE) {
             $this->assertNotEmpty($result['lat']);
             $this->assertNotEmpty($result['lon']);
@@ -121,12 +126,8 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $validator = $this->createMock(LocationValidator::class);
-        $validator->method('validate')->willReturn(true);
-
-        $service = new LocationService($this->pricingRule, $validator);
-
-        $this->assertTrue($service->validate('Aracaju, SE'));
+        // Assert
+        $this->assertTrue($this->service->validate('Aracaju, SE'));
     }
 
     public function testValidateFailWithNullAddress()
@@ -135,16 +136,8 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
-        $exception = $this->createMock(ValidationException::class);
-
-        $validator = $this->createMock(LocationValidator::class);
-        $validator->method('validate')->willReturn(false);
-        $validator->method('getException')->willReturn($exception);
-
-        $service = new LocationService($this->pricingRule, $validator);
-
-        $this->assertFalse($service->validate(''));
-        $this->assertInstanceOf(ValidationException::class, $service->getException());
+        $this->assertFalse($this->service->validate(''));
+        $this->assertInstanceOf(ValidationException::class, $this->service->getException());
     }
 
 
@@ -205,11 +198,19 @@ class LocationServiceTest extends UnitTestCase
             sprintf("Testing the method %s with parameters: %s", __METHOD__, json_encode(func_get_args()))
         );
 
+        // Arrange
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 6, 30)); // antes das 7h
 
+        $data = PricingRuleHelper::getPricingRuleFlag2();
+        $pricingRule = $this->mockPricingRule($data);
+        $this->mockPricingRuleModelFilterRuleBasedOnTime($pricingRule);
+
         $distanceKm = 10;
+
+        // Act
         $price = $this->service->calculatePrice($distanceKm);
 
+        // Assert
         $this->assertEquals(41.00, $price);
     }
 
@@ -220,6 +221,10 @@ class LocationServiceTest extends UnitTestCase
         );
 
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 8, 0)); // 8h
+
+        $data = PricingRuleHelper::getPricingRuleFlag1();
+        $pricingRule = $this->mockPricingRule($data);
+        $this->mockPricingRuleModelFilterRuleBasedOnTime($pricingRule);
 
         $distanceKm = 10;
         $price = $this->service->calculatePrice($distanceKm);
@@ -236,6 +241,10 @@ class LocationServiceTest extends UnitTestCase
 
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 14, 0)); // 14h
 
+        $data = PricingRuleHelper::getPricingRuleDefault();
+        $pricingRule = $this->mockPricingRule($data);
+        $this->mockPricingRuleModelFilterRuleBasedOnTime($pricingRule);
+
         $distanceKm = 5;
         $price = $this->service->calculatePrice($distanceKm);
 
@@ -250,18 +259,12 @@ class LocationServiceTest extends UnitTestCase
 
         Carbon::setTestNow(Carbon::create(2025, 8, 5, 14, 0));
 
-        $pricingRuleMock = $this->createMock(PricingRule::class);
-        $pricingRuleMock->expects($this->once())
-            ->method('filterRuleBasedOnTime')
-            ->withAnyParameters()
-            ->willReturn(null);
-
+        $this->mockPricingRuleModelFilterRuleBasedOnTime(null);
 
         $this->expectException(RideException::class);
 
         $distanceKm = 5;
-        $service = new LocationService($pricingRuleMock, $this->validator);
-        $service->calculatePrice($distanceKm);
+        $this->service->calculatePrice($distanceKm);
     }
 
 

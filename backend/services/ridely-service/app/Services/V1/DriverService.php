@@ -89,8 +89,10 @@ class DriverService extends AbstractService implements DriverServiceInterface
     {
         if ($this->validator->validateDelete($id)) {
             try {
-                //$driver = Driver::findOrFail($id);
                 $driver = $this->driverModel->findOrFail($id);
+                if (!$driver) {
+                    throw new ModelNotFoundException();
+                }
                 $deleted = $driver->delete();
 
                 if (!$deleted) {

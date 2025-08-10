@@ -2,15 +2,13 @@
 
 namespace App\Services\Facades;
 
+use App\Exceptions\ServiceException;
 use App\Http\Criteria\Driver\CreateDriverCriteria;
 use App\Http\Criteria\ListCriteria;
-use App\Http\Criteria\Ride\CreateRideCriteria;
 use App\Http\Hateos\HateosHelper;
-use App\Http\Hateos\HateosItemLinks;
 use App\Models\Driver;
 use App\Services\Interfaces\DriverServiceInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class DriverManagerFacade
 {
@@ -29,11 +27,12 @@ class DriverManagerFacade
 
     public function read($id)
     {
+        throw ServiceException::notImplemented();
     }
 
     public function update()
     {
-
+        throw ServiceException::notImplemented();
     }
 
     public function delete($id)
@@ -44,7 +43,7 @@ class DriverManagerFacade
 
     public function softDelete($id)
     {
-
+        throw ServiceException::notImplemented();
     }
 
     public function list(ListCriteria $criteria):LengthAwarePaginator
