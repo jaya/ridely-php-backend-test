@@ -94,22 +94,20 @@ Sua solução deve considerar:
 
 ---
 
-## 📆 Entrega
+## 📋 Entrega
 
-1. Faça um **fork do repositório oficial** que será fornecido.
-2. Crie uma **branch com seu nome** no padrão: `nome_sobrenome`.
-3. Submeta um **Pull Request para a branch `main`** com:
-   - Título: `Entrega - nome_sobrenome`
-   - Corpo do PR contendo:
-     - Nome completo
-     - Data da entrega
-     - Observações (se desejar)
-4. Certifique-se de que o repositório contenha:
-   - A feature obrigatória funcional
-   - `ARCHITECTURE.md`
-   - `SCALABILITY.md`
-   - Testes
-   - Documentação técnica relevante
+Para padronizar a entrega e facilitar a análise:
+
+1. Faça um **fork deste repositório** para sua conta pessoal do GitHub.
+2. Crie uma **branch com seu nome em snake_case** (exemplo: `joao_silva_souza`).
+3. Suba sua solução utilizando **commits organizados e descritivos**.
+4. Após finalizar:
+   - Certifique-se de que o repositório esteja **público**
+   - Envie o link do seu fork para nossa equipe com:
+     - **Título:** `Entrega - joao_silva_souza`
+     - **Descrição:** Nome completo, data da entrega e quaisquer observações que julgar relevantes.
+
+> ✅ **Dica**: Você pode incluir um arquivo `THOUGHTS.md` com decisões técnicas, ideias descartadas e sugestões de melhoria.
 
 ---
 
